@@ -2142,6 +2142,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     // 7. SATELLITE UPLINK & SUPABASE REALTIME CLOUD PERSISTENCE
     // =========================================================================
     const SUPABASE_CONFIG_KEY = 'cso_supabase_config';
+    const terminalNodeId = 'node_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
     let supabaseClient = null;
     let syncConfig = {
       url: 'https://wdjswfiiyywamzyhpnwl.supabase.co',
@@ -2291,7 +2292,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         updateSyncUI('SYNCING');
         const payload = {
           pin: syncConfig.pin,
-          state: state,
+          state: Object.assign({}, state, { _originNodeId: terminalNodeId }),
           bio_state: bioState,
           updated_at: new Date().toISOString()
         };
@@ -2379,18 +2380,20 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
             table: 'operator_terminal',
             filter: `pin=eq.${syncConfig.pin}`
           }, (payload) => {
-            if (payload.new && payload.new.state && !isSyncing) {
-              state = Object.assign(state, payload.new.state);
+            if (payload.new && payload.new.state) {
+              // Ignore echo of our own transmissions
+              if (payload.new.state._originNodeId === terminalNodeId) return;
+              state = Object.assign({}, payload.new.state);
               if (payload.new.bio_state) {
-                bioState = Object.assign(bioState, payload.new.bio_state);
+                bioState = Object.assign({}, payload.new.bio_state);
                 localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(bioState));
               }
               localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
               renderHUD();
               renderCheckboxes();
               renderBioDeck();
-              showToast('REALTIME UPLINK', 'Telemetry synchronized from remote node.');
-              playTone(600, 'sine', 0.1, 0.05);
+              showToast('REMOTE SYNC', 'Telemetry updated from mobile/remote node.');
+              playTone(750, 'sine', 0.12, 0.08);
             }
           })
           .subscribe();
@@ -2398,6 +2401,20 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         console.warn('Realtime subscription error', e);
       }
     }
+
+    // Auto re-sync when waking device screen or focusing browser tab
+    window.addEventListener('focus', () => {
+      if (supabaseClient && syncConfig.pin) {
+        pullFromCloud(false);
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && supabaseClient && syncConfig.pin) {
+        pullFromCloud(false);
+        checkInactivityAtrophy();
+      }
+    });
 
     function copySupabaseSQL() {
       const code = document.getElementById('supabase-sql-code').textContent;
