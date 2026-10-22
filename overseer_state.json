@@ -83,10 +83,20 @@
         595333227,
         595333231,
         595333233
-      ]
+      ],
+      "todayTargets": [
+        "Hit a gym session (60 min heavy lifts & conditioning)",
+        "Complete first daily alignment journaling session",
+        "Execute at least 10 outreaches for Brand2Audience",
+        "Brand2Audience marketing agency outreach & pipeline"
+      ],
+      "habitProgress": {},
+      "awardedHabitXP": {},
+      "dailyHistory": [],
+      "dayStartXP": 50
     }
   },
-  "updated_at": "2026-10-22T10:53:00-04:00",
+  "updated_at": "2026-10-22T11:18:06.941253-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -102,10 +112,11 @@
     "closing_done": 0,
     "has_infra": false,
     "has_asset": false,
+    "habit_progress": {},
     "penalty_at_risk": 500,
     "xp": 50,
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": true
+  "server_polls_telegram": false
 }

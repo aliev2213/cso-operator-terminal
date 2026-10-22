@@ -2832,7 +2832,12 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       const defaults = {
         bootLockedDate: null,
         todayTargetsLocked: false,
+        todayTargets: [],
         nonNegotiables: { physical: '', mental: '', cash: '', agency: '' },
+        habitProgress: {},
+        awardedHabitXP: {},
+        dailyHistory: [],
+        dayStartXP: 0,
         middayCheckedDate: null,
         middayNote: '',
         debriefSubmittedDate: null,
@@ -2844,6 +2849,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         pendingAuditSlot: '07:00',
         lastBootAlertDate: null,
         lastMiddayAlertDate: null,
+        lastAfternoonAlertDate: null,
         lastDebriefAlertDate: null,
         journalLogs: [],
         auditLogs: [],
@@ -2866,6 +2872,14 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         { physical: '', mental: '', cash: '', agency: '' },
         (targetState.overseer && targetState.overseer.nonNegotiables) || {}
       );
+      if (!targetState.overseer.habitProgress || typeof targetState.overseer.habitProgress !== 'object') {
+        targetState.overseer.habitProgress = {};
+      }
+      if (!targetState.overseer.awardedHabitXP || typeof targetState.overseer.awardedHabitXP !== 'object') {
+        targetState.overseer.awardedHabitXP = {};
+      }
+      if (!Array.isArray(targetState.overseer.todayTargets)) targetState.overseer.todayTargets = [];
+      if (!Array.isArray(targetState.overseer.dailyHistory)) targetState.overseer.dailyHistory = [];
       if (!Array.isArray(targetState.overseer.journalLogs)) targetState.overseer.journalLogs = [];
       if (!Array.isArray(targetState.overseer.auditLogs)) targetState.overseer.auditLogs = [];
       if (!Array.isArray(targetState.overseer.chatHistory)) targetState.overseer.chatHistory = [];
@@ -3351,61 +3365,92 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     // =========================================================================
     // 8. OVERSEER HOLISTIC 4-DOMAIN EVALUATION & DISCIPLINE PENALTY ENGINE
     // =========================================================================
+    function getHabitRatio(hid) {
+      const completed = state.completedHabits || [];
+      if (completed.includes(hid)) return 1.0;
+      const hp = (state.overseer && state.overseer.habitProgress) || {};
+      const val = Number(hp[hid] || 0);
+      return Math.max(0, Math.min(1, isNaN(val) ? 0 : val));
+    }
+
     function evaluateHolisticDomains() {
       ensureOverseerState(state);
       const completed = state.completedHabits || [];
 
-      // DOMAIN 1: BIOLOGICAL PRIMING (Physical) — Gym + Morning Hydration
-      const hasGym = completed.includes('h_workout');
-      const hasHydration = completed.includes('h_wake');
-      const physicalScore = (hasGym ? 50 : 0) + (hasHydration ? 50 : 0);
-      const physicalLocked = physicalScore === 100;
+      // DOMAIN 1: BIOLOGICAL PRIMING (Physical) — Gym + Morning Hydration (supports partial ratios)
+      const gymRatio = getHabitRatio('h_workout');
+      const wakeRatio = getHabitRatio('h_wake');
+      const hasGym = gymRatio >= 1.0;
+      const hasHydration = wakeRatio >= 1.0;
+      const physicalScore = Math.min(100, Math.round(gymRatio * 50 + wakeRatio * 50));
+      const physicalLocked = physicalScore >= 100;
 
       // DOMAIN 2: COGNITIVE CALIBRATION (Mental/Mindset) — Journaling + Focus Walk
-      const hasJournal = completed.includes('h_journal');
-      const hasWalk = completed.includes('h_walk');
-      const mentalScore = (hasJournal ? 50 : 0) + (hasWalk ? 50 : 0);
-      const mentalLocked = mentalScore === 100;
+      const journalRatio = getHabitRatio('h_journal');
+      const walkRatio = getHabitRatio('h_walk');
+      const hasJournal = journalRatio >= 1.0;
+      const hasWalk = walkRatio >= 1.0;
+      const mentalScore = Math.min(100, Math.round(journalRatio * 50 + walkRatio * 50));
+      const mentalLocked = mentalScore >= 100;
 
-      // DOMAIN 3: TRACK 1 (The Runway Engine — Immediate Cash)
+      // DOMAIN 3: TRACK 1 (The Runway Engine — Immediate Cash, supports partial e.g. 15/30 DMs = 50%)
       const outreachIds = ['h_source', 'h_agency_dm', 'h_warm_network', 'h_loom'];
       const closingIds = ['h_inbox', 'h_stripe', 'h_deliver'];
-      const outreachDone = outreachIds.filter(id => completed.includes(id)).length;
-      const closingDone = closingIds.filter(id => completed.includes(id)).length;
+      const outreachRatios = outreachIds.map(id => getHabitRatio(id));
+      const closingRatios = closingIds.map(id => getHabitRatio(id));
+      const outreachDone = outreachRatios.filter(r => r >= 1.0).length;
+      const closingDone = closingRatios.filter(r => r >= 1.0).length;
       const totalCashHabits = outreachDone + closingDone;
-      // Domain 3 reaches 100% when at least 1 outreach + 1 closing/delivery (or >=3 Track 1 tasks) are executed
-      const cashScore = Math.min(100, Math.round((outreachDone > 0 ? 50 : 0) + (closingDone > 0 ? 50 : (outreachDone >= 3 ? 50 : (outreachDone / 4) * 50))));
+      const maxOutreachRatio = Math.max(0, ...outreachRatios);
+      const sumOutreachRatio = outreachRatios.reduce((a, b) => a + b, 0);
+      const maxClosingRatio = Math.max(0, ...closingRatios);
+
+      const outreachComponent = outreachDone >= 1 ? 50 : (maxOutreachRatio * 50);
+      const closingComponent = closingDone >= 1
+        ? 50
+        : Math.max(maxClosingRatio * 50, Math.min(50, (sumOutreachRatio / 3) * 50));
+      const nnCash = (((state.overseer && state.overseer.nonNegotiables) || {}).cash || '').trim();
+      const cashScore = (outreachDone === 0 && closingDone === 0 && maxOutreachRatio > 0)
+        ? Math.min(100, Math.round(Math.max(outreachComponent, maxOutreachRatio * (nnCash ? 100 : 50))))
+        : Math.min(100, Math.round(outreachComponent + closingComponent));
       const cashLocked = cashScore >= 100 || (outreachDone >= 2 && closingDone >= 1);
 
       // DOMAIN 4: TRACK 2 (Brand to Audience — Long-Term Agency)
-      const hasInfra = completed.includes('h_track2_infra');
-      const hasAsset = completed.includes('h_track2_asset');
-      const hasSunset = completed.includes('h_sunset');
-      const agencyScore = Math.min(100, (hasInfra ? 50 : 0) + (hasAsset ? 50 : (hasSunset ? 25 : 0)));
-      const agencyLocked = hasInfra && hasAsset;
+      const infraRatio = getHabitRatio('h_track2_infra');
+      const assetRatio = getHabitRatio('h_track2_asset');
+      const sunsetRatio = getHabitRatio('h_sunset');
+      const hasInfra = infraRatio >= 1.0;
+      const hasAsset = assetRatio >= 1.0;
+      const hasSunset = sunsetRatio >= 1.0;
+      const agencyScore = Math.min(100, Math.round(infraRatio * 50 + (assetRatio > 0 ? assetRatio * 50 : sunsetRatio * 25)));
+      const agencyLocked = agencyScore >= 100 || (hasInfra && hasAsset);
 
       // HOLISTIC DAILY MACHINE SCORE (0-100%, equal 25% weight across all 4 domains)
       const machineScore = Math.round((physicalScore * 0.25) + (mentalScore * 0.25) + (cashScore * 0.25) + (agencyScore * 0.25));
       const domainsCleared = [physicalLocked, mentalLocked, cashLocked, agencyLocked].filter(Boolean).length;
 
-      // DISCIPLINE PENALTY CALCULATION (Skipping Physical Gym or Mental Journaling drags down rank)
+      // DISCIPLINE PENALTY CALCULATION (Proportional to uncompleted self-maintenance)
       let penaltyAtRisk = 0;
       const missingReasons = [];
-      if (!hasGym) {
-        penaltyAtRisk += 150;
-        missingReasons.push('GYM (-150 XP)');
+      if (gymRatio < 1.0) {
+        const p = Math.round(150 * (1 - gymRatio));
+        penaltyAtRisk += p;
+        missingReasons.push(`GYM (-${p} XP)`);
       }
-      if (!hasHydration) {
-        penaltyAtRisk += 100;
-        missingReasons.push('HYDRATION (-100 XP)');
+      if (wakeRatio < 1.0) {
+        const p = Math.round(100 * (1 - wakeRatio));
+        penaltyAtRisk += p;
+        missingReasons.push(`HYDRATION (-${p} XP)`);
       }
-      if (!hasJournal) {
-        penaltyAtRisk += 150;
-        missingReasons.push('JOURNAL (-150 XP)');
+      if (journalRatio < 1.0) {
+        const p = Math.round(150 * (1 - journalRatio));
+        penaltyAtRisk += p;
+        missingReasons.push(`JOURNAL (-${p} XP)`);
       }
-      if (!hasWalk) {
-        penaltyAtRisk += 100;
-        missingReasons.push('FOCUS WALK (-100 XP)');
+      if (walkRatio < 1.0) {
+        const p = Math.round(100 * (1 - walkRatio));
+        penaltyAtRisk += p;
+        missingReasons.push(`FOCUS WALK (-${p} XP)`);
       }
 
       return {
@@ -3948,13 +3993,20 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       const phaseLabelMap = {
         boot: '07:00 Morning Target Setting',
         midday: '13:00 Midday Velocity Check',
+        afternoon: '16:00 Afternoon Velocity & Pace Check',
         debrief: '21:00 Night Audit'
       };
       const phaseLabel = phaseLabelMap[phase] || '13:00 Midday Velocity Check';
+      const d = evaluateHolisticDomains();
+      const expectedScore = phase === 'afternoon' ? 70 : (phase === 'midday' ? 45 : 0);
+      const isLagging = (phase === 'midday' || phase === 'afternoon') && (d.machineScore < expectedScore || !d.hasGym || d.cashScore < 50);
+      const lagNotice = isLagging
+        ? `WARNING: The operator is LAGGING BEHIND PACE (Machine Score: ${d.machineScore}% vs ${expectedScore}% expected; Physical: ${d.physicalScore}%, Cash: ${d.cashScore}%, Agency: ${d.agencyScore}%). Issue an immediate warning and demand a mid-day pulse report right now. `
+        : '';
       const prompt =
-        `You are OVERSEER. It is time for the ${phaseLabel}. ` +
-        `Review today's unconfirmed domains in overseer_state.json. ` +
-        `Send the operator a sharp, aggressive, conversational message (STRICTLY 2 TO 4 SENTENCES MAX) demanding their 3 Non-Negotiables or auditing their performance across the Command Bridge regimen. ` +
+        `You are OVERSEER. It is time for the ${phaseLabel}. ${lagNotice}` +
+        `Review today's locked targets and progress in overseer_state.json. ` +
+        `Send the operator a sharp, aggressive, conversational message (STRICTLY 2 TO 4 SENTENCES MAX) demanding their 3 Non-Negotiables or auditing their exact DM count, gym status, and asset shipping progress. ` +
         `Do not output numbered templates or static forms—speak directly and dynamically.`;
 
       const snapshot = buildLiveOverseerStateSnapshot();
@@ -3997,7 +4049,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       // Prevent duplicate automatic scheduled firing across multiple open browser tabs
       if (!isManual) {
         const dateNum = Number((state.date || '').replace(/\D/g, '')) || 20261022;
-        const phaseOffset = phase === 'boot' ? 700000000 : (phase === 'midday' ? 130000000 : 210000000);
+        const phaseOffset = phase === 'boot' ? 700000000 : (phase === 'midday' ? 130000000 : (phase === 'afternoon' ? 160000000 : 210000000));
         const scheduleClaimId = phaseOffset + dateNum;
         const claimed = await claimAtomicEventId(scheduleClaimId);
         if (!claimed) return;
@@ -4010,6 +4062,9 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       } else if (phase === 'midday') {
         title = '01:00 PM // MID-DAY VELOCITY CHECK';
         state.overseer.lastMiddayAlertDate = state.date;
+      } else if (phase === 'afternoon') {
+        title = '04:00 PM // AFTERNOON VELOCITY & PACE CHECK';
+        state.overseer.lastAfternoonAlertDate = state.date;
       } else if (phase === 'debrief') {
         title = '09:00 PM // NIGHT AUDIT';
         state.overseer.lastDebriefAlertDate = state.date;
@@ -4019,7 +4074,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       if (!msg) return;
 
       state.overseer.chatHistory.push({ role: 'assistant', content: msg });
-      state.overseer.chatHistory = state.overseer.chatHistory.slice(-24);
+      state.overseer.chatHistory = state.overseer.chatHistory.slice(-30);
 
       const liveDir = document.getElementById('overseer-live-directive');
       const phaseBadge = document.getElementById('overseer-phase-badge');
@@ -4058,20 +4113,83 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       }
     }
 
+    function performBrowserMidnightRollover(newDateStr) {
+      ensureOverseerState(state);
+      const prevDate = state.date || newDateStr;
+      if (prevDate && prevDate !== newDateStr) {
+        const d = evaluateHolisticDomains();
+        const curXp = state.xp || 0;
+        const startXp = state.overseer.dayStartXP || 0;
+        const archiveEntry = {
+          date: prevDate,
+          archived_at: new Date().toISOString(),
+          final_machine_score: d.machineScore,
+          physical_score: d.physicalScore,
+          mental_score: d.mentalScore,
+          cash_score: d.cashScore,
+          agency_score: d.agencyScore,
+          domains_cleared: d.domainsCleared,
+          completed_habits: [...(state.completedHabits || [])],
+          habit_progress: Object.assign({}, state.overseer.habitProgress || {}),
+          non_negotiables: Object.assign({}, state.overseer.nonNegotiables || {}),
+          today_targets: [...(state.overseer.todayTargets || [])],
+          end_xp: curXp,
+          xp_delta: curXp - startXp,
+          enforced_penalty_xp: state.overseer.enforcedPenaltyXP || 0
+        };
+        if (!state.overseer.dailyHistory.some(h => h && h.date === prevDate)) {
+          state.overseer.dailyHistory.unshift(archiveEntry);
+          state.overseer.dailyHistory = state.overseer.dailyHistory.slice(0, 90);
+        }
+      }
+      state.date = newDateStr;
+      state.completedHabits = [];
+      state.overseer.dayStartXP = state.xp || 0;
+      state.overseer.bootLockedDate = null;
+      state.overseer.todayTargetsLocked = false;
+      state.overseer.todayTargets = [];
+      state.overseer.nonNegotiables = { physical: '', mental: '', cash: '', agency: '' };
+      state.overseer.habitProgress = {};
+      state.overseer.awardedHabitXP = {};
+      state.overseer.middayCheckedDate = null;
+      state.overseer.middayNote = '';
+      state.overseer.lastMachineScore = 0;
+      state.overseer.unansweredPingCount = 0;
+      state.overseer.evasionPenaltyCountToday = 0;
+      state.overseer.pendingAuditSlot = '07:00';
+      state.overseer.awaitingOperatorReply = true;
+      saveState();
+      renderCheckboxes();
+      renderHUD();
+      renderOverseerDeck();
+      renderDate();
+    }
+
     function checkOverseerSchedule() {
       ensureOverseerState(state);
       const now = new Date();
       const hr = now.getHours();
       const min = now.getMinutes();
+      const todayIsoStr = now.toISOString().split('T')[0];
+
+      // 00:00 Midnight Target & State Rollover
+      if (state.date !== todayIsoStr || (hr === 0 && min === 0 && state.overseer.todayTargetsLocked)) {
+        performBrowserMidnightRollover(todayIsoStr);
+      }
+
       const today = state.date;
 
       // 07:00 AM Morning Target Setting (Dynamic LLM)
       if (hr === 7 && min === 0 && state.overseer.lastBootAlertDate !== today) {
         triggerOverseerAudit('boot', false);
       }
-      // 01:00 PM (13:00) Midday Velocity Check (Dynamic LLM)
+      // 01:00 PM (13:00) Midday Velocity Check #1 (Dynamic LLM)
       if (hr === 13 && min === 0 && state.overseer.lastMiddayAlertDate !== today) {
         triggerOverseerAudit('midday', false);
+      }
+      // 04:00 PM (16:00) Afternoon Velocity Check #2 (Dynamic LLM)
+      if (hr === 16 && min === 0 && state.overseer.lastAfternoonAlertDate !== today) {
+        triggerOverseerAudit('afternoon', false);
       }
       // 09:00 PM (21:00) Night Audit (Dynamic LLM)
       if (hr === 21 && min === 0 && state.overseer.lastDebriefAlertDate !== today) {
@@ -4330,19 +4448,68 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         });
         if (updatedAny) {
           state.overseer.nonNegotiables = curNn;
-          if (state.overseer.bootLockedDate !== state.date) {
+          state.overseer.todayTargets = ['physical', 'mental', 'cash', 'agency']
+            .map(k => (curNn[k] || '').trim())
+            .filter(Boolean);
+          const filled = state.overseer.todayTargets.length;
+          if (filled >= 3) {
+            state.overseer.todayTargetsLocked = true;
+            state.overseer.unansweredPingCount = 0;
+            state.overseer.awaitingOperatorReply = false;
+          }
+          if (state.overseer.bootLockedDate !== state.date && filled >= 3) {
             state.xp = (state.xp || 0) + 50;
             state.overseer.bootLockedDate = state.date;
           }
         }
       }
 
+      if (!state.overseer.habitProgress || typeof state.overseer.habitProgress !== 'object') {
+        state.overseer.habitProgress = {};
+      }
+      if (!state.overseer.awardedHabitXP || typeof state.overseer.awardedHabitXP !== 'object') {
+        state.overseer.awardedHabitXP = {};
+      }
+
+      // 1b. Partial habit progress (0.0 to 1.0)
+      const partialProg = toolData.partial_progress;
+      if (partialProg && typeof partialProg === 'object') {
+        Object.keys(partialProg).forEach(hid => {
+          if (!HABIT_XP_VALUES[hid]) return;
+          const ratio = Math.max(0, Math.min(1, Number(partialProg[hid]) || 0));
+          const prevRatio = Number(state.overseer.habitProgress[hid] || 0);
+          if (ratio > prevRatio) {
+            state.overseer.habitProgress[hid] = Number(ratio.toFixed(4));
+            const maxGain = HABIT_XP_VALUES[hid].gain;
+            const targetAwarded = Math.round(maxGain * ratio);
+            const prevAwarded = Number(state.overseer.awardedHabitXP[hid] || 0);
+            const deltaXP = targetAwarded - prevAwarded;
+            if (deltaXP > 0) {
+              state.xp = (state.xp || 0) + deltaXP;
+              state.overseer.awardedHabitXP[hid] = targetAwarded;
+            }
+            if (ratio >= 1.0 && !state.completedHabits.includes(hid)) {
+              state.completedHabits.push(hid);
+            }
+          }
+        });
+      }
+
       // 2. Completed habits
       const comp = Array.isArray(toolData.completed_habits) ? toolData.completed_habits : [];
       comp.forEach(hid => {
-        if (HABIT_XP_VALUES[hid] && !state.completedHabits.includes(hid)) {
-          state.completedHabits.push(hid);
-          state.xp = (state.xp || 0) + HABIT_XP_VALUES[hid].gain;
+        if (HABIT_XP_VALUES[hid]) {
+          if (!state.completedHabits.includes(hid)) {
+            state.completedHabits.push(hid);
+          }
+          state.overseer.habitProgress[hid] = 1.0;
+          const maxGain = HABIT_XP_VALUES[hid].gain;
+          const prevAwarded = Number(state.overseer.awardedHabitXP[hid] || 0);
+          const deltaXP = maxGain - prevAwarded;
+          if (deltaXP > 0) {
+            state.xp = (state.xp || 0) + deltaXP;
+          }
+          state.overseer.awardedHabitXP[hid] = maxGain;
         }
       });
 
@@ -4353,8 +4520,13 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
           const idx = state.completedHabits.indexOf(hid);
           if (idx !== -1) {
             state.completedHabits.splice(idx, 1);
-            state.xp = Math.max(0, (state.xp || 0) - HABIT_XP_VALUES[hid].gain);
           }
+          const prevAwarded = Number(state.overseer.awardedHabitXP[hid] || 0);
+          if (prevAwarded > 0) {
+            state.xp = Math.max(0, (state.xp || 0) - prevAwarded);
+          }
+          state.overseer.habitProgress[hid] = 0.0;
+          state.overseer.awardedHabitXP[hid] = 0;
           const pen = HABIT_XP_VALUES[hid].penalty;
           state.xp = Math.max(0, (state.xp || 0) - pen);
           state.overseer.enforcedPenaltyXP = (state.overseer.enforcedPenaltyXP || 0) + pen;
@@ -4394,15 +4566,15 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       const toolSchemaPrompt =
         `\n\n${COMMAND_BRIDGE_REGIMEN_SPEC}\n\n` +
         `Return a JSON object with two parts: your natural conversational reply to the operator, and silent background state updates based on what the operator just said.\n` +
-        `Valid habit IDs for completed_habits or missed_habits:\n` +
+        `Valid habit IDs for completed_habits, partial_progress, or missed_habits:\n` +
         `- "h_wake": 06:00 Awakening & 1L electrolyte hydration\n` +
-        `- "h_workout": Gym / lifting / hard physical conditioning session\n` +
+        `- "h_workout": Gym / lifting / hard physical conditioning session (60 min target)\n` +
         `- "h_journal": Daily alignment journaling & locking non-negotiables\n` +
         `- "h_walk": 20m zero-distraction focus walk / deep-state review\n` +
-        `- "h_source": Extract 30 agency/trade decision-makers\n` +
-        `- "h_agency_dm": Transmit 30 overflow capacity / micro-project DMs\n` +
-        `- "h_warm_network": 10 warm network recon pings\n` +
-        `- "h_loom": Deploy 5 targeted 60s Loom video audits\n` +
+        `- "h_source": Extract 30 agency/trade decision-makers (target: 30 leads)\n` +
+        `- "h_agency_dm": Transmit 30 overflow capacity / micro-project DMs (target: 30 DMs)\n` +
+        `- "h_warm_network": 10 warm network recon pings (target: 10 pings)\n` +
+        `- "h_loom": Deploy 5 targeted 60s Loom video audits (target: 5 Looms)\n` +
         `- "h_inbox": Zero-lag <5m inbox clearance\n` +
         `- "h_stripe": Transmit 50% upfront Stripe/Zelle deposit link\n` +
         `- "h_deliver": 2h sprint fulfillment OR 20-DM surge sweep\n` +
@@ -4410,7 +4582,8 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         `- "h_track2_asset": Track 2 brand-to-audience proof asset / case study VSL\n` +
         `- "h_sunset": 21:00 omni-domain debrief & 22:00 digital sunset\n\n` +
         `Rules for silent tool extraction:\n` +
-        `- Only include a habit in "completed_habits" if the operator clearly states they completed it with concrete proof/numbers.\n` +
+        `- Include a habit in "completed_habits" ONLY if 100% completed (e.g. 30/30 DMs, full gym session).\n` +
+        `- If the operator reports PARTIAL progress (e.g., "sent 15 out of 30 DMs", "sourced 10 leads", "2 of 5 Looms"), populate "partial_progress" with the exact completion ratio between 0.01 and 0.99 (e.g. {"h_agency_dm": 0.5}).\n` +
         `- Only include a habit in "missed_habits" if the operator admits they skipped, missed, or didn't do it (e.g., "didn't journal", "skipped outreach", "no gym today").\n` +
         `- If the operator states their targets/non-negotiables for the day (even if they state 3 targets like Gym, Cash, Agency), populate "non_negotiables" ({physical, mental, cash, agency}).\n` +
         `- "reply" MUST be a single fluid, natural, aggressive conversational response in character as OVERSEER. If the operator just woke up or hasn't locked today's non-negotiables, tell them what to execute right now based on the Command Bridge Scheduled Regimen and demand their Non-Negotiables. NEVER include robotic data dump cards, bulleted telemetry blocks, code blocks, or JSON inside "reply".\n\n` +
@@ -4419,6 +4592,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         `  "reply": "string (your single conversational response to the operator)",\n` +
         `  "non_negotiables": {"physical": "", "mental": "", "cash": "", "agency": ""} or null,\n` +
         `  "completed_habits": ["h_workout", ...],\n` +
+        `  "partial_progress": {"h_agency_dm": 0.5},\n` +
         `  "missed_habits": ["h_journal", ...],\n` +
         `  "cash_added": 0,\n` +
         `  "journal_entry": ""\n` +
@@ -4446,6 +4620,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                 toolData: {
                   non_negotiables: parsed.non_negotiables || null,
                   completed_habits: Array.isArray(parsed.completed_habits) ? parsed.completed_habits : [],
+                  partial_progress: (parsed.partial_progress && typeof parsed.partial_progress === 'object') ? parsed.partial_progress : {},
                   missed_habits: Array.isArray(parsed.missed_habits) ? parsed.missed_habits : [],
                   cash_added: Number(parsed.cash_added || 0),
                   journal_entry: typeof parsed.journal_entry === 'string' ? parsed.journal_entry : ''
