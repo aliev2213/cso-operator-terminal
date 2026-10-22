@@ -1,0 +1,111 @@
+{
+  "pin": "OPERATOR-1",
+  "state": {
+    "xp": 50,
+    "cash": 0,
+    "streak": 0,
+    "date": "2026-10-22",
+    "lastActiveDate": "2026-10-22",
+    "lastAcknowledgedLevel": 1,
+    "completedHabits": [],
+    "overseer": {
+      "bootLockedDate": "2026-10-22",
+      "todayTargetsLocked": true,
+      "nonNegotiables": {
+        "physical": "Hit a gym session (60 min heavy lifts & conditioning)",
+        "mental": "Complete first daily alignment journaling session",
+        "cash": "Execute at least 10 outreaches for Brand2Audience",
+        "agency": "Brand2Audience marketing agency outreach & pipeline"
+      },
+      "middayCheckedDate": null,
+      "middayNote": "",
+      "debriefSubmittedDate": "2026-10-21",
+      "lastMachineScore": 0,
+      "enforcedPenaltyXP": 150,
+      "evasionPenaltyCountToday": 0,
+      "unansweredPingCount": 0,
+      "awaitingOperatorReply": false,
+      "pendingAuditSlot": null,
+      "lastPingTimestamp": 1792680188.9541962,
+      "lastOperatorReplyTimestamp": 1792680188.9541953,
+      "lastRevenueSummary": "",
+      "journalLogs": [],
+      "auditLogs": [
+        {
+          "time": "2026-10-22 10:43:08",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: My non negotiables for today are: \n\n- I want to hit a gym session \n\n- I want to have my first journaling day \n\n- at least 10 outreaches for Brand2Audience (my marketing agency)\n- Gym: 60 min, 3 sets each major lift, max weight revision recorded. - Journal: 15-min stream, lock 3 core Non-Negotiables into the log. - Outreach: 10 cold emails + calls, 1 for Brand2Audience per hour. No delays."
+        },
+        {
+          "time": "2026-10-22 10:21:11",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: I just started my day but I finally woke up at 8 am today.\nWake up at 8:00? That’s a 2-hour delay from the 6:00 target. First, drink a liter of electrolytes, hit the gym for hard conditioning, and lock your non-negotiables in the alignment journal. Tell me the non-negotiables you’re locking for today: physical, mental, cash, agency. No excuses."
+        },
+        {
+          "time": "2026-10-22 09:49:01",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: Hello\nYou say hello, but I need results. Did you hit the gym? Hydrate? Journal? Send outreach? Tell me the numbers, not the pleasantries."
+        }
+      ],
+      "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
+      "tgChatId": "5441024587",
+      "webhookUrl": "",
+      "lastTgUpdateId": 595333233,
+      "chatHistory": [
+        {
+          "role": "user",
+          "content": "Hello"
+        },
+        {
+          "role": "assistant",
+          "content": "You say hello, but I need results. Did you hit the gym? Hydrate? Journal? Send outreach? Tell me the numbers, not the pleasantries."
+        },
+        {
+          "role": "user",
+          "content": "I just started my day but I finally woke up at 8 am today."
+        },
+        {
+          "role": "assistant",
+          "content": "Wake up at 8:00? That’s a 2-hour delay from the 6:00 target. First, drink a liter of electrolytes, hit the gym for hard conditioning, and lock your non-negotiables in the alignment journal. Tell me the non-negotiables you’re locking for today: physical, mental, cash, agency. No excuses."
+        },
+        {
+          "role": "user",
+          "content": "My non negotiables for today are: \n\n- I want to hit a gym session \n\n- I want to have my first journaling day \n\n- at least 10 outreaches for Brand2Audience (my marketing agency)"
+        },
+        {
+          "role": "assistant",
+          "content": "- Gym: 60 min, 3 sets each major lift, max weight revision recorded. - Journal: 15-min stream, lock 3 core Non-Negotiables into the log. - Outreach: 10 cold emails + calls, 1 for Brand2Audience per hour. No delays."
+        }
+      ],
+      "processedUpdateIds": [
+        595333225,
+        595333226,
+        595333227,
+        595333231,
+        595333233
+      ]
+    }
+  },
+  "updated_at": "2026-10-22T10:53:00-04:00",
+  "metrics": {
+    "machine_score": 0,
+    "domains_cleared": 0,
+    "physical_score": 0,
+    "mental_score": 0,
+    "cash_score": 0,
+    "agency_score": 0,
+    "has_gym": false,
+    "has_hydration": false,
+    "has_journal": false,
+    "has_walk": false,
+    "outreach_done": 0,
+    "closing_done": 0,
+    "has_infra": false,
+    "has_asset": false,
+    "penalty_at_risk": 500,
+    "xp": 50,
+    "rank_level": 1,
+    "rank_title": "UNOPTIMIZED LIABILITY"
+  },
+  "server_polls_telegram": true
+}

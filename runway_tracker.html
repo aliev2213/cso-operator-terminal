@@ -179,7 +179,7 @@
         <p>• Global Operator XP will be wiped back to <span class="text-amber-400 font-bold">Tier 1: UNOPTIMIZED LIABILITY</span> (0 XP).</p>
         <p>• Cash Runway Vault liquidity balance will be reset to <span class="text-emerald-400 font-bold">$0</span>.</p>
         <p>• Kinetic streaks and daily habit conduits will be wiped clean.</p>
-        <p>• All Bio-Clearance THC logs and taper tracking records will be erased back to baseline.</p>
+        <p>• All OVERSEER audit logs and session records will be erased back to baseline.</p>
       </div>
       <div class="flex items-center justify-center gap-4">
         <button onclick="closeResetModal()" class="hex-button px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 font-cyber text-xs uppercase tracking-wider border border-slate-700 transition-all">
@@ -317,8 +317,8 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     <!-- TOP TELEMETRY BAR & TACTICAL TAB DECK SWITCHER -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 text-[11px] font-mono-tech text-cyan-500/80 px-2 tracking-wider">
       <div class="flex items-center gap-2">
-        <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-        <span class="text-slate-300 font-bold">HOLO_BRIDGE // COMMAND MATRIX</span>
+        <span onclick="handleStealthBioTap()" class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse select-none"></span>
+        <span onclick="handleStealthBioTap()" class="text-slate-300 font-bold select-none">HOLO_BRIDGE // COMMAND MATRIX</span>
         <span class="text-slate-600">|</span>
         <span id="live-clock" class="text-cyan-300 font-bold"></span>
         <span class="text-slate-600">|</span>
@@ -330,7 +330,11 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         <button id="btn-deck-deployment" onclick="switchDeck('deployment')" class="hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-[0_0_15px_rgba(0,240,255,0.6)] transition-all">
           [ DEPLOYMENT DECK ]
         </button>
-        <button id="btn-deck-bioclearance" onclick="switchDeck('bioclearance')" class="hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-slate-900 text-emerald-400 hover:text-white hover:bg-emerald-950/80 border border-slate-700 hover:border-emerald-500 transition-all">
+        <button id="btn-deck-overseer" onclick="switchDeck('overseer')" class="hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-slate-900 text-amber-400 hover:text-white hover:bg-amber-950/80 border border-amber-500/60 hover:border-amber-400 transition-all flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+          <span>[ OVERSEER AI ]</span>
+        </button>
+        <button id="btn-deck-bioclearance" onclick="switchDeck('bioclearance')" class="hidden" aria-hidden="true" tabindex="-1">
           [ BIO-CLEARANCE DECK ]
         </button>
         <button id="btn-satellite-sync" onclick="openSyncModal()" class="hex-button px-3 py-2 font-mono-tech text-[10px] font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/60 shadow-[0_0_12px_rgba(0,240,255,0.25)] transition-all flex items-center gap-1.5" title="Cloud sync status & Supabase settings">
@@ -351,7 +355,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       <div class="holo-bridge-panel hex-cut p-4 relative overflow-hidden group border border-amber-900/50 hover:border-amber-500/70 transition-all">
         <div class="flex items-center justify-between text-[11px] font-mono-tech text-amber-400 tracking-wider">
           <span>KINETIC STREAK MATRIX</span>
-          <span class="text-xs font-mono-tech bg-amber-950 px-2 py-0.5 rounded border border-amber-600/50 text-amber-300">NODE_01</span>
+          <span id="stealth-node01-trigger" onclick="handleStealthBioTap()" class="text-xs font-mono-tech bg-amber-950 px-2 py-0.5 rounded border border-amber-600/50 text-amber-300 select-none">NODE_01</span>
         </div>
         <div class="flex items-center gap-3.5 mt-3">
           <div id="flame-container" class="w-14 h-14 flex items-center justify-center relative">
@@ -392,8 +396,8 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         </div>
       </div>
 
-      <!-- NODE 3: OPERATOR RANK AVATAR -->
-      <div class="holo-bridge-panel hex-cut p-3.5 relative overflow-hidden group border border-cyan-900/50 hover:border-cyan-500/70 transition-all flex items-center gap-3.5">
+      <!-- NODE 3: OPERATOR RANK AVATAR & DISCIPLINE PENALTY BAR -->
+      <div id="rank-node-card" class="holo-bridge-panel hex-cut p-3.5 relative overflow-hidden group border border-cyan-900/50 hover:border-cyan-500/70 transition-all flex items-center gap-3.5">
         <div id="avatar-frame" class="w-16 h-16 rounded-lg bg-slate-950/90 border-2 border-cyan-400 p-1 shrink-0 relative shadow-[0_0_15px_rgba(0,240,255,0.45)]">
           <div id="avatar-graphic" class="w-full h-full flex items-center justify-center"></div>
           <div class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></div>
@@ -406,18 +410,25 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
           <div id="rank-title" class="text-base font-cyber font-black text-white truncate mt-0.5 tracking-wider">
             RECRUIT
           </div>
-          <div class="w-full bg-slate-950 h-2 rounded-full mt-2 overflow-hidden border border-slate-800">
+          <!-- Rank Progression Bar with Visible Discipline Penalty Segment -->
+          <div class="w-full bg-slate-950 h-2.5 rounded-full mt-1.5 overflow-hidden border border-slate-800 relative flex">
             <div id="xp-bar" class="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-magenta-500 transition-all duration-500" style="width: 0%"></div>
+            <div id="xp-penalty-bar" class="h-full bg-red-600/90 animate-pulse transition-all duration-500 shadow-[0_0_10px_#ef4444]" style="width: 0%" title="Discipline Penalty for Uncompleted Physical/Mental Protocols"></div>
+          </div>
+          <div class="flex items-center justify-between mt-1 text-[9px] font-mono-tech">
+            <span id="discipline-penalty-badge" class="text-red-400 font-bold tracking-wider truncate">
+              ⚠ DISCIPLINE PENALTY: -300 XP AT RISK
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- NODE 4: CIRCULAR REACTOR CORE GAUGE -->
+      <!-- NODE 4: CIRCULAR REACTOR CORE & DAILY MACHINE SCORE GAUGE -->
       <div class="holo-bridge-panel hex-cut p-3.5 relative overflow-hidden border border-magenta-900/50 hover:border-magenta-500/70 transition-all flex items-center justify-between">
         <div class="pl-2">
-          <div class="text-[11px] font-mono-tech text-magenta-400 tracking-wider">REACTOR CORE GAUGE</div>
+          <div class="text-[11px] font-mono-tech text-magenta-400 tracking-wider">DAILY MACHINE SCORE</div>
           <div id="reactor-status" class="text-xs font-cyber font-bold text-slate-300 mt-1">STANDBY</div>
-          <div id="core-tasks-label" class="text-[10px] font-mono-tech text-slate-400 mt-0.5">0/10 CONDUITS</div>
+          <div id="core-tasks-label" class="text-[10px] font-mono-tech text-slate-400 mt-0.5">0/4 DOMAINS // 0/12 CONDUITS</div>
         </div>
 
         <div class="relative w-16 h-16 flex items-center justify-center shrink-0">
@@ -527,34 +538,237 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
       </div>
 
-      <!-- DEPLOYMENT PROTOCOL MODULES (CHECKLIST) -->
+      <!-- =================================================================================== -->
+      <!-- OVERSEER // OMNI-DOMAIN STATUS GRID & LIVE SUPERVISOR COMMAND BAR                   -->
+      <!-- =================================================================================== -->
+      <section class="holo-bridge-panel hex-cut p-5 md:p-6 border-2 border-amber-500/60 relative overflow-hidden shadow-[0_0_40px_rgba(255,145,0,0.2)]">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+          <div class="flex items-start sm:items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-950/90 border border-amber-400 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,145,0,0.5)]">
+              <span class="text-amber-400 font-cyber font-black text-sm">👁</span>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-cyber font-black tracking-widest text-amber-400 uppercase">
+                  OVERSEER AI SUPERVISOR // OMNI-DOMAIN STATUS GRID
+                </span>
+                <span id="overseer-phase-badge" class="px-2 py-0.5 text-[10px] font-mono-tech font-bold rounded bg-amber-950 text-amber-300 border border-amber-500/70">
+                  AUDIT WINDOW: ACTIVE
+                </span>
+                <span id="overseer-webhook-badge" class="px-2 py-0.5 text-[10px] font-mono-tech rounded bg-slate-900 text-slate-400 border border-slate-700">
+                  MOBILE PUSH: STANDBY
+                </span>
+              </div>
+              <p id="overseer-live-directive" class="text-xs font-mono-tech text-slate-300 mt-1">
+                "[OVERSEER] Holistic discipline enforced. Failure in Physical, Mental, Cash, or Agency domains drags down Global Operator Rank and Daily Machine Score."
+              </p>
+            </div>
+          </div>
+
+          <!-- Holistic Daily Machine Score & Quick Audit Triggers -->
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <div class="bg-slate-950/90 px-3.5 py-2 rounded-lg border border-cyan-500/50 text-right">
+              <div class="text-[9px] font-mono-tech text-slate-400 uppercase tracking-widest">DAILY MACHINE SCORE</div>
+              <div class="flex items-baseline justify-end gap-1.5">
+                <span id="omni-machine-score" class="text-xl font-cyber font-black text-cyan-300">0%</span>
+                <span id="omni-domains-cleared" class="text-[10px] font-mono-tech text-amber-400">(0/4 DOMAINS)</span>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button onclick="triggerOverseerAudit('boot', true)" class="px-2.5 py-2 rounded bg-slate-900 hover:bg-amber-950 text-amber-300 border border-amber-600/60 font-cyber text-[10px] font-bold uppercase tracking-wider transition-all" title="07:00 AM Morning System Boot">
+                07:00 BOOT
+              </button>
+              <button onclick="triggerOverseerAudit('midday', true)" class="px-2.5 py-2 rounded bg-slate-900 hover:bg-cyan-950 text-cyan-300 border border-cyan-600/60 font-cyber text-[10px] font-bold uppercase tracking-wider transition-all" title="01:00 PM Mid-Day Velocity Check">
+                13:00 CHECK
+              </button>
+              <button onclick="openDebriefModal()" class="px-3 py-2 rounded bg-gradient-to-r from-amber-500 to-red-600 text-black font-cyber text-[10px] font-black uppercase tracking-wider hover:brightness-125 shadow-[0_0_15px_rgba(255,145,0,0.5)] transition-all" title="09:00 PM Omni-Domain De-Brief">
+                21:00 DE-BRIEF
+              </button>
+              <button onclick="switchDeck('overseer')" class="px-2.5 py-2 rounded bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-mono-tech text-[10px] uppercase tracking-wider transition-all">
+                [ CONFIG / LOGS ]
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-COLUMN OMNI-DOMAIN STATUS MATRIX -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+
+          <!-- DOMAIN 1: BIOLOGICAL PRIMING (PHYSICAL) -->
+          <div id="omni-card-physical" class="p-3.5 rounded-xl bg-slate-950/90 border border-amber-900/60 hover:border-amber-500/80 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                <div>
+                  <span class="text-[10px] font-mono-tech text-amber-400 uppercase tracking-widest block">DOMAIN 01 // PHYSICAL</span>
+                  <h3 class="text-xs font-cyber font-black text-white uppercase">BIOLOGICAL PRIMING</h3>
+                </div>
+                <span id="omni-check-physical" class="px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-red-950/90 text-red-400 border border-red-600/60">
+                  ✗ UNLOCKED
+                </span>
+              </div>
+              <div class="space-y-1.5 my-2.5 text-[11px] font-mono-tech">
+                <div onclick="toggleHabitById('h_workout')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-gym" class="text-red-400 font-bold">✗</span> Gym / Hard Conditioning
+                  </span>
+                  <span class="text-amber-400 text-[10px]">+150 XP</span>
+                </div>
+                <div onclick="toggleHabitById('h_wake')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-hydration" class="text-red-400 font-bold">✗</span> 06:00 Wake &amp; 1L Electrolytes
+                  </span>
+                  <span class="text-amber-400 text-[10px]">+100 XP</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono-tech text-slate-400 mb-1">
+                <span id="omni-bio-taper-tag">HYDRATION: STANDBY</span>
+                <span id="omni-score-physical" class="text-amber-400 font-bold">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                <div id="omni-bar-physical" class="h-full bg-amber-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DOMAIN 2: COGNITIVE CALIBRATION (MENTAL/MINDSET) -->
+          <div id="omni-card-mental" class="p-3.5 rounded-xl bg-slate-950/90 border border-purple-900/60 hover:border-purple-500/80 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                <div>
+                  <span class="text-[10px] font-mono-tech text-purple-400 uppercase tracking-widest block">DOMAIN 02 // MENTAL</span>
+                  <h3 class="text-xs font-cyber font-black text-white uppercase">COGNITIVE CALIBRATION</h3>
+                </div>
+                <span id="omni-check-mental" class="px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-red-950/90 text-red-400 border border-red-600/60">
+                  ✗ UNLOCKED
+                </span>
+              </div>
+              <div class="space-y-1.5 my-2.5 text-[11px] font-mono-tech">
+                <div onclick="toggleHabitById('h_journal')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-journal" class="text-red-400 font-bold">✗</span> Daily Alignment Journal
+                  </span>
+                  <span class="text-purple-400 text-[10px]">+150 XP</span>
+                </div>
+                <div onclick="toggleHabitById('h_walk')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-walk" class="text-red-400 font-bold">✗</span> Zero-Distraction Focus Walk
+                  </span>
+                  <span class="text-purple-400 text-[10px]">+100 XP</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono-tech text-slate-400 mb-1">
+                <button onclick="openJournalModal()" class="text-purple-300 hover:text-white underline">[ + WRITE JOURNAL LOG ]</button>
+                <span id="omni-score-mental" class="text-purple-400 font-bold">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                <div id="omni-bar-mental" class="h-full bg-purple-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DOMAIN 3: TRACK 1 (THE RUNWAY ENGINE - CASH) -->
+          <div id="omni-card-cash" class="p-3.5 rounded-xl bg-slate-950/90 border border-cyan-900/60 hover:border-cyan-500/80 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                <div>
+                  <span class="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest block">DOMAIN 03 // TRACK 1</span>
+                  <h3 class="text-xs font-cyber font-black text-white uppercase">THE RUNWAY ENGINE (CASH)</h3>
+                </div>
+                <span id="omni-check-cash" class="px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-red-950/90 text-red-400 border border-red-600/60">
+                  ✗ UNLOCKED
+                </span>
+              </div>
+              <div class="space-y-1.5 my-2.5 text-[11px] font-mono-tech">
+                <div onclick="toggleHabitById('h_agency_dm')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-outreach" class="text-red-400 font-bold">✗</span> Direct Outreach &amp; Looms
+                  </span>
+                  <span class="text-cyan-400 text-[10px]" id="subcount-outreach">0/4</span>
+                </div>
+                <div onclick="toggleHabitById('h_stripe')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-closing" class="text-red-400 font-bold">✗</span> Micro-Project / Deposit Close
+                  </span>
+                  <span class="text-cyan-400 text-[10px]" id="subcount-closing">0/3</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono-tech text-slate-400 mb-1">
+                <span>QUOTA: OUTREACH + SPRINT</span>
+                <span id="omni-score-cash" class="text-cyan-400 font-bold">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                <div id="omni-bar-cash" class="h-full bg-cyan-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DOMAIN 4: TRACK 2 (BRAND TO AUDIENCE - AGENCY) -->
+          <div id="omni-card-agency" class="p-3.5 rounded-xl bg-slate-950/90 border border-emerald-900/60 hover:border-emerald-500/80 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                <div>
+                  <span class="text-[10px] font-mono-tech text-emerald-400 uppercase tracking-widest block">DOMAIN 04 // TRACK 2</span>
+                  <h3 class="text-xs font-cyber font-black text-white uppercase">BRAND TO AUDIENCE</h3>
+                </div>
+                <span id="omni-check-agency" class="px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-red-950/90 text-red-400 border border-red-600/60">
+                  ✗ UNLOCKED
+                </span>
+              </div>
+              <div class="space-y-1.5 my-2.5 text-[11px] font-mono-tech">
+                <div onclick="toggleHabitById('h_track2_infra')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-infra" class="text-red-400 font-bold">✗</span> Agency Infra &amp; Positioning
+                  </span>
+                  <span class="text-emerald-400 text-[10px]">+200 XP</span>
+                </div>
+                <div onclick="toggleHabitById('h_track2_asset')" class="flex items-center justify-between p-1.5 rounded bg-slate-900/80 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                  <span class="text-slate-200 flex items-center gap-1.5">
+                    <span id="subcheck-asset" class="text-red-400 font-bold">✗</span> Brand-to-Audience Asset
+                  </span>
+                  <span class="text-emerald-400 text-[10px]">+150 XP</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between text-[10px] font-mono-tech text-slate-400 mb-1">
+                <span>BLUE-OCEAN ARCHITECTURE</span>
+                <span id="omni-score-agency" class="text-emerald-400 font-bold">0%</span>
+              </div>
+              <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                <div id="omni-bar-agency" class="h-full bg-emerald-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- DEPLOYMENT PROTOCOL MODULES (CHECKLIST ACROSS ALL 4 DOMAINS) -->
       <div class="space-y-4">
 
-        <!-- ZONE 0: BIOLOGICAL PRIMING PROTOCOL -->
+        <!-- DOMAIN 1: BIOLOGICAL PRIMING PROTOCOL (PHYSICAL) -->
         <section class="holo-bridge-panel hex-cut border-l-4 border-l-amber-400 overflow-hidden">
           <div class="bg-slate-900/80 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class="text-amber-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-amber-950 border border-amber-500 shadow-[0_0_10px_rgba(255,183,3,0.4)]">
-                DEPLOYMENT ZONE 0
+                DOMAIN 1 // PHYSICAL
               </span>
-              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Biological Priming Protocol (06:00 – 07:45)</h2>
+              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Biological Priming &amp; Hard Conditioning (06:00 – 07:45)</h2>
             </div>
             <div class="flex items-center gap-3 text-xs font-mono-tech text-amber-400/90">
-              <span class="flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                HQ Bunker
-              </span>
-              <span class="text-slate-600">/</span>
-              <span class="flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="3" width="16" height="16" rx="2" stroke-width="2"/><path stroke-width="2" d="M4 11h16M12 3v8"/></svg>
-                Transit Grid
-              </span>
+              <span>SKIP PENALTY: -250 XP</span>
             </div>
           </div>
 
           <div class="p-4 space-y-2.5">
-            <!-- Item 1 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-amber-500/50 relative" data-id="h_wake" data-xp="50" onclick="triggerNode(this)">
+            <!-- Item 1: 06:00 Hard Awakening & Electrolyte Hydration -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-amber-500/50 relative" data-id="h_wake" data-domain="physical" data-xp="100" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-amber-500 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,183,3,0.3)]">
                 <span class="check-mark hidden text-amber-400 font-black text-xs">✓</span>
               </div>
@@ -562,16 +776,16 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">06:00 Hard Awakening & Electrolyte Priming</span>
+                    <span class="text-sm font-cyber font-bold text-slate-100">06:00 Hard Awakening &amp; 1L Electrolyte Hydration Protocol</span>
                   </div>
-                  <span class="text-xs font-mono-tech text-amber-400 font-bold">+50 XP</span>
+                  <span class="text-xs font-mono-tech text-amber-400 font-bold">+100 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Feet on floor immediately. 500ml water + mineral salt. Zero algorithmic feed exposure.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Feet on floor immediately at 06:00. Drink 1L water + electrolytes and initiate morning sunlight/cold exposure.</p>
               </div>
             </div>
 
-            <!-- Item 2 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-amber-500/50 relative" data-id="h_workout" data-xp="100" onclick="triggerNode(this)">
+            <!-- Item 2: Gym / Hard Physical Conditioning -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-amber-500/50 relative" data-id="h_workout" data-domain="physical" data-xp="150" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-amber-500 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,183,3,0.3)]">
                 <span class="check-mark hidden text-amber-400 font-black text-xs">✓</span>
               </div>
@@ -579,51 +793,86 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">Kinetic Conditioning (Threshold Run or Calisthenics Grid)</span>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Gym / Hard Physical Conditioning Session (Strength or Endurance)</span>
                   </div>
-                  <span class="text-xs font-mono-tech text-amber-400 font-bold">+100 XP</span>
+                  <span class="text-xs font-mono-tech text-amber-400 font-bold">+150 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">20-minute threshold run OR 4-round dense bodyweight circuit (pushups, squats, lunges, plank).</p>
-              </div>
-            </div>
-
-            <!-- Item 3 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-amber-500/50 relative" data-id="h_walk" data-xp="50" onclick="triggerNode(this)">
-              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-amber-500 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,183,3,0.3)]">
-                <span class="check-mark hidden text-amber-400 font-black text-xs">✓</span>
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" stroke-width="2"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">20-Minute Focus Calibration Commute</span>
-                  </div>
-                  <span class="text-xs font-mono-tech text-amber-400 font-bold">+50 XP</span>
-                </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Walk to library bunker. Zero entertainment audio. Internalize the day's outreach quotas.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Heavy resistance training, boxing/combat conditioning, or high-output threshold run. Skipping triggers -150 XP Discipline Penalty.</p>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- ZONE 1: DEEP HUNT (SILENT BUNKER) -->
-        <section class="holo-bridge-panel hex-cut border-l-4 border-l-cyan-400 overflow-hidden">
+        <!-- DOMAIN 2: COGNITIVE CALIBRATION PROTOCOL (MENTAL / MINDSET) -->
+        <section class="holo-bridge-panel hex-cut border-l-4 border-l-purple-400 overflow-hidden">
           <div class="bg-slate-900/80 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="text-cyan-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-cyan-950 border border-cyan-500 shadow-[0_0_10px_rgba(0,240,255,0.4)]">
-                DEPLOYMENT ZONE 1
+              <span class="text-purple-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-purple-950 border border-purple-500 shadow-[0_0_10px_rgba(157,78,221,0.4)]">
+                DOMAIN 2 // COGNITIVE
               </span>
-              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Deep Hunt: Sourcing & Transmission (08:00 – 11:30)</h2>
+              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Cognitive Calibration &amp; Mindset Alignment (07:15 – 08:00)</h2>
             </div>
-            <div class="flex items-center gap-1.5 text-xs font-mono-tech text-cyan-400/90">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-              Library Silent Bunker // Stealth Recon
+            <div class="flex items-center gap-3 text-xs font-mono-tech text-purple-400/90">
+              <button onclick="openJournalModal()" class="px-2.5 py-0.5 rounded bg-purple-950 hover:bg-purple-800 text-purple-200 border border-purple-500 font-cyber text-[10px] font-bold">
+                + OPEN ALIGNMENT JOURNAL
+              </button>
             </div>
           </div>
 
           <div class="p-4 space-y-2.5">
-            <!-- Item 4 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_source" data-xp="150" onclick="triggerNode(this)">
+            <!-- Item 3: Daily Journaling / Psychological Alignment Log -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-purple-500/50 relative" data-id="h_journal" data-domain="mental" data-xp="150" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-purple-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(157,78,221,0.3)]">
+                <span class="check-mark hidden text-purple-400 font-black text-xs">✓</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Daily Journaling &amp; Psychological Alignment Log</span>
+                  </div>
+                  <span class="text-xs font-mono-tech text-purple-400 font-bold">+150 XP</span>
+                </div>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Audit internal resistance, neutralize avoidance loops, and lock today's 4 Non-Negotiables. Skipping incurs -150 XP Discipline Penalty.</p>
+              </div>
+            </div>
+
+            <!-- Item 4: Zero-Distraction Focus Walk -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-purple-500/50 relative" data-id="h_walk" data-domain="mental" data-xp="100" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-purple-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(157,78,221,0.3)]">
+                <span class="check-mark hidden text-purple-400 font-black text-xs">✓</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" stroke-width="2"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Zero-Distraction Focus Walk / Deep-State Review</span>
+                  </div>
+                  <span class="text-xs font-mono-tech text-purple-400 font-bold">+100 XP</span>
+                </div>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">20-minute silent walk or deep-state strategic review. Zero entertainment audio or dopamine feeds.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DOMAIN 3 (PART A): TRACK 1 — DEEP HUNT SOURCING & OUTREACH -->
+        <section class="holo-bridge-panel hex-cut border-l-4 border-l-cyan-400 overflow-hidden">
+          <div class="bg-slate-900/80 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-cyan-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-cyan-950 border border-cyan-500 shadow-[0_0_10px_rgba(0,240,255,0.4)]">
+                DOMAIN 3 // TRACK 1 (RUNWAY ENGINE)
+              </span>
+              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Immediate Cash Outreach, Loom Audits &amp; Closing (08:00 – 16:30)</h2>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs font-mono-tech text-cyan-400/90">
+              <span>24-48H CASH GENERATION</span>
+            </div>
+          </div>
+
+          <div class="p-4 space-y-2.5">
+            <!-- Item 5 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_source" data-domain="cash" data-xp="150" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
                 <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
               </div>
@@ -631,16 +880,16 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><line x1="22" y1="12" x2="18" y2="12" stroke-width="2"/><line x1="6" y1="12" x2="2" y2="12" stroke-width="2"/><line x1="12" y1="6" x2="12" y2="2" stroke-width="2"/><line x1="12" y1="22" x2="12" y2="18" stroke-width="2"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">Extract 30 Verified Agency Decision-Makers</span>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Extract 30 Verified Agency / Trade Decision-Makers</span>
                   </div>
                   <span class="text-xs font-mono-tech text-cyan-400 font-bold">+150 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Target boutique agencies (5–20 staff) on LinkedIn/Clutch. Pull Owner/Ops names into spreadsheet.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Target boutique agencies (5–20 staff) or high-ticket local operators. Pull Founder/Owner names into pipeline.</p>
               </div>
             </div>
 
-            <!-- Item 5 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_agency_dm" data-xp="200" onclick="triggerNode(this)">
+            <!-- Item 6 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_agency_dm" data-domain="cash" data-xp="200" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
                 <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
               </div>
@@ -648,16 +897,16 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">Transmit 30 Overflow Capacity Direct Messages</span>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Transmit 30 Overflow Capacity / Micro-Project Direct Messages</span>
                   </div>
                   <span class="text-xs font-mono-tech text-cyan-400 font-bold">+200 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Deploy Play 1 Overflow script: offering 48-hour sprint clearance for Webflow/WordPress bottlenecks.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Deploy Track 1 script: offering 48-hour white-label build clearance or high-converting trial funnels.</p>
               </div>
             </div>
 
-            <!-- Item 6 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_warm_network" data-xp="100" onclick="triggerNode(this)">
+            <!-- Item 7 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_warm_network" data-domain="cash" data-xp="100" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
                 <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
               </div>
@@ -669,134 +918,131 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                   </div>
                   <span class="text-xs font-mono-tech text-cyan-400 font-bold">+100 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Pings to past employers, clients, and technical peers offering open execution bandwidth this week.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Pings to past employers, contacts, and technical peers offering immediate 48h execution bandwidth.</p>
+              </div>
+            </div>
+
+            <!-- Item 8 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_loom" data-domain="cash" data-xp="250" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+                <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Deploy 5 Targeted 60s Video Audits (Loom Strikes)</span>
+                  </div>
+                  <span class="text-xs font-mono-tech text-cyan-400 font-bold">+250 XP</span>
+                </div>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Record short screen audits exposing broken mobile conversions or live demoing rapid replacement funnels.</p>
+              </div>
+            </div>
+
+            <!-- Item 9 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_inbox" data-domain="cash" data-xp="150" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+                <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" stroke-width="2"/><path stroke-width="2" d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Zero-Lag Response Speed (&lt;5 Min Clearance)</span>
+                  </div>
+                  <span class="text-xs font-mono-tech text-cyan-400 font-bold">+150 XP</span>
+                </div>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Intervene on incoming prospect replies instantly. Funnel straight into 10-min scope calls or direct chat close.</p>
+              </div>
+            </div>
+
+            <!-- Item 10 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_stripe" data-domain="cash" data-xp="300" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+                <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" stroke-width="2"/><line x1="1" y1="10" x2="23" y2="10" stroke-width="2"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Transmit 50% Upfront Stripe/Zelle Deposit Link</span>
+                  </div>
+                  <span class="text-xs font-mono-tech text-cyan-400 font-bold">+300 XP</span>
+                </div>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Non-negotiable cash gate: 50% down before staging or code initialization. Zero work commences before deposit ping.</p>
+              </div>
+            </div>
+
+            <!-- Item 11 -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-cyan-500/50 relative" data-id="h_deliver" data-domain="cash" data-xp="200" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-cyan-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+                <span class="check-mark hidden text-cyan-400 font-black text-xs">✓</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">2-Hour Deep Sprint Fulfillment OR Surge Outreach Sweep</span>
+                  </div>
+                  <span class="text-xs font-mono-tech text-cyan-400 font-bold">+200 XP</span>
+                </div>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">If client deposit is secured: execute sprint delivery. If zero deposit locked: fire 20 emergency outreach transmissions.</p>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- ZONE 2: VIDEO AUDITS & VOICE STRIKES -->
+        <!-- DOMAIN 4: TRACK 2 (BRAND TO AUDIENCE — LONG-TERM AGENCY INFRASTRUCTURE) -->
         <section class="holo-bridge-panel hex-cut border-l-4 border-l-emerald-400 overflow-hidden">
           <div class="bg-slate-900/80 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span class="text-emerald-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-emerald-950 border border-emerald-500 shadow-[0_0_10px_rgba(0,255,157,0.4)]">
-                DEPLOYMENT ZONE 2
+                DOMAIN 4 // TRACK 2 (BRAND TO AUDIENCE)
               </span>
-              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Friction Striking & Optical Audits (11:30 – 13:00)</h2>
+              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Long-Term Agency Infrastructure, Positioning &amp; Asset Creation (16:30 – 22:00)</h2>
             </div>
             <div class="flex items-center gap-1.5 text-xs font-mono-tech text-emerald-400/90">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-              Exterior Strike Zone // Phone & Video
+              <span>ANTI-COMMODITIZATION ENGINE</span>
             </div>
           </div>
 
           <div class="p-4 space-y-2.5">
-            <!-- Item 7 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-emerald-500/50 relative" data-id="h_loom" data-xp="250" onclick="triggerNode(this)">
+            <!-- Item 12: Track 2 Agency Infrastructure -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-emerald-500/50 relative" data-id="h_track2_infra" data-domain="agency" data-xp="200" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-emerald-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,255,157,0.3)]">
                 <span class="check-mark hidden text-emerald-400 font-black text-xs">✓</span>
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">Deploy 5 Targeted 60s Video Audits (Loom Strikes)</span>
+                    <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Build Long-Term Agency Infrastructure &amp; Blue-Ocean Positioning</span>
                   </div>
-                  <span class="text-xs font-mono-tech text-emerald-400 font-bold">+250 XP</span>
+                  <span class="text-xs font-mono-tech text-emerald-400 font-bold">+200 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Record short screen audits exposing broken mobile conversions or calling their line to prove missed-call revenue loss.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Architect high-margin system integrations, risk-reversed offers, and automated client fulfillment pipelines isolated from short-term panic.</p>
               </div>
             </div>
-          </div>
-        </section>
 
-        <!-- ZONE 3: CLOSING & STRIPE INVOICE -->
-        <section class="holo-bridge-panel hex-cut border-l-4 border-l-purple-400 overflow-hidden">
-          <div class="bg-slate-900/80 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="text-purple-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-purple-950 border border-purple-500 shadow-[0_0_10px_rgba(157,78,221,0.4)]">
-                DEPLOYMENT ZONE 3
-              </span>
-              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Tactical Closing & Deposit Extraction (13:45 – 16:30)</h2>
-            </div>
-            <div class="flex items-center gap-1.5 text-xs font-mono-tech text-purple-400/90">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              Active Pipeline Response Window
-            </div>
-          </div>
-
-          <div class="p-4 space-y-2.5">
-            <!-- Item 8 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-purple-500/50 relative" data-id="h_inbox" data-xp="150" onclick="triggerNode(this)">
-              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-purple-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(157,78,221,0.3)]">
-                <span class="check-mark hidden text-purple-400 font-black text-xs">✓</span>
+            <!-- Item 13: Track 2 Brand-to-Audience Asset -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-emerald-500/50 relative" data-id="h_track2_asset" data-domain="agency" data-xp="150" onclick="triggerNode(this)">
+              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-emerald-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(0,255,157,0.3)]">
+                <span class="check-mark hidden text-emerald-400 font-black text-xs">✓</span>
               </div>
               <div class="flex-1">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" stroke-width="2"/><path stroke-width="2" d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">Zero-Lag Response Speed (&lt;5 Min Clearance)</span>
+                    <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span class="text-sm font-cyber font-bold text-slate-100">Publish Brand-to-Audience Proof Asset / Case Study System</span>
                   </div>
-                  <span class="text-xs font-mono-tech text-purple-400 font-bold">+150 XP</span>
+                  <span class="text-xs font-mono-tech text-emerald-400 font-bold">+150 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Intervene on incoming prospect replies instantly. Funnel straight into 10-min scope calls or direct chat close.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Create high-leverage authority asset, interactive demo, orinbound/outbound audience magnet for Brand to Audience.</p>
               </div>
             </div>
 
-            <!-- Item 9 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-purple-500/50 relative" data-id="h_stripe" data-xp="300" onclick="triggerNode(this)">
-              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-purple-400 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(157,78,221,0.3)]">
-                <span class="check-mark hidden text-purple-400 font-black text-xs">✓</span>
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" stroke-width="2"/><line x1="1" y1="10" x2="23" y2="10" stroke-width="2"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">Transmit 50% Upfront Stripe/Zelle Deposit Link</span>
-                  </div>
-                  <span class="text-xs font-mono-tech text-purple-400 font-bold">+300 XP</span>
-                </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Non-negotiable cash gate: 50% down before staging or code initialization. Zero work commences before deposit ping.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ZONE 4: EXECUTION & DIGITAL SUNSET -->
-        <section class="holo-bridge-panel hex-cut border-l-4 border-l-magenta-500 overflow-hidden">
-          <div class="bg-slate-900/80 px-5 py-3 border-b border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span class="text-magenta-400 font-cyber text-xs font-black px-2.5 py-0.5 rounded bg-magenta-950 border border-magenta-500 shadow-[0_0_10px_rgba(255,0,85,0.4)]">
-                DEPLOYMENT ZONE 4
-              </span>
-              <h2 class="text-sm font-cyber font-bold uppercase tracking-wider text-slate-100">Delivery Sprint & System Shutdown (16:30 – 22:00)</h2>
-            </div>
-            <div class="flex items-center gap-1.5 text-xs font-mono-tech text-magenta-400/90">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><polyline points="12 6 12 12 16 14" stroke-width="2"/></svg>
-              Command Bunker Shutdown
-            </div>
-          </div>
-
-          <div class="p-4 space-y-2.5">
-            <!-- Item 10 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-magenta-500/50 relative" data-id="h_deliver" data-xp="200" onclick="triggerNode(this)">
-              <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-magenta-500 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,0,85,0.3)]">
-                <span class="check-mark hidden text-magenta-400 font-black text-xs">✓</span>
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-magenta-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">2-Hour Deep Sprint Fulfillment OR Surge Outreach Sweep</span>
-                  </div>
-                  <span class="text-xs font-mono-tech text-magenta-400 font-bold">+200 XP</span>
-                </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">If client deposit is secured: execute sprint delivery. If zero deposit locked: fire 20 emergency outreach transmissions.</p>
-              </div>
-            </div>
-
-            <!-- Item 11 -->
-            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-magenta-500/50 relative" data-id="h_sunset" data-xp="100" onclick="triggerNode(this)">
+            <!-- Item 14: 21:00 Omni-Domain De-Brief & 22:00 Digital Sunset -->
+            <div class="habit-item-card flex items-start gap-4 p-3.5 rounded-lg hover:bg-slate-900/70 cursor-pointer transition-all border border-slate-800 hover:border-magenta-500/50 relative" data-id="h_sunset" data-domain="agency" data-xp="100" onclick="triggerNode(this)">
               <div class="hex-activation-node w-7 h-7 rounded-sm bg-slate-900 border-2 border-magenta-500 flex items-center justify-center shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,0,85,0.3)]">
                 <span class="check-mark hidden text-magenta-400 font-black text-xs">✓</span>
               </div>
@@ -804,11 +1050,11 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-magenta-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                    <span class="text-sm font-cyber font-bold text-slate-100">22:00 Digital Sunset & Metric Crypt-Log</span>
+                    <span class="text-sm font-cyber font-bold text-slate-100">21:00 OVERSEER Omni-Domain De-Brief &amp; 22:00 Digital Sunset</span>
                   </div>
                   <span class="text-xs font-mono-tech text-magenta-400 font-bold">+100 XP</span>
                 </div>
-                <p class="text-xs font-mono-tech text-slate-400 mt-1">Record outreach/conversion metrics in physical log. Complete terminal disconnection. Zero bedtime negotiation.</p>
+                <p class="text-xs font-mono-tech text-slate-400 mt-1">Submit 09:00 PM Omni-Domain De-Brief, lock Daily Machine Score, and disconnect terminal at 22:00.</p>
               </div>
             </div>
           </div>
@@ -819,9 +1065,278 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     </div>
 
     <!-- =================================================================================== -->
-    <!-- VIEW B: BIO-CLEARANCE DECK (CANNABIS TAPERING & PURITY ENGINE) -->
+    <!-- VIEW C: OVERSEER AI SUPERVISOR DECK (HOLISTIC AUDIT, SCHEDULE & WEBHOOK/TELEGRAM)   -->
+    <!-- =================================================================================== -->
+    <div id="deck-overseer" class="space-y-5 hidden">
+
+      <!-- TOP ROW: 3 SCHEDULED AUDIT PROTOCOLS (07:00 AM, 01:00 PM, 09:00 PM) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        <!-- 07:00 AM - MORNING SYSTEM BOOT -->
+        <section class="holo-bridge-panel hex-cut p-5 border-t-2 border-t-amber-400 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                <span class="text-xs font-cyber font-black text-amber-400 uppercase tracking-wider">07:00 AM // MORNING SYSTEM BOOT</span>
+              </div>
+              <span id="boot-lock-status" class="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">UNLOCKED</span>
+            </div>
+            <div class="p-3 rounded bg-slate-950/90 border border-amber-900/50 text-[11px] font-mono-tech text-amber-200 leading-relaxed mb-3">
+              "[OVERSEER] System boot. State today's non-negotiables: 1. Physical Protocol (Gym/Conditioning), 2. Mental Protocol (Journaling), 3. Cash Target, 4. Agency Target. Zero excuses."
+            </div>
+
+            <div class="space-y-2 text-xs font-mono-tech">
+              <div>
+                <label class="text-[10px] text-amber-400 uppercase">1. Physical Protocol (Gym / Conditioning)</label>
+                <input id="boot-input-physical" type="text" placeholder="e.g. Heavy Push Session + 20m Run + 1L Electrolytes" class="w-full bg-slate-950 border border-slate-800 focus:border-amber-400 rounded p-2 text-xs text-slate-100 mt-0.5 focus:outline-none">
+              </div>
+              <div>
+                <label class="text-[10px] text-purple-400 uppercase">2. Mental Protocol (Journaling / Focus)</label>
+                <input id="boot-input-mental" type="text" placeholder="e.g. Alignment Journal + 20m Silent Library Walk" class="w-full bg-slate-950 border border-slate-800 focus:border-purple-400 rounded p-2 text-xs text-slate-100 mt-0.5 focus:outline-none">
+              </div>
+              <div>
+                <label class="text-[10px] text-cyan-400 uppercase">3. Track 1 Cash Target (Runway Engine)</label>
+                <input id="boot-input-cash" type="text" placeholder="e.g. 30 Agency Overflow DMs + 5 Loom Audits" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-400 rounded p-2 text-xs text-slate-100 mt-0.5 focus:outline-none">
+              </div>
+              <div>
+                <label class="text-[10px] text-emerald-400 uppercase">4. Track 2 Agency Target (Brand to Audience)</label>
+                <input id="boot-input-agency" type="text" placeholder="e.g. Ship Case Study VSL Funnel Architecture" class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-400 rounded p-2 text-xs text-slate-100 mt-0.5 focus:outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-slate-800">
+            <button onclick="lockMorningBoot()" class="flex-1 py-2.5 hex-button bg-gradient-to-r from-amber-500 to-orange-500 text-black font-cyber font-black text-xs uppercase tracking-wider hover:brightness-125 transition-all">
+              LOCK NON-NEGOTIABLES (+50 XP)
+            </button>
+            <button onclick="triggerOverseerAudit('boot', true)" class="px-3 py-2.5 rounded bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-700 font-mono-tech text-[10px] uppercase">
+              PUSH ALERT
+            </button>
+          </div>
+        </section>
+
+        <!-- 01:00 PM - MID-DAY VELOCITY CHECK -->
+        <section class="holo-bridge-panel hex-cut p-5 border-t-2 border-t-cyan-400 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span class="text-xs font-cyber font-black text-cyan-400 uppercase tracking-wider">01:00 PM // MID-DAY VELOCITY CHECK</span>
+              </div>
+              <span id="midday-lock-status" class="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">PENDING</span>
+            </div>
+            <div class="p-3 rounded bg-slate-950/90 border border-cyan-900/50 text-[11px] font-mono-tech text-cyan-200 leading-relaxed mb-3">
+              "[OVERSEER] Mid-day audit. Has the gym session been locked in? Are the cash pipelines moving? Report status."
+            </div>
+
+            <div class="space-y-3 text-xs font-mono-tech">
+              <div class="p-3 rounded bg-slate-950 border border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">GYM / CONDITIONING STATUS:</span>
+                  <span id="midday-gym-indicator" class="font-bold text-red-400">NOT LOCKED</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">TRACK 1 CASH PIPELINE:</span>
+                  <span id="midday-cash-indicator" class="font-bold text-red-400">STALLED (0 ACTIONS)</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">COGNITIVE JOURNAL STATUS:</span>
+                  <span id="midday-journal-indicator" class="font-bold text-red-400">NOT LOGGED</span>
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[10px] text-cyan-400 uppercase">Mid-Day Operator Status Report</label>
+                <textarea id="midday-status-note" rows="3" placeholder="Report gym completion, outreach volume transmitted, and active prospect replies..." class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-400 rounded p-2 text-xs text-slate-100 mt-1 focus:outline-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-slate-800">
+            <button onclick="submitMiddayCheck()" class="flex-1 py-2.5 hex-button bg-gradient-to-r from-cyan-400 to-blue-600 text-black font-cyber font-black text-xs uppercase tracking-wider hover:brightness-125 transition-all">
+              TRANSMIT MID-DAY REPORT
+            </button>
+            <button onclick="triggerOverseerAudit('midday', true)" class="px-3 py-2.5 rounded bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-700 font-mono-tech text-[10px] uppercase">
+              PUSH ALERT
+            </button>
+          </div>
+        </section>
+
+        <!-- 09:00 PM - OMNI-DOMAIN DE-BRIEF -->
+        <section class="holo-bridge-panel hex-cut p-5 border-t-2 border-t-magenta-500 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-magenta-500 animate-ping"></span>
+                <span class="text-xs font-cyber font-black text-magenta-400 uppercase tracking-wider">09:00 PM // OMNI-DOMAIN DE-BRIEF</span>
+              </div>
+              <span id="debrief-lock-status" class="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700">AWAITING 21:00</span>
+            </div>
+            <div class="p-3 rounded bg-slate-950/90 border border-magenta-900/50 text-[11px] font-mono-tech text-magenta-200 leading-relaxed mb-3">
+              "[OVERSEER] 21:00 Evening Audit. Retrieving your exact 07:00 AM targets for individual confirmation: 1. Did you lift? 2. Did you journal? 3. What revenue actions were executed? 4. Was your Agency target completed?"
+            </div>
+
+            <!-- 07:00 AM -> 21:00 PM Memory Comparison Preview -->
+            <div id="debrief-card-morning-memory" class="p-3 rounded-lg bg-slate-950 border border-magenta-500/40 space-y-1.5 text-[11px] font-mono-tech mb-3">
+              <div class="text-[10px] text-magenta-400 font-bold uppercase tracking-wider">07:00 AM LOCKED TARGET MEMORY LOOP:</div>
+              <div class="flex items-center justify-between gap-2"><span class="text-amber-400">1. PHYSICAL:</span><span id="mem-preview-physical" class="text-slate-300 truncate">Not set at 07:00</span></div>
+              <div class="flex items-center justify-between gap-2"><span class="text-purple-400">2. MENTAL:</span><span id="mem-preview-mental" class="text-slate-300 truncate">Not set at 07:00</span></div>
+              <div class="flex items-center justify-between gap-2"><span class="text-cyan-400">3. CASH:</span><span id="mem-preview-cash" class="text-slate-300 truncate">Not set at 07:00</span></div>
+              <div class="flex items-center justify-between gap-2"><span class="text-emerald-400">4. AGENCY:</span><span id="mem-preview-agency" class="text-slate-300 truncate">Not set at 07:00</span></div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5 text-xs font-mono-tech">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">HOLISTIC DAILY MACHINE SCORE:</span>
+                <span id="debrief-preview-score" class="text-lg font-cyber font-black text-cyan-300">0%</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">PROJECTED DISCIPLINE PENALTY:</span>
+                <span id="debrief-preview-penalty" class="text-xs font-bold text-red-400">-300 XP AT RISK</span>
+              </div>
+              <p class="text-[10px] text-slate-400 leading-relaxed">
+                Skipping Physical (Gym) or Mental (Journaling) protocols triggers an immediate Discipline Penalty on your Rank Progression Bar.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-slate-800">
+            <button onclick="openDebriefModal()" class="flex-1 py-2.5 hex-button bg-gradient-to-r from-magenta-500 to-amber-500 text-black font-cyber font-black text-xs uppercase tracking-wider hover:brightness-125 transition-all shadow-[0_0_15px_rgba(255,0,85,0.5)]">
+              OPEN 21:00 DE-BRIEF CONSOLE
+            </button>
+            <button onclick="triggerOverseerAudit('debrief', true)" class="px-3 py-2.5 rounded bg-slate-900 hover:bg-slate-800 text-magenta-300 border border-magenta-700 font-mono-tech text-[10px] uppercase">
+              PUSH ALERT
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- BOTTOM ROW: TELEGRAM TWO-WAY CONVERSATION & LLM PARSER + COGNITIVE JOURNAL ARCHIVE -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- TELEGRAM & WEBHOOK TWO-WAY MOBILE CONVERSATION + LLM PARSER ENGINE -->
+        <section class="lg:col-span-6 holo-bridge-panel hex-cut p-6 border-l-4 border-l-cyan-400">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-mono-tech text-cyan-400 uppercase tracking-widest">TWO-WAY TELEGRAM &amp; LLM SCHEDULER ENGINE</span>
+                <span id="overseer-tz-badge" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/60 text-[10px] font-mono-tech">TZ LOCK: LOCAL</span>
+              </div>
+              <h3 class="text-sm font-cyber font-black text-white uppercase mt-0.5">TELEGRAM BOT POLLING, VOICE/TEXT LLM PARSER &amp; WEBHOOK</h3>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span id="tg-polling-status" class="px-2 py-1 rounded bg-slate-900 text-slate-400 border border-slate-700 text-[10px] font-mono-tech">2-WAY BOT: STANDBY</span>
+              <button onclick="requestBrowserNotificationPermission()" class="px-2.5 py-1 rounded bg-cyan-950 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/60 text-[10px] font-mono-tech">
+                [ ENABLE ALERTS ]
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono-tech mb-4">
+            <div>
+              <label class="text-[10px] text-cyan-400 uppercase block mb-1">TELEGRAM BOT TOKEN (2-WAY POLLING)</label>
+              <input id="overseer-tg-token" type="password" placeholder="123456789:ABCdefGHIjklMNO..." class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded p-2 text-cyan-300 text-xs focus:outline-none">
+            </div>
+            <div>
+              <label class="text-[10px] text-cyan-400 uppercase block mb-1">TELEGRAM CHAT ID</label>
+              <input id="overseer-tg-chatid" type="text" placeholder="e.g. 987654321" class="w-full bg-slate-950 border border-slate-700 focus:border-cyan-400 rounded p-2 text-cyan-300 text-xs focus:outline-none">
+            </div>
+            <div>
+              <label class="text-[10px] text-purple-400 uppercase block mb-1">LLM API KEY (GEMINI / OPENAI / OPTIONAL)</label>
+              <input id="overseer-llm-key" type="password" placeholder="AIza... or sk-... (blank = Local LLM / NLP)" class="w-full bg-slate-950 border border-slate-700 focus:border-purple-400 rounded p-2 text-purple-300 text-xs focus:outline-none">
+            </div>
+            <div>
+              <label class="text-[10px] text-amber-400 uppercase block mb-1">WEBHOOK URL (OPTIONAL)</label>
+              <input id="overseer-webhook-url" type="text" placeholder="https://hooks.zapier.com/... or Discord webhook" class="w-full bg-slate-950 border border-slate-700 focus:border-amber-400 rounded p-2 text-amber-300 text-xs focus:outline-none">
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800">
+            <button onclick="saveOverseerConfig()" class="hex-button px-5 py-2 bg-gradient-to-r from-cyan-400 to-blue-600 text-black font-cyber font-black text-xs uppercase tracking-wider hover:brightness-125 transition-all">
+              SAVE UPLINK &amp; ARM 2-WAY BOT
+            </button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="pollTelegramUpdatesOnce(true)" class="px-3 py-2 rounded bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-600/60 font-mono-tech text-xs">
+                [ SYNC TELEGRAM REPLIES ]
+              </button>
+              <button onclick="testOverseerWebhook()" class="px-3 py-2 rounded bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-600/60 font-mono-tech text-xs">
+                [ TEST MOBILE PUSH ]
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive Two-Way Reply / Voice Note LLM Parser -->
+          <div class="mt-4 pt-3 border-t border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono-tech text-emerald-400 uppercase tracking-widest font-bold">TWO-WAY MOBILE / VOICE REPLY LLM PARSER:</span>
+              <button id="voice-mic-btn" onclick="startOverseerVoiceReply()" class="px-2.5 py-1 rounded bg-magenta-950 hover:bg-magenta-900 text-magenta-300 border border-magenta-500/60 text-[10px] font-mono-tech">
+                🎙️ DICTATE VOICE REPLY
+              </button>
+            </div>
+            <textarea id="overseer-mobile-reply-input" rows="2" placeholder="Reply naturally via Telegram or test here (e.g. 'Yes I lifted heavy push and hydrated, did my journal and focus walk, sent 30 agency DMs and 5 Looms, shipped the Track 2 funnel')..." class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded p-2.5 text-xs font-mono-tech text-slate-100 focus:outline-none"></textarea>
+            <button onclick="processIncomingOperatorReply()" class="w-full py-2 hex-button bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-cyber font-black text-xs uppercase tracking-wider hover:brightness-125 transition-all">
+              PARSE REPLY VIA LLM ENGINE, AUTO-SCORE (0–100%) &amp; SYNC DB
+            </button>
+          </div>
+
+          <!-- Audit Transmission Log -->
+          <div class="mt-4 pt-3 border-t border-slate-800">
+            <div class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-widest mb-2">OVERSEER AUDIT TRANSMISSION STREAM:</div>
+            <div id="overseer-audit-log" class="space-y-1.5 max-h-40 overflow-y-auto text-[11px] font-mono-tech pr-1"></div>
+          </div>
+        </section>
+
+        <!-- COGNITIVE CALIBRATION // PSYCHOLOGICAL ALIGNMENT JOURNAL -->
+        <section class="lg:col-span-6 holo-bridge-panel hex-cut p-6 border-l-4 border-l-purple-400 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+              <div>
+                <span class="text-[10px] font-mono-tech text-purple-400 uppercase tracking-widest block">DOMAIN 2 // COGNITIVE CALIBRATION</span>
+                <h3 class="text-sm font-cyber font-black text-white uppercase">PSYCHOLOGICAL ALIGNMENT &amp; JOURNAL LOG</h3>
+              </div>
+              <span class="text-[10px] font-mono-tech text-purple-300 bg-purple-950 px-2 py-0.5 rounded border border-purple-600">
+                +150 XP ON ENTRY
+              </span>
+            </div>
+
+            <div class="space-y-3 text-xs font-mono-tech">
+              <div>
+                <label class="text-[10px] text-purple-300 uppercase block mb-1">TODAY'S MENTAL ALIGNMENT / RESISTANCE DIAGNOSTIC:</label>
+                <textarea id="inline-journal-input" rows="4" placeholder="Identify any avoidance loops, dopamine cravings, or sales resistance. State exact cognitive framing for today's execution..." class="w-full bg-slate-950 border border-slate-700 focus:border-purple-400 rounded p-3 text-slate-100 text-xs focus:outline-none"></textarea>
+              </div>
+              <button onclick="saveInlineJournalEntry()" class="w-full py-2.5 hex-button bg-gradient-to-r from-purple-500 to-magenta-500 text-white font-cyber font-black text-xs uppercase tracking-wider hover:brightness-125 transition-all">
+                COMMIT COGNITIVE JOURNAL &amp; LOCK DOMAIN 2 (+150 XP)
+              </button>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800">
+              <div class="text-[10px] font-mono-tech text-slate-400 uppercase tracking-widest mb-2">RECENT ALIGNMENT LOGS:</div>
+              <div id="journal-entries-list" class="space-y-2 max-h-40 overflow-y-auto text-xs font-mono-tech pr-1"></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- =================================================================================== -->
+    <!-- VIEW B: BIO-CLEARANCE DECK (STEALTH PRIVATE ACCESS ONLY) -->
     <!-- =================================================================================== -->
     <div id="deck-bioclearance" class="space-y-5 hidden">
+
+      <div class="flex items-center justify-between px-4 py-2.5 rounded-lg bg-emerald-950/70 border border-emerald-500/60 text-xs font-mono-tech">
+        <div class="flex items-center gap-2 text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="font-bold uppercase tracking-wider">PRIVATE STEALTH DECK UNLOCKED</span>
+          <span class="text-slate-400 hidden sm:inline">// Hidden from main navigation (Triple-tap NODE_01 or Ctrl+Shift+B)</span>
+        </div>
+        <button onclick="switchDeck('deployment')" class="px-3 py-1 rounded bg-slate-900 hover:bg-red-950 text-emerald-300 hover:text-red-300 border border-emerald-500/60 hover:border-red-500 font-cyber text-[10px] font-black uppercase tracking-wider transition-all">
+          [ ESC // CLOAK &amp; EXIT ]
+        </button>
+      </div>
 
       <!-- TOP BIO-TELEMETRY & PURITY SUMMARY -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -1138,6 +1653,154 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     </div>
   </div>
 
+  <!-- 09:00 PM OMNI-DOMAIN DE-BRIEF MODAL (INTERACTIVE 07:00 AM MEMORY & COMPARISON LOOP) -->
+  <div id="debrief-modal" class="fixed inset-0 bg-black/92 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="holo-bridge-panel hex-cut max-w-2xl w-full p-6 md:p-7 border-2 border-magenta-500 relative overflow-hidden shadow-[0_0_50px_rgba(255,0,85,0.4)] my-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-magenta-500 animate-ping"></span>
+          <h3 class="text-base font-cyber font-black text-magenta-400 uppercase tracking-wider">
+            21:00 // OVERSEER MEMORY &amp; COMPARISON LOOP DE-BRIEF
+          </h3>
+        </div>
+        <button onclick="closeDebriefModal()" class="text-slate-400 hover:text-white font-mono-tech">✕</button>
+      </div>
+
+      <p id="debrief-morning-recall-banner" class="text-xs font-mono-tech text-slate-300 leading-relaxed mb-3 p-2.5 rounded bg-slate-950/90 border border-magenta-500/40">
+        "[OVERSEER] 21:00 Evening Audit. Retrieving your exact 07:00 AM Non-Negotiable Targets. Confirm execution on each target individually below."
+      </p>
+
+      <div class="space-y-2.5 text-xs font-mono-tech">
+        <!-- Target 1 Confirmation: Physical (Did you lift?) -->
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <span class="text-[10px] text-amber-400 uppercase block">1. 07:00 AM PHYSICAL TARGET: <span id="debrief-target-physical" class="text-amber-200 font-bold">"Heavy Conditioning / Gym"</span></span>
+            <span class="text-slate-100 font-bold">Did you lift / complete hard physical conditioning today?</span>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer shrink-0">
+            <input id="debrief-chk-lift" type="checkbox" onchange="syncDebriefCheckboxes()" class="w-4 h-4 accent-amber-400">
+            <span class="text-amber-300 font-bold">CONFIRMED (+150 XP)</span>
+          </label>
+        </div>
+
+        <!-- Target 2 Confirmation: Mental (Did you journal?) -->
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <span class="text-[10px] text-purple-400 uppercase block">2. 07:00 AM MENTAL TARGET: <span id="debrief-target-mental" class="text-purple-200 font-bold">"Psychological Alignment Journal"</span></span>
+            <span class="text-slate-100 font-bold">Did you journal &amp; complete your cognitive focus protocol?</span>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer shrink-0">
+            <input id="debrief-chk-journal" type="checkbox" onchange="syncDebriefCheckboxes()" class="w-4 h-4 accent-purple-400">
+            <span class="text-purple-300 font-bold">CONFIRMED (+150 XP)</span>
+          </label>
+        </div>
+
+        <!-- Target 3 Confirmation: Cash Target (Track 1) -->
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <span class="text-[10px] text-cyan-400 uppercase block">3. 07:00 AM CASH TARGET: <span id="debrief-target-cash" class="text-cyan-200 font-bold">"Direct Outreach &amp; Closing Pipeline"</span></span>
+            <span class="text-slate-100 font-bold">Did you execute your Track 1 Cash Runway target today?</span>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer shrink-0">
+            <input id="debrief-chk-cash" type="checkbox" onchange="syncDebriefCheckboxes()" class="w-4 h-4 accent-cyan-400">
+            <span class="text-cyan-300 font-bold">CONFIRMED</span>
+          </label>
+        </div>
+
+        <!-- Target 4 Confirmation: Agency Target (Track 2) -->
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex-1">
+            <span class="text-[10px] text-emerald-400 uppercase block">4. 07:00 AM AGENCY TARGET: <span id="debrief-target-agency" class="text-emerald-200 font-bold">"Brand-to-Audience Infrastructure"</span></span>
+            <span class="text-slate-100 font-bold">Did you ship your Track 2 Brand-to-Audience target today?</span>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer shrink-0">
+            <input id="debrief-chk-agency" type="checkbox" onchange="syncDebriefCheckboxes()" class="w-4 h-4 accent-emerald-400">
+            <span class="text-emerald-300 font-bold">CONFIRMED</span>
+          </label>
+        </div>
+
+        <!-- Revenue & Execution Details / Voice or Text Natural Language Input -->
+        <div class="p-3 rounded-lg bg-slate-950 border border-slate-800 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-cyan-400 uppercase">WHAT REVENUE &amp; AGENCY ACTIONS WERE EXECUTED? (OR DICTATE NATURAL REPLY)</span>
+            <span id="debrief-business-summary" class="text-[10px] text-emerald-400 font-bold">AUDITING CONDUITS...</span>
+          </div>
+          <textarea id="debrief-revenue-input" rows="2" placeholder="State exact revenue actions executed (or type/dictate full natural reply and click Auto-Parse)..." class="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded p-2 text-xs text-slate-100 focus:outline-none"></textarea>
+          <div class="flex justify-end">
+            <button onclick="parseDebriefTextWithLLM()" class="px-3 py-1 rounded bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/60 text-[10px] font-mono-tech">
+              ⚡ AUTO-PARSE TEXT/VOICE REPLY VIA LLM ENGINE
+            </button>
+          </div>
+        </div>
+
+        <!-- Holistic Score Preview -->
+        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-cyan-500/50 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-cyan-400 uppercase tracking-widest">CALCULATED DAILY MACHINE SCORE</div>
+            <div id="debrief-modal-verdict" class="text-xs text-slate-300 mt-0.5">Evaluating 4-Domain Matrix...</div>
+          </div>
+          <div class="text-right">
+            <div id="debrief-modal-score" class="text-3xl font-cyber font-black text-cyan-300">0%</div>
+            <div id="debrief-modal-xp-impact" class="text-[10px] font-bold text-amber-400">0 XP NET</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-slate-800">
+        <button onclick="closeDebriefModal()" class="px-4 py-2.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-cyber">
+          CANCEL
+        </button>
+        <button onclick="submitOmniDebrief()" class="hex-button px-6 py-2.5 bg-gradient-to-r from-magenta-500 via-amber-500 to-cyan-400 text-black font-cyber font-black text-xs uppercase tracking-widest hover:brightness-125 transition-all shadow-[0_0_25px_rgba(255,0,85,0.6)]">
+          SUBMIT OMNI-DOMAIN DE-BRIEF &amp; LOCK SCORE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COGNITIVE CALIBRATION // JOURNAL MODAL -->
+  <div id="journal-modal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+    <div class="holo-bridge-panel hex-cut max-w-lg w-full p-6 border-2 border-purple-400 relative overflow-hidden shadow-[0_0_40px_rgba(157,78,221,0.4)]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+        <h3 class="text-base font-cyber font-bold text-purple-300 uppercase tracking-wider flex items-center gap-2">
+          <span>◈</span> DOMAIN 2 // PSYCHOLOGICAL ALIGNMENT LOG
+        </h3>
+        <button onclick="closeJournalModal()" class="text-slate-400 hover:text-white font-mono-tech">✕</button>
+      </div>
+      <p class="text-xs font-mono-tech text-slate-400 mb-3">
+        Log your daily mental calibration, identify avoidance triggers, and lock in cold operational focus. Awards +150 XP and clears the Mental Journal requirement.
+      </p>
+      <textarea id="modal-journal-input" rows="5" placeholder="Write today's cognitive calibration log..." class="w-full bg-slate-950 border border-purple-500/60 rounded-lg p-3 text-xs font-mono-tech text-slate-100 focus:outline-none focus:border-purple-400"></textarea>
+      <div class="flex justify-end gap-2 mt-4">
+        <button onclick="closeJournalModal()" class="px-4 py-2 rounded bg-slate-900 text-slate-400 text-xs font-cyber">CLOSE</button>
+        <button onclick="saveModalJournalEntry()" class="hex-button px-6 py-2 bg-gradient-to-r from-purple-500 to-magenta-500 text-white font-cyber font-black text-xs uppercase tracking-wider">
+          COMMIT LOG (+150 XP)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERSEER SCHEDULED ALERT OVERRIDE MODAL -->
+  <div id="overseer-alert-modal" class="fixed inset-0 bg-black/92 backdrop-blur-2xl z-50 hidden flex items-center justify-center p-4">
+    <div class="holo-bridge-panel hex-cut max-w-lg w-full p-6 md:p-8 border-2 border-amber-400 relative overflow-hidden shadow-[0_0_60px_rgba(255,145,0,0.5)]">
+      <div class="text-xs font-mono-tech text-amber-400 tracking-widest uppercase mb-1 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+        <span id="overseer-alert-window-label">OVERSEER SCHEDULED TRANSMISSION</span>
+      </div>
+      <h2 id="overseer-alert-title" class="text-2xl font-cyber font-black text-white glitch-title mb-3">
+        MORNING SYSTEM BOOT
+      </h2>
+      <div id="overseer-alert-message" class="p-4 rounded-lg bg-slate-950 border border-amber-500/60 text-xs font-mono-tech text-amber-200 leading-relaxed mb-5"></div>
+      <div class="flex items-center justify-end gap-3">
+        <button onclick="closeOverseerAlertModal()" class="px-4 py-2.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-cyber">
+          ACKNOWLEDGE
+        </button>
+        <button id="overseer-alert-action-btn" onclick="openOverseerDeckFromAlert()" class="hex-button px-6 py-2.5 bg-gradient-to-r from-amber-400 to-orange-500 text-black font-cyber font-black text-xs uppercase tracking-wider">
+          OPEN OVERSEER CONSOLE
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // =========================================================================
     // 1. PHARMACOKINETIC ENGINE CONSTANTS & LOGIC (PRESERVED VERBATIM)
@@ -1321,7 +1984,29 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       xp: 0,
       cash: 0,
       completedHabits: [],
-      lastAcknowledgedLevel: 1
+      lastAcknowledgedLevel: 1,
+      overseer: {
+        bootLockedDate: null,
+        nonNegotiables: {
+          physical: '',
+          mental: '',
+          cash: '',
+          agency: ''
+        },
+        middayCheckedDate: null,
+        middayNote: '',
+        debriefSubmittedDate: null,
+        lastMachineScore: 0,
+        enforcedPenaltyXP: 0,
+        lastBootAlertDate: null,
+        lastMiddayAlertDate: null,
+        lastDebriefAlertDate: null,
+        journalLogs: [],
+        auditLogs: [],
+        tgToken: '',
+        tgChatId: '',
+        webhookUrl: ''
+      }
     };
 
     let bioState = {
@@ -1333,28 +2018,72 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     let bioLoggingTarget = 'today'; // 'today' | 'yesterday' | 'custom'
     let bioCustomDateStr = null;
 
+    // Stealth Bio-Clearance Access (Triple-click NODE_01 or HOLO_BRIDGE title, or press Ctrl+Shift+B / Alt+B)
+    let stealthTapCount = 0;
+    let stealthTapTimer = null;
+
+    function handleStealthBioTap() {
+      stealthTapCount += 1;
+      if (stealthTapTimer) clearTimeout(stealthTapTimer);
+      if (stealthTapCount >= 3) {
+        stealthTapCount = 0;
+        switchDeck(currentDeck === 'bioclearance' ? 'deployment' : 'bioclearance');
+        return;
+      }
+      stealthTapTimer = setTimeout(() => {
+        stealthTapCount = 0;
+      }, 1200);
+    }
+
+    document.addEventListener('keydown', (ev) => {
+      if ((ev.ctrlKey && ev.shiftKey && (ev.key === 'B' || ev.key === 'b')) || (ev.altKey && (ev.key === 'B' || ev.key === 'b'))) {
+        ev.preventDefault();
+        switchDeck(currentDeck === 'bioclearance' ? 'deployment' : 'bioclearance');
+      } else if (ev.key === 'Escape' && currentDeck === 'bioclearance') {
+        switchDeck('deployment');
+      }
+    });
+
     // Tactical Deck Switcher
     function switchDeck(deck) {
       currentDeck = deck;
       const depEl = document.getElementById('deck-deployment');
+      const ovsEl = document.getElementById('deck-overseer');
       const bioEl = document.getElementById('deck-bioclearance');
       const btnDep = document.getElementById('btn-deck-deployment');
+      const btnOvs = document.getElementById('btn-deck-overseer');
       const btnBio = document.getElementById('btn-deck-bioclearance');
       const statusLabel = document.getElementById('deck-status-label');
 
+      depEl.classList.add('hidden');
+      if (ovsEl) ovsEl.classList.add('hidden');
+      bioEl.classList.add('hidden');
+
+      btnDep.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-slate-900 text-cyan-400 hover:text-white hover:bg-cyan-950/80 border border-slate-700 hover:border-cyan-500 transition-all";
+      if (btnOvs) {
+        btnOvs.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-slate-900 text-amber-400 hover:text-white hover:bg-amber-950/80 border border-amber-500/60 hover:border-amber-400 transition-all flex items-center gap-1.5";
+      }
+      // Always keep the Bio-Clearance nav button completely hidden from the public UI
+      if (btnBio) {
+        btnBio.className = "hidden";
+      }
+
       if (deck === 'deployment') {
         depEl.classList.remove('hidden');
-        bioEl.classList.add('hidden');
         btnDep.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 text-black shadow-[0_0_15px_rgba(0,240,255,0.6)] transition-all";
-        btnBio.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-slate-900 text-emerald-400 hover:text-white hover:bg-emerald-950/80 border border-slate-700 hover:border-emerald-500 transition-all";
         statusLabel.textContent = "DECK: [DEPLOYMENT]";
         statusLabel.className = "text-amber-400 font-bold";
+      } else if (deck === 'overseer') {
+        if (ovsEl) ovsEl.classList.remove('hidden');
+        if (btnOvs) {
+          btnOvs.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-[0_0_15px_rgba(255,145,0,0.6)] transition-all flex items-center gap-1.5";
+        }
+        statusLabel.textContent = "DECK: [OVERSEER AI SUPERVISOR]";
+        statusLabel.className = "text-amber-400 font-bold";
+        renderOverseerDeck();
       } else {
-        depEl.classList.add('hidden');
         bioEl.classList.remove('hidden');
-        btnBio.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-400 to-cyan-500 text-black shadow-[0_0_15px_rgba(0,255,157,0.6)] transition-all";
-        btnDep.className = "hex-button px-4 py-2 font-cyber text-xs font-black uppercase tracking-wider bg-slate-900 text-cyan-400 hover:text-white hover:bg-cyan-950/80 border border-slate-700 hover:border-cyan-500 transition-all";
-        statusLabel.textContent = "DECK: [BIO-CLEARANCE]";
+        statusLabel.textContent = "DECK: [SYS_DIAGNOSTICS]";
         statusLabel.className = "text-emerald-400 font-bold";
         setBioLoggingDate(bioLoggingTarget);
         renderBioDeck();
@@ -1723,6 +2452,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
       // Render Entries List for currently targeted date
       renderBioEntriesList();
+      renderHUD();
     }
 
     // Dynamic Render of Logged Sessions Stream with Residual Decay Telemetry
@@ -2017,7 +2747,24 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     const PENALTY_PER_MISSED_DAY = 300;
 
     function checkInactivityAtrophy(parsedState, todayStr) {
-      if (!parsedState.lastActiveDate) return;
+      if (!parsedState) return;
+      ensureOverseerState(parsedState);
+
+      // 1. Check if previous active day skipped Physical (Gym) or Mental (Journal) protocols without already being penalized at 21:00
+      let disciplinePenalty = 0;
+      if (parsedState.date && parsedState.date !== todayStr && parsedState.overseer.debriefSubmittedDate !== parsedState.date) {
+        const prevHabits = parsedState.completedHabits || [];
+        if (!prevHabits.includes('h_workout')) disciplinePenalty += 150;
+        if (!prevHabits.includes('h_journal')) disciplinePenalty += 150;
+      }
+
+      if (!parsedState.lastActiveDate) {
+        if (disciplinePenalty > 0) {
+          parsedState.xp = Math.max(0, (parsedState.xp || 0) - disciplinePenalty);
+          parsedState.overseer.enforcedPenaltyXP = disciplinePenalty;
+        }
+        return;
+      }
 
       const todayDate = new Date(todayStr + 'T00:00:00');
       const lastActive = new Date(parsedState.lastActiveDate + 'T00:00:00');
@@ -2025,14 +2772,15 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
       // If diffDays >= 2, at least 1 full operational day was completely abandoned
-      if (diffDays >= 2) {
-        const missedDays = diffDays - 1;
-        const totalPenalty = missedDays * PENALTY_PER_MISSED_DAY;
+      if (diffDays >= 2 || disciplinePenalty > 0) {
+        const missedDays = Math.max(0, diffDays - 1);
+        const totalPenalty = (missedDays * PENALTY_PER_MISSED_DAY) + disciplinePenalty;
         const priorXP = parsedState.xp || 0;
         const newXP = Math.max(0, priorXP - totalPenalty);
 
         parsedState.xp = newXP;
-        parsedState.streak = 0;
+        if (missedDays > 0) parsedState.streak = 0;
+        parsedState.overseer.enforcedPenaltyXP = totalPenalty;
 
         // Check if operator suffered rank demotion
         let newRank = ranks[0];
@@ -2045,7 +2793,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         parsedState.lastAcknowledgedLevel = newRank.level;
 
         setTimeout(() => {
-          showAtrophyModal(missedDays, totalPenalty, wasDemoted, newRank);
+          showAtrophyModal(missedDays || 1, totalPenalty, wasDemoted, newRank);
         }, 600);
       }
     }
@@ -2074,6 +2822,161 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       document.getElementById('atrophy-modal').classList.add('hidden');
     }
 
+    const DEFAULT_TG_BOT_TOKEN = '8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM';
+    const DEFAULT_TG_CHAT_ID = '5441024587';
+    const LOCAL_OVERSEER_API = 'http://127.0.0.1:8765';
+    const OVERSEER_DRILL_SYSTEM_PROMPT =
+      "You are OVERSEER. Your sole mission is driving the operator to maximum human execution. If the operator gives weak excuses, dodges questions, or goes silent, call it out directly. Do not accept pleasantries or vague answers. Demand exact numbers and immediate target locks. STRICT CONCISENESS RULE: Keep every response punchy, brutal, and conversational — strictly 2 to 4 sentences max per message. Never output huge walls of text, giant schedule dumps, robotic data cards, or code blocks unless explicitly asked.";
+
+    function ensureOverseerState(targetState) {
+      const defaults = {
+        bootLockedDate: null,
+        todayTargetsLocked: false,
+        nonNegotiables: { physical: '', mental: '', cash: '', agency: '' },
+        middayCheckedDate: null,
+        middayNote: '',
+        debriefSubmittedDate: null,
+        lastMachineScore: 0,
+        enforcedPenaltyXP: 0,
+        evasionPenaltyCountToday: 0,
+        unansweredPingCount: 0,
+        awaitingOperatorReply: true,
+        pendingAuditSlot: '07:00',
+        lastBootAlertDate: null,
+        lastMiddayAlertDate: null,
+        lastDebriefAlertDate: null,
+        journalLogs: [],
+        auditLogs: [],
+        chatHistory: [],
+        processedUpdateIds: [],
+        tgToken: DEFAULT_TG_BOT_TOKEN,
+        tgChatId: DEFAULT_TG_CHAT_ID,
+        llmApiKey: '',
+        lastTgUpdateId: 0,
+        webhookUrl: ''
+      };
+      targetState.overseer = Object.assign(defaults, targetState.overseer || {});
+      if (!targetState.overseer.tgToken) {
+        targetState.overseer.tgToken = DEFAULT_TG_BOT_TOKEN;
+      }
+      if (!targetState.overseer.tgChatId) {
+        targetState.overseer.tgChatId = DEFAULT_TG_CHAT_ID;
+      }
+      targetState.overseer.nonNegotiables = Object.assign(
+        { physical: '', mental: '', cash: '', agency: '' },
+        (targetState.overseer && targetState.overseer.nonNegotiables) || {}
+      );
+      if (!Array.isArray(targetState.overseer.journalLogs)) targetState.overseer.journalLogs = [];
+      if (!Array.isArray(targetState.overseer.auditLogs)) targetState.overseer.auditLogs = [];
+      if (!Array.isArray(targetState.overseer.chatHistory)) targetState.overseer.chatHistory = [];
+      if (!Array.isArray(targetState.overseer.processedUpdateIds)) targetState.overseer.processedUpdateIds = [];
+    }
+
+    let lastLocalSyncTimestamp = '';
+    let isApplyingRemoteState = false;
+    let serverPollsTelegram = false;
+
+    function applyUnifiedRecordToUI(record) {
+      if (!record || !record.state) return;
+      if (record.server_polls_telegram !== undefined) {
+        serverPollsTelegram = Boolean(record.server_polls_telegram);
+      }
+      if (record.updated_at && record.updated_at === lastLocalSyncTimestamp) return;
+      lastLocalSyncTimestamp = record.updated_at || new Date().toISOString();
+
+      isApplyingRemoteState = true;
+      try {
+        const incoming = record.state;
+        const curUpdateId = (state.overseer && state.overseer.lastTgUpdateId) || 0;
+        const curProcessed = (state.overseer && state.overseer.processedUpdateIds) || [];
+
+        state.xp = incoming.xp ?? state.xp;
+        state.cash = incoming.cash ?? state.cash;
+        state.streak = incoming.streak ?? state.streak;
+        state.date = incoming.date || state.date;
+        state.lastActiveDate = incoming.lastActiveDate || state.lastActiveDate;
+        state.lastAcknowledgedLevel = incoming.lastAcknowledgedLevel || state.lastAcknowledgedLevel;
+        state.completedHabits = Array.isArray(incoming.completedHabits) ? incoming.completedHabits : [];
+        state.overseer = Object.assign({}, state.overseer || {}, incoming.overseer || {});
+        ensureOverseerState(state);
+
+        state.overseer.lastTgUpdateId = Math.max(curUpdateId, state.overseer.lastTgUpdateId || 0);
+        const mergedIds = new Set([...curProcessed, ...(state.overseer.processedUpdateIds || [])]);
+        state.overseer.processedUpdateIds = Array.from(mergedIds).slice(-100);
+
+        if (record.bio_state) {
+          bioState = Object.assign(bioState, record.bio_state);
+          localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(bioState));
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+        // Update boot input boxes in real time
+        const nn = state.overseer.nonNegotiables || {};
+        const inPhys = document.getElementById('boot-input-physical');
+        const inMent = document.getElementById('boot-input-mental');
+        const inCash = document.getElementById('boot-input-cash');
+        const inAg = document.getElementById('boot-input-agency');
+        if (inPhys && nn.physical !== undefined) inPhys.value = nn.physical;
+        if (inMent && nn.mental !== undefined) inMent.value = nn.mental;
+        if (inCash && nn.cash !== undefined) inCash.value = nn.cash;
+        if (inAg && nn.agency !== undefined) inAg.value = nn.agency;
+
+        renderBioDeck();
+        renderCheckboxes();
+        renderHUD();
+        renderOverseerDeck();
+      } finally {
+        isApplyingRemoteState = false;
+      }
+    }
+
+    async function pullFromLocalOverseerState() {
+      try {
+        const resp = await fetch(`${LOCAL_OVERSEER_API}/api/state?t=${Date.now()}`, { cache: 'no-store' });
+        if (resp.ok) {
+          const rec = await resp.json();
+          applyUnifiedRecordToUI(rec);
+        }
+      } catch (_) {}
+    }
+
+    async function pushToLocalOverseerState() {
+      if (isApplyingRemoteState) return;
+      try {
+        const resp = await fetch(`${LOCAL_OVERSEER_API}/api/state`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pin: syncConfig.pin || 'OPERATOR-1',
+            state: state,
+            bio_state: bioState,
+            updated_at: new Date().toISOString()
+          })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.record && data.record.updated_at) {
+            lastLocalSyncTimestamp = data.record.updated_at;
+          }
+        }
+      } catch (_) {}
+    }
+
+    function initLocalRealtimeSSE() {
+      pullFromLocalOverseerState();
+      try {
+        const es = new EventSource(`${LOCAL_OVERSEER_API}/api/stream`);
+        es.onmessage = (ev) => {
+          try {
+            const rec = JSON.parse(ev.data);
+            applyUnifiedRecordToUI(rec);
+          } catch (_) {}
+        };
+      } catch (_) {}
+      setInterval(pullFromLocalOverseerState, 1500);
+    }
+
     function loadState() {
       const saved = localStorage.getItem(STORAGE_KEY);
       const today = new Date().toISOString().split('T')[0];
@@ -2086,12 +2989,14 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
           state.streak = parsed.streak || 0;
           state.lastActiveDate = parsed.lastActiveDate || null;
           state.lastAcknowledgedLevel = parsed.lastAcknowledgedLevel || 1;
+          state.overseer = parsed.overseer || {};
+          ensureOverseerState(state);
 
           if (parsed.date === today) {
             state.completedHabits = parsed.completedHabits || [];
             state.date = today;
           } else {
-            // Check for skipped days and enforce Inactivity Atrophy
+            // Check for skipped days and enforce Inactivity Atrophy + Uncompleted Self-Maintenance Penalty
             checkInactivityAtrophy(parsed, today);
             state.xp = parsed.xp;
             state.streak = parsed.streak;
@@ -2099,12 +3004,14 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
             state.date = today;
             state.completedHabits = [];
+            state.overseer.enforcedPenaltyXP = 0;
           }
         } catch (e) {
           console.error('Error loading state', e);
         }
       } else {
         state.date = today;
+        ensureOverseerState(state);
       }
 
       const savedSound = localStorage.getItem('cso_holo_sound');
@@ -2117,12 +3024,18 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       loadBioState();
       setBioLoggingDate('today');
       renderBioDeck();
-      renderHUD();
       renderCheckboxes();
+      renderHUD();
+      renderOverseerDeck();
       renderDate();
       renderPsyQuote();
       updateClock();
       setInterval(updateClock, 1000);
+      setInterval(checkOverseerSchedule, 15000);
+      setTimeout(checkOverseerSchedule, 2000);
+
+      // Initialize Unified Local State (`overseer_state.json`) SSE & Real-Time Sync
+      initLocalRealtimeSSE();
 
       // Initialize Supabase Satellite Uplink & Realtime Sync
       initSupabase();
@@ -2135,6 +3048,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      pushToLocalOverseerState();
       debouncedPushToCloud();
     }
 
@@ -2337,14 +3251,16 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
         if (data && data.state) {
           state = Object.assign(state, data.state);
+          ensureOverseerState(state);
           if (data.bio_state) {
             bioState = Object.assign(bioState, data.bio_state);
             localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(bioState));
           }
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-          renderHUD();
           renderCheckboxes();
+          renderHUD();
           renderBioDeck();
+          renderOverseerDeck();
           updateSyncUI('CONNECTED');
           if (isManual) showToast('UPLINK SYNCED', 'Remote telemetry synchronized.');
         } else {
@@ -2384,14 +3300,16 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
               // Ignore echo of our own transmissions
               if (payload.new.state._originNodeId === terminalNodeId) return;
               state = Object.assign({}, payload.new.state);
+              ensureOverseerState(state);
               if (payload.new.bio_state) {
                 bioState = Object.assign({}, payload.new.bio_state);
                 localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(bioState));
               }
               localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-              renderHUD();
               renderCheckboxes();
+              renderHUD();
               renderBioDeck();
+              renderOverseerDeck();
               showToast('REMOTE SYNC', 'Telemetry updated from mobile/remote node.');
               playTone(750, 'sine', 0.12, 0.08);
             }
@@ -2412,7 +3330,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && supabaseClient && syncConfig.pin) {
         pullFromCloud(false);
-        checkInactivityAtrophy();
+        checkInactivityAtrophy(state, new Date().toISOString().split('T')[0]);
       }
     });
 
@@ -2430,7 +3348,186 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options).toUpperCase();
     }
 
+    // =========================================================================
+    // 8. OVERSEER HOLISTIC 4-DOMAIN EVALUATION & DISCIPLINE PENALTY ENGINE
+    // =========================================================================
+    function evaluateHolisticDomains() {
+      ensureOverseerState(state);
+      const completed = state.completedHabits || [];
+
+      // DOMAIN 1: BIOLOGICAL PRIMING (Physical) — Gym + Morning Hydration
+      const hasGym = completed.includes('h_workout');
+      const hasHydration = completed.includes('h_wake');
+      const physicalScore = (hasGym ? 50 : 0) + (hasHydration ? 50 : 0);
+      const physicalLocked = physicalScore === 100;
+
+      // DOMAIN 2: COGNITIVE CALIBRATION (Mental/Mindset) — Journaling + Focus Walk
+      const hasJournal = completed.includes('h_journal');
+      const hasWalk = completed.includes('h_walk');
+      const mentalScore = (hasJournal ? 50 : 0) + (hasWalk ? 50 : 0);
+      const mentalLocked = mentalScore === 100;
+
+      // DOMAIN 3: TRACK 1 (The Runway Engine — Immediate Cash)
+      const outreachIds = ['h_source', 'h_agency_dm', 'h_warm_network', 'h_loom'];
+      const closingIds = ['h_inbox', 'h_stripe', 'h_deliver'];
+      const outreachDone = outreachIds.filter(id => completed.includes(id)).length;
+      const closingDone = closingIds.filter(id => completed.includes(id)).length;
+      const totalCashHabits = outreachDone + closingDone;
+      // Domain 3 reaches 100% when at least 1 outreach + 1 closing/delivery (or >=3 Track 1 tasks) are executed
+      const cashScore = Math.min(100, Math.round((outreachDone > 0 ? 50 : 0) + (closingDone > 0 ? 50 : (outreachDone >= 3 ? 50 : (outreachDone / 4) * 50))));
+      const cashLocked = cashScore >= 100 || (outreachDone >= 2 && closingDone >= 1);
+
+      // DOMAIN 4: TRACK 2 (Brand to Audience — Long-Term Agency)
+      const hasInfra = completed.includes('h_track2_infra');
+      const hasAsset = completed.includes('h_track2_asset');
+      const hasSunset = completed.includes('h_sunset');
+      const agencyScore = Math.min(100, (hasInfra ? 50 : 0) + (hasAsset ? 50 : (hasSunset ? 25 : 0)));
+      const agencyLocked = hasInfra && hasAsset;
+
+      // HOLISTIC DAILY MACHINE SCORE (0-100%, equal 25% weight across all 4 domains)
+      const machineScore = Math.round((physicalScore * 0.25) + (mentalScore * 0.25) + (cashScore * 0.25) + (agencyScore * 0.25));
+      const domainsCleared = [physicalLocked, mentalLocked, cashLocked, agencyLocked].filter(Boolean).length;
+
+      // DISCIPLINE PENALTY CALCULATION (Skipping Physical Gym or Mental Journaling drags down rank)
+      let penaltyAtRisk = 0;
+      const missingReasons = [];
+      if (!hasGym) {
+        penaltyAtRisk += 150;
+        missingReasons.push('GYM (-150 XP)');
+      }
+      if (!hasHydration) {
+        penaltyAtRisk += 100;
+        missingReasons.push('HYDRATION (-100 XP)');
+      }
+      if (!hasJournal) {
+        penaltyAtRisk += 150;
+        missingReasons.push('JOURNAL (-150 XP)');
+      }
+      if (!hasWalk) {
+        penaltyAtRisk += 100;
+        missingReasons.push('FOCUS WALK (-100 XP)');
+      }
+
+      return {
+        hasGym,
+        hasHydration,
+        physicalScore,
+        physicalLocked,
+        hasJournal,
+        hasWalk,
+        mentalScore,
+        mentalLocked,
+        outreachDone,
+        closingDone,
+        totalCashHabits,
+        cashScore,
+        cashLocked,
+        hasInfra,
+        hasAsset,
+        hasSunset,
+        agencyScore,
+        agencyLocked,
+        machineScore,
+        domainsCleared,
+        penaltyAtRisk,
+        missingReasons
+      };
+    }
+
+    function renderOmniDomainGrid(evalData) {
+      const d = evalData || evaluateHolisticDomains();
+
+      // Header Score & Domains Cleared
+      const scoreEl = document.getElementById('omni-machine-score');
+      const clearedEl = document.getElementById('omni-domains-cleared');
+      if (scoreEl) scoreEl.textContent = `${d.machineScore}%`;
+      if (clearedEl) clearedEl.textContent = `(${d.domainsCleared}/4 DOMAINS LOCKED)`;
+
+      // Helper to style domain card badge
+      function setDomainBadge(badgeId, cardId, isLocked, score, accentColor) {
+        const badge = document.getElementById(badgeId);
+        const card = document.getElementById(cardId);
+        if (!badge) return;
+        if (isLocked) {
+          badge.textContent = '✓ LOCKED';
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-emerald-950 text-emerald-300 border border-emerald-500 shadow-[0_0_8px_rgba(0,255,157,0.4)]';
+          if (card) card.classList.add('border-emerald-500/70');
+        } else if (score > 0) {
+          badge.textContent = `◐ ${score}% ACTIVE`;
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-amber-950 text-amber-300 border border-amber-500';
+          if (card) card.classList.remove('border-emerald-500/70');
+        } else {
+          badge.textContent = '✗ UNLOCKED';
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-cyber font-black bg-red-950/90 text-red-400 border border-red-600/60';
+          if (card) card.classList.remove('border-emerald-500/70');
+        }
+      }
+
+      function setSubCheck(elId, isDone) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.textContent = isDone ? '✓' : '✗';
+        el.className = isDone ? 'text-emerald-400 font-black' : 'text-red-400 font-bold';
+      }
+
+      // Domain 1: Physical
+      setDomainBadge('omni-check-physical', 'omni-card-physical', d.physicalLocked, d.physicalScore);
+      setSubCheck('subcheck-gym', d.hasGym);
+      setSubCheck('subcheck-hydration', d.hasHydration);
+      const physScoreEl = document.getElementById('omni-score-physical');
+      const physBarEl = document.getElementById('omni-bar-physical');
+      const taperTag = document.getElementById('omni-bio-taper-tag');
+      if (physScoreEl) physScoreEl.textContent = `${d.physicalScore}%`;
+      if (physBarEl) physBarEl.style.width = `${d.physicalScore}%`;
+      if (taperTag) {
+        taperTag.textContent = d.hasHydration
+          ? `HYDRATION: LOCKED ✓`
+          : `HYDRATION: PENDING`;
+        taperTag.className = d.hasHydration ? 'text-emerald-400 font-bold' : 'text-slate-400 font-bold';
+      }
+
+      // Domain 2: Mental
+      setDomainBadge('omni-check-mental', 'omni-card-mental', d.mentalLocked, d.mentalScore);
+      setSubCheck('subcheck-journal', d.hasJournal);
+      setSubCheck('subcheck-walk', d.hasWalk);
+      const mentScoreEl = document.getElementById('omni-score-mental');
+      const mentBarEl = document.getElementById('omni-bar-mental');
+      if (mentScoreEl) mentScoreEl.textContent = `${d.mentalScore}%`;
+      if (mentBarEl) mentBarEl.style.width = `${d.mentalScore}%`;
+
+      // Domain 3: Cash (Track 1)
+      setDomainBadge('omni-check-cash', 'omni-card-cash', d.cashLocked, d.cashScore);
+      setSubCheck('subcheck-outreach', d.outreachDone > 0);
+      setSubCheck('subcheck-closing', d.closingDone > 0);
+      const outCnt = document.getElementById('subcount-outreach');
+      const clsCnt = document.getElementById('subcount-closing');
+      const cashScoreEl = document.getElementById('omni-score-cash');
+      const cashBarEl = document.getElementById('omni-bar-cash');
+      if (outCnt) outCnt.textContent = `${d.outreachDone}/4`;
+      if (clsCnt) clsCnt.textContent = `${d.closingDone}/3`;
+      if (cashScoreEl) cashScoreEl.textContent = `${d.cashScore}%`;
+      if (cashBarEl) cashBarEl.style.width = `${d.cashScore}%`;
+
+      // Domain 4: Agency (Track 2)
+      setDomainBadge('omni-check-agency', 'omni-card-agency', d.agencyLocked, d.agencyScore);
+      setSubCheck('subcheck-infra', d.hasInfra);
+      setSubCheck('subcheck-asset', d.hasAsset);
+      const agScoreEl = document.getElementById('omni-score-agency');
+      const agBarEl = document.getElementById('omni-bar-agency');
+      if (agScoreEl) agScoreEl.textContent = `${d.agencyScore}%`;
+      if (agBarEl) agBarEl.style.width = `${d.agencyScore}%`;
+    }
+
+    function toggleHabitById(habitId) {
+      const node = document.querySelector(`.habit-item-card[data-id="${habitId}"]`);
+      if (node) {
+        triggerNode(node);
+      }
+    }
+
     function renderHUD() {
+      const evalData = evaluateHolisticDomains();
+
       // 1. Streak Flame & Intensity
       document.getElementById('streak-count').textContent = state.streak;
       const flame = document.getElementById('flame-icon');
@@ -2458,7 +3555,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       graphLine.setAttribute('d', `M0,24 Q25,${yEnd + 4} 50,${yEnd + 2} T100,${yEnd}`);
       graphFill.setAttribute('d', `M0,28 L0,24 Q25,${yEnd + 4} 50,${yEnd + 2} T100,${yEnd} L100,28 Z`);
 
-      // 3. Rank, Avatar & XP
+      // 3. Rank, Avatar, XP & Visible Discipline Penalty Bar
       let currentRank = ranks[0];
       let nextRank = ranks[1];
       for (let i = 0; i < ranks.length; i++) {
@@ -2477,43 +3574,67 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       document.getElementById('xp-text').textContent = `${state.xp} XP`;
       document.getElementById('avatar-graphic').innerHTML = avatars[currentRank.level] || avatars[1];
 
+      const xpBarEl = document.getElementById('xp-bar');
+      const penBarEl = document.getElementById('xp-penalty-bar');
+      const penBadgeEl = document.getElementById('discipline-penalty-badge');
+
       if (nextRank) {
         const span = nextRank.minXP - currentRank.minXP;
         const progress = state.xp - currentRank.minXP;
-        const pct = Math.min(100, Math.round((progress / span) * 100));
-        document.getElementById('xp-bar').style.width = pct + '%';
+        const pct = Math.min(100, Math.max(0, Math.round((progress / span) * 100)));
+        const penPct = evalData.penaltyAtRisk > 0
+          ? Math.min(100 - pct, Math.max(12, Math.round((evalData.penaltyAtRisk / span) * 100)))
+          : 0;
+        if (xpBarEl) xpBarEl.style.width = pct + '%';
+        if (penBarEl) penBarEl.style.width = penPct + '%';
       } else {
-        document.getElementById('xp-bar').style.width = '100%';
+        if (xpBarEl) xpBarEl.style.width = '100%';
+        if (penBarEl) penBarEl.style.width = '0%';
       }
 
-      // 4. Central Reactor Core Gauge
+      if (penBadgeEl) {
+        if (state.overseer && state.overseer.enforcedPenaltyXP > 0) {
+          penBadgeEl.textContent = `⚠ DISCIPLINE PENALTY ENFORCED: -${state.overseer.enforcedPenaltyXP} XP`;
+          penBadgeEl.className = 'text-red-400 font-bold tracking-wider truncate animate-pulse';
+        } else if (evalData.penaltyAtRisk > 0) {
+          penBadgeEl.textContent = `⚠ DISCIPLINE PENALTY: -${evalData.penaltyAtRisk} XP (${evalData.missingReasons.slice(0, 2).join(', ')})`;
+          penBadgeEl.className = 'text-amber-400 font-bold tracking-wider truncate';
+        } else {
+          penBadgeEl.textContent = '✓ PHYSICAL & MENTAL LOCKED // 0 PENALTY';
+          penBadgeEl.className = 'text-emerald-400 font-bold tracking-wider truncate';
+        }
+      }
+
+      // 4. Central Reactor Core & Holistic Daily Machine Score Gauge
       const allNodes = document.querySelectorAll('.habit-item-card');
       const total = allNodes.length;
       const completed = state.completedHabits.length;
-      const completionPct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-      document.getElementById('core-tasks-label').textContent = `${completed}/${total} CONDUITS`;
-      document.getElementById('reactor-percentage').textContent = `${completionPct}%`;
+      document.getElementById('core-tasks-label').textContent = `${evalData.domainsCleared}/4 DOMAINS // ${completed}/${total} TASKS`;
+      document.getElementById('reactor-percentage').textContent = `${evalData.machineScore}%`;
 
       const coreCenter = document.getElementById('reactor-core-center');
       const reactorStatus = document.getElementById('reactor-status');
 
-      if (completionPct === 100) {
+      if (evalData.machineScore === 100) {
         coreCenter.classList.add('ignited-core');
         coreCenter.style.borderColor = '#00ff9d';
-        reactorStatus.textContent = 'CORE OVERCHARGE';
+        reactorStatus.textContent = 'OMNI-MACHINE 100%';
         reactorStatus.className = 'text-xs font-cyber font-bold text-emerald-400 animate-pulse';
-      } else if (completionPct >= 50) {
+      } else if (evalData.machineScore >= 50) {
         coreCenter.classList.remove('ignited-core');
         coreCenter.style.borderColor = '#00f0ff';
-        reactorStatus.textContent = 'STABLE SYNC';
+        reactorStatus.textContent = 'HOLISTIC SYNC';
         reactorStatus.className = 'text-xs font-cyber font-bold text-cyan-400';
       } else {
         coreCenter.classList.remove('ignited-core');
         coreCenter.style.borderColor = '#ff0055';
-        reactorStatus.textContent = 'STANDBY';
-        reactorStatus.className = 'text-xs font-cyber font-bold text-slate-300';
+        reactorStatus.textContent = 'DISCIPLINE DEFICIT';
+        reactorStatus.className = 'text-xs font-cyber font-bold text-amber-400';
       }
+
+      // Render Omni-Domain Status Grid
+      renderOmniDomainGrid(evalData);
     }
 
     function renderCheckboxes() {
@@ -2549,7 +3670,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         showToast('OBJECTIVE CLEARED', `+${xpVal} XP ASSIGNED`);
         triggerSparks(node);
 
-        if (state.completedHabits.length === 7) {
+        if (state.completedHabits.length === 8) {
           state.streak += 1;
           triggerConfetti(true);
         }
@@ -2558,7 +3679,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         if (state.completedHabits.length === allNodes.length) {
           playReactorIgniteSound();
           triggerConfetti(true);
-          showToast('REACTOR IGNITION', '100% MISSION CLEARANCE');
+          showToast('REACTOR IGNITION', '100% OMNI-DOMAIN CLEARANCE');
         }
       } else {
         state.completedHabits = state.completedHabits.filter(item => item !== id);
@@ -2569,6 +3690,1275 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       saveState();
       renderCheckboxes();
       renderHUD();
+      renderOverseerDeck();
+    }
+
+    // =========================================================================
+    // 9. PURE LLM OVERSEER ENGINE (DYNAMIC REMINDERS, 2-WAY CHAT & SILENT STATE SYNC)
+    // =========================================================================
+    function getLocalTimezoneName() {
+      try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Toronto';
+      } catch (e) {
+        return 'America/Toronto';
+      }
+    }
+
+    function logOverseerAuditEvent(tag, message) {
+      ensureOverseerState(state);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      state.overseer.auditLogs.unshift({
+        time: `${state.date} ${timeStr}`,
+        tag,
+        message
+      });
+      if (state.overseer.auditLogs.length > 30) {
+        state.overseer.auditLogs = state.overseer.auditLogs.slice(0, 30);
+      }
+      saveState();
+      renderOverseerDeck();
+    }
+
+    async function dispatchExternalAlert(message, auditPhase = 'OVERSEER') {
+      ensureOverseerState(state);
+      const cleanMessage = (message || '').trim();
+      if (!cleanMessage) return false;
+      const { tgToken, tgChatId, webhookUrl } = state.overseer;
+      let sentAny = false;
+
+      // 1. Browser Desktop Notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification(`OVERSEER // ${auditPhase.toUpperCase()}`, { body: cleanMessage });
+        } catch (e) {
+          console.warn('Notification err', e);
+        }
+      }
+
+      // 2. Telegram Bot API Dispatch (Single natural conversational output)
+      if (tgToken && tgChatId) {
+        try {
+          const tgUrl = `https://api.telegram.org/bot${tgToken}/sendMessage`;
+          await fetch(tgUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: tgChatId,
+              text: cleanMessage
+            })
+          });
+          sentAny = true;
+        } catch (err) {
+          console.warn('Telegram push error:', err);
+        }
+      }
+
+      // 3. Optional Webhook Dispatch
+      if (webhookUrl) {
+        try {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              content: cleanMessage,
+              text: cleanMessage,
+              phase: auditPhase,
+              timezone: getLocalTimezoneName(),
+              timestamp: new Date().toISOString(),
+              nonNegotiables: state.overseer.nonNegotiables,
+              machineScore: evaluateHolisticDomains().machineScore
+            })
+          });
+          sentAny = true;
+        } catch (err) {
+          console.warn('Webhook push error:', err);
+        }
+      }
+
+      return sentAny;
+    }
+
+    const COMMAND_BRIDGE_REGIMEN_SPEC =
+      `COMMAND BRIDGE DAILY REGIMEN: ` +
+      `(1) 06:00-07:45 PHYSICAL: h_wake (06:00 wakeup + 1L electrolytes & morning hydration), h_workout (Gym/Hard Conditioning). ` +
+      `(2) 07:15-08:00 MENTAL: h_journal (Alignment Journal + lock today's Non-Negotiables), h_walk (20m silent Focus Walk). ` +
+      `(3) 08:00-16:30 TRACK 1 CASH RUNWAY (50% upfront rule, zero retainers): h_source (30 leads sourced), h_agency_dm (30 Overflow DMs), ` +
+      `h_warm_network (10 warm pings), h_loom (5 Loom video audits), h_inbox (<5m reply speed), h_stripe (50% Stripe deposit link), h_deliver (2h sprint or 20-DM surge). ` +
+      `(4) 16:30-22:00 TRACK 2 BRAND-TO-AUDIENCE AGENCY: h_track2_infra (long-term agency infra/positioning), h_track2_asset (Case Study/VSL proof asset), h_sunset (21:00 Debrief & 22:00 sunset). ` +
+      `STRICT PRIVACY RULE: NEVER mention weed, cannabis, THC, or substance tapering under any circumstances.`;
+
+    function buildLiveOverseerStateSnapshot() {
+      ensureOverseerState(state);
+      const d = evaluateHolisticDomains();
+      let currentRank = ranks[0];
+      for (let i = 0; i < ranks.length; i++) {
+        if ((state.xp || 0) >= ranks[i].minXP) currentRank = ranks[i];
+      }
+      const completed = state.completedHabits || [];
+      const nn = state.overseer.nonNegotiables || { physical: '', mental: '', cash: '', agency: '' };
+      const targetsLockedToday = Boolean(
+        state.overseer.bootLockedDate === state.date &&
+        [nn.physical, nn.mental, nn.cash, nn.agency].filter(v => (v || '').trim().length > 0).length >= 3
+      );
+      const allIds = [
+        'h_wake', 'h_workout', 'h_journal', 'h_walk',
+        'h_source', 'h_agency_dm', 'h_warm_network', 'h_loom', 'h_inbox', 'h_stripe', 'h_deliver',
+        'h_track2_infra', 'h_track2_asset', 'h_sunset'
+      ];
+      const pending = allIds.filter(hid => !completed.includes(hid));
+
+      return {
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        xp: state.xp || 0,
+        rank: `T${currentRank.level}:${currentRank.title}`,
+        cash_usd: state.cash || 0,
+        machine_score_pct: d.machineScore,
+        targets_locked_today: targetsLockedToday,
+        non_negotiables: nn,
+        completed_habits: completed,
+        pending_habits: pending
+      };
+    }
+
+    async function callRawLLMCompletion(messages, temperature = 0.55, jsonMode = false) {
+      ensureOverseerState(state);
+      const apiKey = (state.overseer.llmApiKey || '').trim();
+
+      // 1. Gemini API if configured
+      if (apiKey.startsWith('AIza')) {
+        try {
+          const convo = messages.map(m => `${m.role.toUpperCase()}:\n${m.content}`).join('\n\n');
+          const genCfg = { temperature };
+          if (jsonMode) genCfg.responseMimeType = 'application/json';
+          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: convo }] }],
+              generationConfig: genCfg
+            })
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            const txt = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+            if (txt) return txt;
+          }
+        } catch (_) {}
+      }
+
+      // 2. OpenAI API if configured
+      if (apiKey.startsWith('sk-')) {
+        try {
+          const payload = { model: 'gpt-4o-mini', messages, temperature };
+          if (jsonMode) payload.response_format = { type: 'json_object' };
+          const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify(payload)
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            const txt = (data.choices?.[0]?.message?.content || '').trim();
+            if (txt) return txt;
+          }
+        } catch (_) {}
+      }
+
+      // 3. Local LM Studio (`http://127.0.0.1:1234/v1/chat/completions`)
+      try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 1200);
+        const resp = await fetch('http://127.0.0.1:1234/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: ctrl.signal,
+          body: JSON.stringify({ model: 'openai', messages, temperature })
+        });
+        clearTimeout(tid);
+        if (resp.ok) {
+          const data = await resp.json();
+          const candidate = (data.choices?.[0]?.message?.content || '').trim();
+          if (candidate && candidate.length > 5) return candidate;
+        }
+      } catch (_) {}
+
+      // 4. Cloud OpenAI-Compatible Endpoint (`https://text.pollinations.ai/openai`) with multi-model retry
+      for (const modelName of ['openai', 'openai-fast', 'mistral']) {
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 12000);
+          const payload = {
+            model: modelName,
+            messages,
+            temperature,
+            seed: Math.floor(Math.random() * 100000)
+          };
+          const resp = await fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: ctrl.signal,
+            body: JSON.stringify(payload)
+          });
+          clearTimeout(tid);
+          if (resp.ok) {
+            const rawText = await resp.text();
+            try {
+              const data = JSON.parse(rawText);
+              const candidate = (data.choices?.[0]?.message?.content || '').trim();
+              if (candidate && candidate.length > 5) return candidate;
+            } catch (_) {
+              if (rawText.trim().length > 5) return rawText.trim();
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 5. Pollinations GET Endpoint Fallback (`https://text.pollinations.ai/{prompt}?model=openai&system={system}`)
+      try {
+        const sysMsg = (messages.find(m => m.role === 'system')?.content || OVERSEER_DRILL_SYSTEM_PROMPT).slice(0, 850);
+        const usrMsg = ([...messages].reverse().find(m => m.role === 'user')?.content || '').slice(0, 500);
+        const seed = Math.floor(Math.random() * 100000);
+        const getUrl = `https://text.pollinations.ai/${encodeURIComponent(usrMsg)}?model=openai&seed=${seed}&system=${encodeURIComponent(sysMsg)}`;
+        const resp = await fetch(getUrl);
+        if (resp.ok) {
+          const txt = (await resp.text()).trim();
+          if (txt.length > 5) return txt;
+        }
+      } catch (_) {}
+
+      return '';
+    }
+
+    function sanitizeConversationalReply(rawText, userText = '', maxSentences = 4) {
+      let clean = (rawText || '').trim();
+      clean = clean.replace(/^```(?:json|text|markdown)?\s*/i, '').replace(/\s*```$/i, '').trim();
+      clean = clean.replace(/\s*\n+\s*/g, ' ').trim();
+      const lowerReq = (userText || '').toLowerCase();
+      if (lowerReq.includes('full schedule') || lowerReq.includes('entire schedule') || lowerReq.includes('full regimen')) {
+        return clean;
+      }
+      const sentences = clean.split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+      if (sentences.length > maxSentences) {
+        clean = sentences.slice(0, maxSentences).join(' ').trim();
+      }
+      return clean;
+    }
+
+    async function generateDynamicScheduledReminderLLM(phase) {
+      const phaseLabelMap = {
+        boot: '07:00 Morning Target Setting',
+        midday: '13:00 Midday Velocity Check',
+        debrief: '21:00 Night Audit'
+      };
+      const phaseLabel = phaseLabelMap[phase] || '13:00 Midday Velocity Check';
+      const prompt =
+        `You are OVERSEER. It is time for the ${phaseLabel}. ` +
+        `Review today's unconfirmed domains in overseer_state.json. ` +
+        `Send the operator a sharp, aggressive, conversational message (STRICTLY 2 TO 4 SENTENCES MAX) demanding their 3 Non-Negotiables or auditing their performance across the Command Bridge regimen. ` +
+        `Do not output numbered templates or static forms—speak directly and dynamically.`;
+
+      const snapshot = buildLiveOverseerStateSnapshot();
+      const messages = [
+        { role: 'system', content: `${OVERSEER_DRILL_SYSTEM_PROMPT}\n\n${COMMAND_BRIDGE_REGIMEN_SPEC}\n\n${prompt}` },
+        ...((state.overseer.chatHistory || []).slice(-15)),
+        {
+          role: 'user',
+          content: `Current overseer_state.json snapshot:\n${JSON.stringify(snapshot)}\n\nInitiate the ${phaseLabel} conversation now in strictly 2 to 4 brutal sentences.`
+        }
+      ];
+
+      const raw = await callRawLLMCompletion(messages, 0.65, false);
+      return sanitizeConversationalReply(raw, '', 4);
+    }
+
+    async function claimAtomicEventId(eventNumber) {
+      try {
+        const resp = await fetch(`${LOCAL_OVERSEER_API}/api/claim_update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ update_id: eventNumber, claim_key: `tg_${eventNumber}` })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          return Boolean(data.claimed);
+        }
+      } catch (_) {}
+      if (processedUpdateIdsInBrowser.has(eventNumber) || (state.overseer.processedUpdateIds || []).includes(eventNumber)) {
+        return false;
+      }
+      return true;
+    }
+
+    let currentAlertPhase = 'boot';
+    async function triggerOverseerAudit(phase, isManual = false) {
+      ensureOverseerState(state);
+      currentAlertPhase = phase;
+
+      // Prevent duplicate automatic scheduled firing across multiple open browser tabs
+      if (!isManual) {
+        const dateNum = Number((state.date || '').replace(/\D/g, '')) || 20261022;
+        const phaseOffset = phase === 'boot' ? 700000000 : (phase === 'midday' ? 130000000 : 210000000);
+        const scheduleClaimId = phaseOffset + dateNum;
+        const claimed = await claimAtomicEventId(scheduleClaimId);
+        if (!claimed) return;
+      }
+
+      let title = '07:00 AM // MORNING TARGET SETTING';
+      if (phase === 'boot') {
+        title = '07:00 AM // MORNING TARGET SETTING';
+        state.overseer.lastBootAlertDate = state.date;
+      } else if (phase === 'midday') {
+        title = '01:00 PM // MID-DAY VELOCITY CHECK';
+        state.overseer.lastMiddayAlertDate = state.date;
+      } else if (phase === 'debrief') {
+        title = '09:00 PM // NIGHT AUDIT';
+        state.overseer.lastDebriefAlertDate = state.date;
+      }
+
+      const msg = await generateDynamicScheduledReminderLLM(phase);
+      if (!msg) return;
+
+      state.overseer.chatHistory.push({ role: 'assistant', content: msg });
+      state.overseer.chatHistory = state.overseer.chatHistory.slice(-24);
+
+      const liveDir = document.getElementById('overseer-live-directive');
+      const phaseBadge = document.getElementById('overseer-phase-badge');
+      if (liveDir) liveDir.textContent = `"${msg}"`;
+      if (phaseBadge) phaseBadge.textContent = `ACTIVE: ${title}`;
+
+      logOverseerAuditEvent(phase.toUpperCase(), msg);
+      const pushed = await dispatchExternalAlert(msg, title);
+
+      if (phase === 'debrief' && isManual) {
+        openDebriefModal();
+      } else {
+        const modal = document.getElementById('overseer-alert-modal');
+        const titleEl = document.getElementById('overseer-alert-title');
+        const msgEl = document.getElementById('overseer-alert-message');
+        const winEl = document.getElementById('overseer-alert-window-label');
+        if (titleEl) titleEl.textContent = title;
+        if (msgEl) msgEl.textContent = msg;
+        if (winEl) winEl.textContent = pushed ? 'OVERSEER // DYNAMIC LLM PING DISPATCHED' : 'OVERSEER // DYNAMIC LLM AUDIT';
+        if (modal) modal.classList.remove('hidden');
+      }
+
+      playRankUpAlarm();
+    }
+
+    function closeOverseerAlertModal() {
+      document.getElementById('overseer-alert-modal').classList.add('hidden');
+    }
+
+    function openOverseerDeckFromAlert() {
+      closeOverseerAlertModal();
+      if (currentAlertPhase === 'debrief') {
+        openDebriefModal();
+      } else {
+        switchDeck('overseer');
+      }
+    }
+
+    function checkOverseerSchedule() {
+      ensureOverseerState(state);
+      const now = new Date();
+      const hr = now.getHours();
+      const min = now.getMinutes();
+      const today = state.date;
+
+      // 07:00 AM Morning Target Setting (Dynamic LLM)
+      if (hr === 7 && min === 0 && state.overseer.lastBootAlertDate !== today) {
+        triggerOverseerAudit('boot', false);
+      }
+      // 01:00 PM (13:00) Midday Velocity Check (Dynamic LLM)
+      if (hr === 13 && min === 0 && state.overseer.lastMiddayAlertDate !== today) {
+        triggerOverseerAudit('midday', false);
+      }
+      // 09:00 PM (21:00) Night Audit (Dynamic LLM)
+      if (hr === 21 && min === 0 && state.overseer.lastDebriefAlertDate !== today) {
+        triggerOverseerAudit('debrief', false);
+      }
+
+      // Poll Telegram 2-way LLM proxy if token is armed
+      if (state.overseer.tgToken) {
+        pollTelegramUpdatesOnce(false);
+      }
+    }
+
+    async function lockMorningBoot() {
+      ensureOverseerState(state);
+      const phys = (document.getElementById('boot-input-physical').value || '').trim();
+      const ment = (document.getElementById('boot-input-mental').value || '').trim();
+      const cash = (document.getElementById('boot-input-cash').value || '').trim();
+      const ag = (document.getElementById('boot-input-agency').value || '').trim();
+
+      if (!phys || !ment || !cash || !ag) {
+        showToast('INCOMPLETE BOOT', 'State all 4 non-negotiables. Zero excuses.');
+        playTone(150, 'sawtooth', 0.25, 0.08);
+        return;
+      }
+
+      state.overseer.nonNegotiables = { physical: phys, mental: ment, cash, agency: ag };
+      const firstLockToday = state.overseer.bootLockedDate !== state.date;
+      state.overseer.bootLockedDate = state.date;
+
+      if (firstLockToday) {
+        state.xp += 50;
+      }
+      saveState();
+      renderHUD();
+      renderOverseerDeck();
+      showToast('BOOT LOCKED', firstLockToday ? '+50 XP // 4 Non-Negotiables Armed' : 'Non-Negotiables Updated');
+      playCashSound();
+
+      // Let the LLM respond naturally to the newly locked targets
+      const naturalInput = `I just locked today's 4 morning targets on the terminal: Physical: ${phys}, Mental: ${ment}, Cash Track 1: ${cash}, Agency Track 2: ${ag}.`;
+      await interrogateAndSyncOperatorMessage(naturalInput, 'TERMINAL BOOT');
+    }
+
+    async function submitMiddayCheck() {
+      ensureOverseerState(state);
+      const note = (document.getElementById('midday-status-note').value || '').trim();
+      state.overseer.middayCheckedDate = state.date;
+      state.overseer.middayNote = note;
+      saveState();
+      renderOverseerDeck();
+      playActivationSound();
+
+      const naturalInput = note
+        ? `Midday velocity check-in from terminal: ${note}`
+        : `Checking in for the 13:00 midday audit from the terminal.`;
+      await interrogateAndSyncOperatorMessage(naturalInput, '13:00 TERMINAL');
+    }
+
+    function openDebriefModal() {
+      ensureOverseerState(state);
+      const d = evaluateHolisticDomains();
+      const nn = state.overseer.nonNegotiables || {};
+
+      const tPhysEl = document.getElementById('debrief-target-physical');
+      const tMentEl = document.getElementById('debrief-target-mental');
+      const tCashEl = document.getElementById('debrief-target-cash');
+      const tAgEl = document.getElementById('debrief-target-agency');
+      const recallBanner = document.getElementById('debrief-morning-recall-banner');
+
+      const tPhys = nn.physical || 'Hard Physical Conditioning / Gym Session (Not set at 07:00)';
+      const tMent = nn.mental || 'Daily Alignment Journal & Focus Walk (Not set at 07:00)';
+      const tCash = nn.cash || 'Track 1 Immediate Cash Outreach & Closing (Not set at 07:00)';
+      const tAg = nn.agency || 'Track 2 Brand-to-Audience Infrastructure (Not set at 07:00)';
+
+      if (tPhysEl) tPhysEl.textContent = `"${tPhys}"`;
+      if (tMentEl) tMentEl.textContent = `"${tMent}"`;
+      if (tCashEl) tCashEl.textContent = `"${tCash}"`;
+      if (tAgEl) tAgEl.textContent = `"${tAg}"`;
+      if (recallBanner) {
+        recallBanner.textContent = `Morning 07:00 targets on file: (1) ${tPhys} | (2) ${tMent} | (3) ${tCash} | (4) ${tAg}. Confirm execution below:`;
+      }
+
+      const chkLift = document.getElementById('debrief-chk-lift');
+      const chkJournal = document.getElementById('debrief-chk-journal');
+      const chkCash = document.getElementById('debrief-chk-cash');
+      const chkAgency = document.getElementById('debrief-chk-agency');
+      const revInput = document.getElementById('debrief-revenue-input');
+
+      if (chkLift) chkLift.checked = d.hasGym;
+      if (chkJournal) chkJournal.checked = d.hasJournal;
+      if (chkCash) chkCash.checked = d.cashScore > 0;
+      if (chkAgency) chkAgency.checked = d.agencyScore > 0;
+      if (revInput && state.overseer.lastRevenueSummary) {
+        revInput.value = state.overseer.lastRevenueSummary;
+      }
+      updateDebriefModalPreview();
+      document.getElementById('debrief-modal').classList.remove('hidden');
+      playActivationSound();
+    }
+
+    function closeDebriefModal() {
+      document.getElementById('debrief-modal').classList.add('hidden');
+    }
+
+    function setHabitStateDirectly(habitId, shouldComplete) {
+      const idx = state.completedHabits.indexOf(habitId);
+      const node = document.querySelector(`.habit-item-card[data-id="${habitId}"]`);
+      const xpVal = node ? (parseInt(node.dataset.xp, 10) || 100) : 100;
+      if (shouldComplete && idx === -1) {
+        state.completedHabits.push(habitId);
+        state.xp += xpVal;
+        state.lastActiveDate = state.date;
+      } else if (!shouldComplete && idx !== -1) {
+        state.completedHabits.splice(idx, 1);
+        state.xp = Math.max(0, state.xp - xpVal);
+      }
+    }
+
+    function syncDebriefCheckboxes() {
+      const chkLift = document.getElementById('debrief-chk-lift');
+      const chkJournal = document.getElementById('debrief-chk-journal');
+      const chkCash = document.getElementById('debrief-chk-cash');
+      const chkAgency = document.getElementById('debrief-chk-agency');
+
+      if (chkLift) setHabitStateDirectly('h_workout', chkLift.checked);
+      if (chkJournal) setHabitStateDirectly('h_journal', chkJournal.checked);
+      if (chkCash) {
+        setHabitStateDirectly('h_agency_dm', chkCash.checked);
+        setHabitStateDirectly('h_inbox', chkCash.checked);
+      }
+      if (chkAgency) {
+        setHabitStateDirectly('h_track2_infra', chkAgency.checked);
+        setHabitStateDirectly('h_track2_asset', chkAgency.checked);
+      }
+
+      saveState();
+      renderCheckboxes();
+      renderHUD();
+      updateDebriefModalPreview();
+    }
+
+    function updateDebriefModalPreview() {
+      const d = evaluateHolisticDomains();
+      const scoreEl = document.getElementById('debrief-modal-score');
+      const verdictEl = document.getElementById('debrief-modal-verdict');
+      const xpImpactEl = document.getElementById('debrief-modal-xp-impact');
+      const bizSumEl = document.getElementById('debrief-business-summary');
+
+      if (scoreEl) scoreEl.textContent = `${d.machineScore}%`;
+      if (bizSumEl) {
+        bizSumEl.textContent = `TRACK 1: ${d.cashScore}% | TRACK 2: ${d.agencyScore}%`;
+      }
+
+      let penalty = 0;
+      if (!d.hasGym) penalty += 150;
+      if (!d.hasJournal) penalty += 150;
+      if (d.cashScore === 0) penalty += 100;
+      if (d.agencyScore === 0) penalty += 100;
+
+      if (penalty > 0) {
+        if (verdictEl) verdictEl.textContent = `Discipline Deficit Detected (${d.domainsCleared}/4 Domains Cleared)`;
+        if (xpImpactEl) {
+          xpImpactEl.textContent = `-${penalty} XP DISCIPLINE PENALTY`;
+          xpImpactEl.className = 'text-[10px] font-bold text-red-400 animate-pulse';
+        }
+      } else {
+        if (verdictEl) verdictEl.textContent = `Holistic Execution Verified (${d.domainsCleared}/4 Domains Cleared)`;
+        if (xpImpactEl) {
+          xpImpactEl.textContent = `+200 XP OMNI-MACHINE BONUS`;
+          xpImpactEl.className = 'text-[10px] font-bold text-emerald-400';
+        }
+      }
+    }
+
+    async function submitOmniDebrief() {
+      ensureOverseerState(state);
+      const revText = (document.getElementById('debrief-revenue-input').value || '').trim();
+      state.overseer.lastRevenueSummary = revText;
+
+      if (!state.completedHabits.includes('h_sunset')) {
+        state.completedHabits.push('h_sunset');
+        state.xp += 100;
+      }
+
+      const d = evaluateHolisticDomains();
+      let penalty = 0;
+      if (!d.hasGym) penalty += 150;
+      if (!d.hasJournal) penalty += 150;
+      if (d.cashScore === 0) penalty += 100;
+      if (d.agencyScore === 0) penalty += 100;
+
+      const alreadySubmittedToday = state.overseer.debriefSubmittedDate === state.date;
+      state.overseer.debriefSubmittedDate = state.date;
+      state.overseer.lastMachineScore = d.machineScore;
+
+      if (!alreadySubmittedToday) {
+        if (penalty > 0) {
+          state.xp = Math.max(0, state.xp - penalty);
+          state.overseer.enforcedPenaltyXP = (state.overseer.enforcedPenaltyXP || 0) + penalty;
+          playTone(95, 'sawtooth', 0.7, 0.15, 40);
+        } else {
+          state.xp += 200;
+          playCashSound();
+          triggerConfetti(true);
+        }
+      }
+
+      saveState();
+      renderCheckboxes();
+      renderHUD();
+      renderOverseerDeck();
+      closeDebriefModal();
+      showToast('OMNI DE-BRIEF LOCKED', `Machine Score: ${d.machineScore}%`);
+
+      const summaryPrompt = `Submitting 21:00 end-of-day debrief. Gym completed: ${d.hasGym}, Journal completed: ${d.hasJournal}, Cash Track 1 score: ${d.cashScore}%, Agency Track 2 score: ${d.agencyScore}%. Notes: ${revText || 'None'}.`;
+      await interrogateAndSyncOperatorMessage(summaryPrompt, '21:00 DE-BRIEF');
+    }
+
+    // =========================================================================
+    // 9B. 100% PURE LLM CONVERSATIONAL PROXY & SILENT TOOL STATE MUTATION
+    // =========================================================================
+    const processedUpdateIdsInBrowser = new Set();
+
+    const HABIT_XP_VALUES = {
+      h_wake: { gain: 100, penalty: 100 },
+      h_workout: { gain: 150, penalty: 150 },
+      h_journal: { gain: 150, penalty: 150 },
+      h_walk: { gain: 100, penalty: 100 },
+      h_source: { gain: 150, penalty: 100 },
+      h_agency_dm: { gain: 200, penalty: 100 },
+      h_warm_network: { gain: 100, penalty: 100 },
+      h_loom: { gain: 250, penalty: 100 },
+      h_inbox: { gain: 150, penalty: 100 },
+      h_stripe: { gain: 300, penalty: 100 },
+      h_deliver: { gain: 200, penalty: 100 },
+      h_track2_infra: { gain: 200, penalty: 100 },
+      h_track2_asset: { gain: 150, penalty: 100 },
+      h_sunset: { gain: 100, penalty: 100 }
+    };
+
+    function applySilentToolUpdatesLocally(toolData, rawUserText) {
+      ensureOverseerState(state);
+      if (!toolData || typeof toolData !== 'object') return;
+
+      // 1. Morning non-negotiable targets
+      const nn = toolData.non_negotiables;
+      if (nn && typeof nn === 'object') {
+        const curNn = state.overseer.nonNegotiables || { physical: '', mental: '', cash: '', agency: '' };
+        let updatedAny = false;
+        ['physical', 'mental', 'cash', 'agency'].forEach(k => {
+          const val = typeof nn[k] === 'string' ? nn[k].trim() : '';
+          if (val) {
+            curNn[k] = val;
+            updatedAny = true;
+          }
+        });
+        if (updatedAny) {
+          state.overseer.nonNegotiables = curNn;
+          if (state.overseer.bootLockedDate !== state.date) {
+            state.xp = (state.xp || 0) + 50;
+            state.overseer.bootLockedDate = state.date;
+          }
+        }
+      }
+
+      // 2. Completed habits
+      const comp = Array.isArray(toolData.completed_habits) ? toolData.completed_habits : [];
+      comp.forEach(hid => {
+        if (HABIT_XP_VALUES[hid] && !state.completedHabits.includes(hid)) {
+          state.completedHabits.push(hid);
+          state.xp = (state.xp || 0) + HABIT_XP_VALUES[hid].gain;
+        }
+      });
+
+      // 3. Missed / skipped habits (enforce discipline penalty)
+      const missed = Array.isArray(toolData.missed_habits) ? toolData.missed_habits : [];
+      missed.forEach(hid => {
+        if (HABIT_XP_VALUES[hid]) {
+          const idx = state.completedHabits.indexOf(hid);
+          if (idx !== -1) {
+            state.completedHabits.splice(idx, 1);
+            state.xp = Math.max(0, (state.xp || 0) - HABIT_XP_VALUES[hid].gain);
+          }
+          const pen = HABIT_XP_VALUES[hid].penalty;
+          state.xp = Math.max(0, (state.xp || 0) - pen);
+          state.overseer.enforcedPenaltyXP = (state.overseer.enforcedPenaltyXP || 0) + pen;
+        }
+      });
+
+      // 4. Cash added
+      const cashAdded = Number(toolData.cash_added || 0);
+      if (cashAdded > 0) {
+        state.cash = (state.cash || 0) + cashAdded;
+        state.xp = (state.xp || 0) + Math.floor(cashAdded / 2);
+        state.overseer.lastRevenueSummary = rawUserText;
+      } else if (comp.includes('h_agency_dm') || comp.includes('h_inbox') || comp.includes('h_stripe')) {
+        state.overseer.lastRevenueSummary = rawUserText;
+      }
+
+      // 5. Journal entry
+      const jEntry = typeof toolData.journal_entry === 'string' ? toolData.journal_entry.trim() : '';
+      if (jEntry || comp.includes('h_journal')) {
+        state.overseer.journalLogs.unshift({
+          id: Date.now().toString(),
+          date: state.date,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: jEntry || rawUserText
+        });
+        state.overseer.journalLogs = state.overseer.journalLogs.slice(0, 30);
+      }
+
+      const d = evaluateHolisticDomains();
+      state.overseer.lastMachineScore = d.machineScore;
+      state.lastActiveDate = state.date;
+    }
+
+    async function runPureLLMChatTurn(rawText) {
+      ensureOverseerState(state);
+      const snapshot = buildLiveOverseerStateSnapshot();
+      const toolSchemaPrompt =
+        `\n\n${COMMAND_BRIDGE_REGIMEN_SPEC}\n\n` +
+        `Return a JSON object with two parts: your natural conversational reply to the operator, and silent background state updates based on what the operator just said.\n` +
+        `Valid habit IDs for completed_habits or missed_habits:\n` +
+        `- "h_wake": 06:00 Awakening & 1L electrolyte hydration\n` +
+        `- "h_workout": Gym / lifting / hard physical conditioning session\n` +
+        `- "h_journal": Daily alignment journaling & locking non-negotiables\n` +
+        `- "h_walk": 20m zero-distraction focus walk / deep-state review\n` +
+        `- "h_source": Extract 30 agency/trade decision-makers\n` +
+        `- "h_agency_dm": Transmit 30 overflow capacity / micro-project DMs\n` +
+        `- "h_warm_network": 10 warm network recon pings\n` +
+        `- "h_loom": Deploy 5 targeted 60s Loom video audits\n` +
+        `- "h_inbox": Zero-lag <5m inbox clearance\n` +
+        `- "h_stripe": Transmit 50% upfront Stripe/Zelle deposit link\n` +
+        `- "h_deliver": 2h sprint fulfillment OR 20-DM surge sweep\n` +
+        `- "h_track2_infra": Track 2 long-term agency infrastructure / positioning\n` +
+        `- "h_track2_asset": Track 2 brand-to-audience proof asset / case study VSL\n` +
+        `- "h_sunset": 21:00 omni-domain debrief & 22:00 digital sunset\n\n` +
+        `Rules for silent tool extraction:\n` +
+        `- Only include a habit in "completed_habits" if the operator clearly states they completed it with concrete proof/numbers.\n` +
+        `- Only include a habit in "missed_habits" if the operator admits they skipped, missed, or didn't do it (e.g., "didn't journal", "skipped outreach", "no gym today").\n` +
+        `- If the operator states their targets/non-negotiables for the day (even if they state 3 targets like Gym, Cash, Agency), populate "non_negotiables" ({physical, mental, cash, agency}).\n` +
+        `- "reply" MUST be a single fluid, natural, aggressive conversational response in character as OVERSEER. If the operator just woke up or hasn't locked today's non-negotiables, tell them what to execute right now based on the Command Bridge Scheduled Regimen and demand their Non-Negotiables. NEVER include robotic data dump cards, bulleted telemetry blocks, code blocks, or JSON inside "reply".\n\n` +
+        `Output strictly valid JSON matching this schema:\n` +
+        `{\n` +
+        `  "reply": "string (your single conversational response to the operator)",\n` +
+        `  "non_negotiables": {"physical": "", "mental": "", "cash": "", "agency": ""} or null,\n` +
+        `  "completed_habits": ["h_workout", ...],\n` +
+        `  "missed_habits": ["h_journal", ...],\n` +
+        `  "cash_added": 0,\n` +
+        `  "journal_entry": ""\n` +
+        `}`;
+
+      const messages = [
+        { role: 'system', content: OVERSEER_DRILL_SYSTEM_PROMPT + toolSchemaPrompt },
+        { role: 'system', content: `LIVE overseer_state.json TELEMETRY:\n${JSON.stringify(snapshot)}` },
+        ...((state.overseer.chatHistory || []).slice(-15)),
+        { role: 'user', content: rawText }
+      ];
+
+      // Stage 1: JSON extraction turn
+      const rawOutput = await callRawLLMCompletion(messages, 0.55, true);
+      if (rawOutput) {
+        let cleaned = (rawOutput || '').trim().replace(/^```(?:json|text|markdown)?\s*/i, '').replace(/\s*```$/i, '').trim();
+        try {
+          const start = cleaned.indexOf('{');
+          const end = cleaned.lastIndexOf('}');
+          if (start !== -1 && end !== -1 && end > start) {
+            const parsed = JSON.parse(cleaned.slice(start, end + 1));
+            if (parsed && typeof parsed === 'object' && typeof parsed.reply === 'string' && parsed.reply.trim()) {
+              return {
+                reply: sanitizeConversationalReply(parsed.reply, rawText, 4),
+                toolData: {
+                  non_negotiables: parsed.non_negotiables || null,
+                  completed_habits: Array.isArray(parsed.completed_habits) ? parsed.completed_habits : [],
+                  missed_habits: Array.isArray(parsed.missed_habits) ? parsed.missed_habits : [],
+                  cash_added: Number(parsed.cash_added || 0),
+                  journal_entry: typeof parsed.journal_entry === 'string' ? parsed.journal_entry : ''
+                }
+              };
+            }
+          }
+        } catch (_) {}
+
+        if (cleaned && !cleaned.startsWith('{')) {
+          return { reply: sanitizeConversationalReply(cleaned, rawText, 4), toolData: {} };
+        }
+      }
+
+      // Stage 2: Plain conversational fallback so the bot NEVER drops a turn
+      const plainMessages = [
+        {
+          role: 'system',
+          content:
+            `${OVERSEER_DRILL_SYSTEM_PROMPT}\n\n${COMMAND_BRIDGE_REGIMEN_SPEC}\n\n` +
+            `LIVE TELEMETRY:\n${JSON.stringify(snapshot)}\n\n` +
+            `Reply directly to the operator in strictly 2 to 4 brutal sentences. ` +
+            `Call out any excuses from the conversation history and demand exact numbers and immediate target locks.`
+        },
+        ...((state.overseer.chatHistory || []).slice(-15)),
+        { role: 'user', content: rawText }
+      ];
+      const plainOutput = await callRawLLMCompletion(plainMessages, 0.6, false);
+      return { reply: sanitizeConversationalReply(plainOutput, rawText, 4), toolData: {} };
+    }
+
+    async function interrogateAndSyncOperatorMessage(rawText, sourceLabel = 'TELEGRAM', updateId = null) {
+      ensureOverseerState(state);
+      const text = (rawText || '').trim();
+      if (!text) return '';
+
+      // Atomic cross-tab & cross-process lease check (18s TTL)
+      if (updateId !== null) {
+        const claimed = await claimAtomicEventId(updateId);
+        if (!claimed) {
+          return '';
+        }
+      }
+
+      // 1. Run 100% Pure LLM Proxy (conversational reply + structured silent tool updates)
+      const { reply, toolData } = await runPureLLMChatTurn(text);
+      if (!reply) return '';
+
+      // 2. Send ONLY the single natural conversational reply to Telegram
+      await dispatchExternalAlert(reply, 'OVERSEER');
+
+      // 3. Mark updateId committed ONLY after reply was generated & dispatched
+      if (updateId !== null) {
+        processedUpdateIdsInBrowser.add(updateId);
+        if (!(state.overseer.processedUpdateIds || []).includes(updateId)) {
+          state.overseer.processedUpdateIds.push(updateId);
+        }
+        state.overseer.lastTgUpdateId = Math.max(state.overseer.lastTgUpdateId || 0, updateId);
+      }
+
+      // 4. Silently apply tool updates to local state and commit to `overseer_state.json` + Supabase
+      let committedViaServer = false;
+      try {
+        const resp = await fetch(`${LOCAL_OVERSEER_API}/api/llm_turn_commit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_text: text,
+            reply,
+            tool_data: toolData,
+            source: sourceLabel,
+            update_id: updateId,
+            chat_id: state.overseer.tgChatId
+          })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.record) {
+            applyUnifiedRecordToUI(data.record);
+            committedViaServer = true;
+          }
+        }
+      } catch (_) {}
+
+      if (!committedViaServer) {
+        applySilentToolUpdatesLocally(toolData, text);
+        state.overseer.chatHistory.push({ role: 'user', content: text });
+        state.overseer.chatHistory.push({ role: 'assistant', content: reply });
+        state.overseer.chatHistory = state.overseer.chatHistory.slice(-24);
+        logOverseerAuditEvent(`${sourceLabel} -> OVERSEER`, `OPERATOR: "${text}"\n${reply}`);
+      }
+
+      saveState();
+      renderCheckboxes();
+      renderHUD();
+      renderOverseerDeck();
+
+      const d = evaluateHolisticDomains();
+      showToast('OVERSEER TELEMETRY SYNCED', `Machine Score: ${d.machineScore}% // XP: ${state.xp}`);
+      playCashSound();
+      return reply;
+    }
+
+    async function processIncomingOperatorReply() {
+      const input = document.getElementById('overseer-mobile-reply-input');
+      const rawText = (input ? input.value : '').trim();
+      if (!rawText) {
+        showToast('EMPTY REPLY', 'Enter or dictate a reply to send to OVERSEER.');
+        return;
+      }
+      if (input) input.value = '';
+      await interrogateAndSyncOperatorMessage(rawText, 'TERMINAL');
+    }
+
+    async function parseDebriefTextWithLLM() {
+      const input = document.getElementById('debrief-revenue-input');
+      const rawText = (input ? input.value : '').trim();
+      if (!rawText) {
+        showToast('EMPTY INPUT', 'Type or dictate your execution reply first.');
+        return;
+      }
+      await interrogateAndSyncOperatorMessage(rawText, '21:00 MODAL');
+      openDebriefModal();
+    }
+
+    function startOverseerVoiceReply() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        showToast('VOICE UNSUPPORTED', 'Browser SpeechRecognition not available; type reply or send Telegram voice note.');
+        return;
+      }
+      const btn = document.getElementById('voice-mic-btn');
+      const rec = new SpeechRec();
+      rec.lang = 'en-US';
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      if (btn) btn.textContent = '🔴 LISTENING...';
+      rec.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        const input = document.getElementById('overseer-mobile-reply-input');
+        if (input) input.value = transcript;
+        if (btn) btn.textContent = '🎙️ DICTATE VOICE REPLY';
+        await interrogateAndSyncOperatorMessage(transcript, 'VOICE NOTE');
+      };
+      rec.onerror = () => {
+        if (btn) btn.textContent = '🎙️ DICTATE VOICE REPLY';
+      };
+      rec.onend = () => {
+        if (btn) btn.textContent = '🎙️ DICTATE VOICE REPLY';
+      };
+      rec.start();
+    }
+
+    async function transcribeTelegramVoiceInBrowser(token, fileId) {
+      try {
+        const infoResp = await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${encodeURIComponent(fileId)}`);
+        if (!infoResp.ok) return '';
+        const infoData = await infoResp.json();
+        const filePath = infoData.result && infoData.result.file_path;
+        if (!filePath) return '';
+
+        const audioResp = await fetch(`https://api.telegram.org/file/bot${token}/${filePath}`);
+        if (!audioResp.ok) return '';
+        const audioBlob = await audioResp.blob();
+        const apiKey = (state.overseer.llmApiKey || '').trim();
+
+        if (apiKey.startsWith('sk-')) {
+          const form = new FormData();
+          form.append('file', audioBlob, 'voice.ogg');
+          form.append('model', 'whisper-1');
+          const wResp = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${apiKey}` },
+            body: form
+          });
+          if (wResp.ok) {
+            const wData = await wResp.json();
+            return (wData.text || '').trim();
+          }
+        }
+      } catch (_) {}
+      return '';
+    }
+
+    let isPollingTg = false;
+    async function pollTelegramUpdatesOnce(isManual = false) {
+      ensureOverseerState(state);
+      // If local Python server is actively polling Telegram directly, yield so we never steal updates!
+      if (serverPollsTelegram && !isManual) {
+        return;
+      }
+      const token = (state.overseer.tgToken || '').trim();
+      if (!token || isPollingTg) {
+        if (isManual && !token) showToast('NO BOT TOKEN', 'Enter your Telegram Bot Token first.');
+        return;
+      }
+      isPollingTg = true;
+      try {
+        const offset = (state.overseer.lastTgUpdateId || 0) + 1;
+        const resp = await fetch(`https://api.telegram.org/bot${token}/getUpdates?offset=${offset}&timeout=1`);
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (!data.ok || !Array.isArray(data.result)) return;
+
+        let processedCount = 0;
+        for (const upd of data.result) {
+          const updId = upd.update_id;
+          if (processedUpdateIdsInBrowser.has(updId) || (state.overseer.processedUpdateIds || []).includes(updId)) {
+            state.overseer.lastTgUpdateId = Math.max(state.overseer.lastTgUpdateId || 0, updId);
+            continue;
+          }
+
+          const msg = upd.message || upd.edited_message;
+          if (!msg) {
+            state.overseer.lastTgUpdateId = Math.max(state.overseer.lastTgUpdateId || 0, updId);
+            continue;
+          }
+
+          if (msg.chat && msg.chat.id) {
+            state.overseer.tgChatId = String(msg.chat.id);
+            const chatEl = document.getElementById('overseer-tg-chatid');
+            if (chatEl) chatEl.value = state.overseer.tgChatId;
+          }
+
+          let incomingText = (msg.text || msg.caption || '').trim();
+          if (!incomingText && (msg.voice || msg.audio)) {
+            const fid = (msg.voice && msg.voice.file_id) || (msg.audio && msg.audio.file_id);
+            if (fid) {
+              incomingText = await transcribeTelegramVoiceInBrowser(token, fid);
+              if (!incomingText) {
+                incomingText = '[Operator sent a voice message, but Whisper API key is not configured to transcribe it.]';
+              }
+            }
+          }
+
+          if (incomingText) {
+            const cmd = incomingText.toLowerCase();
+            if (cmd === '/boot' || cmd === '/midday' || cmd === '/debrief') {
+              const claimed = await claimAtomicEventId(updId);
+              if (claimed) {
+                const phase = cmd === '/boot' ? 'boot' : (cmd === '/midday' ? 'midday' : 'debrief');
+                await triggerOverseerAudit(phase, true);
+                processedUpdateIdsInBrowser.add(updId);
+                state.overseer.processedUpdateIds.push(updId);
+                state.overseer.lastTgUpdateId = Math.max(state.overseer.lastTgUpdateId || 0, updId);
+                processedCount++;
+              }
+              continue;
+            }
+
+            const sentReply = await interrogateAndSyncOperatorMessage(incomingText, 'TELEGRAM', updId);
+            if (sentReply) {
+              processedCount++;
+            }
+          }
+        }
+        if (processedCount > 0) {
+          saveState();
+        } else if (isManual) {
+          showToast('TELEGRAM SYNCED', 'No new unprocessed replies in queue.');
+        }
+      } catch (err) {
+        console.warn('Telegram getUpdates poll error:', err);
+      } finally {
+        isPollingTg = false;
+      }
+    }
+
+    // Cognitive Calibration Journal Functions
+    function openJournalModal() {
+      document.getElementById('journal-modal').classList.remove('hidden');
+      document.getElementById('modal-journal-input').focus();
+    }
+
+    function closeJournalModal() {
+      document.getElementById('journal-modal').classList.add('hidden');
+    }
+
+    function commitJournalText(text) {
+      if (!text) return;
+      ensureOverseerState(state);
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      state.overseer.journalLogs.unshift({
+        id: Date.now().toString(),
+        date: state.date,
+        time: timeStr,
+        text
+      });
+      if (state.overseer.journalLogs.length > 30) {
+        state.overseer.journalLogs = state.overseer.journalLogs.slice(0, 30);
+      }
+
+      if (!state.completedHabits.includes('h_journal')) {
+        state.completedHabits.push('h_journal');
+        state.xp += 150;
+        state.lastActiveDate = state.date;
+        playCashSound();
+        showToast('COGNITIVE LOG LOCKED', '+150 XP // Mental Alignment Verified');
+      } else {
+        playActivationSound();
+        showToast('JOURNAL APPENDED', 'Alignment log recorded.');
+      }
+
+      saveState();
+      renderCheckboxes();
+      renderHUD();
+      renderOverseerDeck();
+    }
+
+    function saveInlineJournalEntry() {
+      const input = document.getElementById('inline-journal-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      commitJournalText(text);
+      input.value = '';
+    }
+
+    function saveModalJournalEntry() {
+      const input = document.getElementById('modal-journal-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      commitJournalText(text);
+      input.value = '';
+      closeJournalModal();
+    }
+
+    function saveOverseerConfig() {
+      ensureOverseerState(state);
+      state.overseer.tgToken = (document.getElementById('overseer-tg-token').value || '').trim();
+      state.overseer.tgChatId = (document.getElementById('overseer-tg-chatid').value || '').trim();
+      const llmEl = document.getElementById('overseer-llm-key');
+      if (llmEl) state.overseer.llmApiKey = (llmEl.value || '').trim();
+      state.overseer.webhookUrl = (document.getElementById('overseer-webhook-url').value || '').trim();
+      saveState();
+      renderOverseerDeck();
+      showToast('OVERSEER UPLINK SAVED', '2-Way Telegram Bot, LLM Parser & Schedule armed.');
+      playActivationSound();
+    }
+
+    async function testOverseerWebhook() {
+      saveOverseerConfig();
+      const testMsg = await generateDynamicScheduledReminderLLM('midday');
+      if (!testMsg) return;
+      const sent = await dispatchExternalAlert(testMsg, 'OVERSEER');
+      logOverseerAuditEvent('TEST PUSH', testMsg);
+      if (sent) {
+        showToast('MOBILE PUSH SENT', 'Dynamic LLM message delivered to Telegram.');
+        playCashSound();
+      } else {
+        showToast('LOCAL TEST LOGGED', 'Add Telegram Token/ChatID or Webhook URL for external push.');
+        playActivationSound();
+      }
+    }
+
+    function requestBrowserNotificationPermission() {
+      if (!('Notification' in window)) {
+        showToast('UNSUPPORTED', 'Browser notifications not supported.');
+        return;
+      }
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+          showToast('ALERTS ARMED', 'Desktop/Mobile browser notifications enabled.');
+          new Notification('OVERSEER ARMED', { body: '07:00, 13:00, and 21:00 holistic audits enabled.' });
+        }
+      });
+    }
+
+    function renderOverseerDeck() {
+      ensureOverseerState(state);
+      const d = evaluateHolisticDomains();
+
+      // Timezone lock badge
+      const tzBadge = document.getElementById('overseer-tz-badge');
+      if (tzBadge) {
+        tzBadge.textContent = `TZ LOCK: ${getLocalTimezoneName().toUpperCase()} (07:00 | 13:00 | 21:00)`;
+      }
+
+      // 2-Way Bot Polling badge
+      const pollBadge = document.getElementById('tg-polling-status');
+      if (pollBadge) {
+        const active = Boolean(state.overseer.tgToken);
+        pollBadge.textContent = active ? '2-WAY BOT: ACTIVE ✓' : '2-WAY BOT: LOCAL';
+        pollBadge.className = active
+          ? 'px-2 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/60 text-[10px] font-mono-tech'
+          : 'px-2 py-1 rounded bg-slate-900 text-slate-400 border border-slate-700 text-[10px] font-mono-tech';
+      }
+
+      // Webhook badge on main bar
+      const whBadge = document.getElementById('overseer-webhook-badge');
+      const hasWebhook = Boolean((state.overseer.tgToken && state.overseer.tgChatId) || state.overseer.webhookUrl);
+      if (whBadge) {
+        whBadge.textContent = hasWebhook ? 'MOBILE PUSH: ARMED ✓' : 'MOBILE PUSH: LOCAL';
+        whBadge.className = hasWebhook
+          ? 'px-2 py-0.5 text-[10px] font-mono-tech rounded bg-emerald-950 text-emerald-300 border border-emerald-500/70'
+          : 'px-2 py-0.5 text-[10px] font-mono-tech rounded bg-slate-900 text-slate-400 border border-slate-700';
+      }
+
+      // 07:00 Boot inputs & 21:00 Memory Loop Preview
+      const nn = state.overseer.nonNegotiables || {};
+      const inPhys = document.getElementById('boot-input-physical');
+      const inMent = document.getElementById('boot-input-mental');
+      const inCash = document.getElementById('boot-input-cash');
+      const inAg = document.getElementById('boot-input-agency');
+      if (inPhys && !inPhys.value && nn.physical) inPhys.value = nn.physical;
+      if (inMent && !inMent.value && nn.mental) inMent.value = nn.mental;
+      if (inCash && !inCash.value && nn.cash) inCash.value = nn.cash;
+      if (inAg && !inAg.value && nn.agency) inAg.value = nn.agency;
+
+      const memP = document.getElementById('mem-preview-physical');
+      const memM = document.getElementById('mem-preview-mental');
+      const memC = document.getElementById('mem-preview-cash');
+      const memA = document.getElementById('mem-preview-agency');
+      if (memP) memP.textContent = nn.physical ? `${nn.physical} [${d.hasGym ? '✓' : '✗'}]` : 'Not set at 07:00';
+      if (memM) memM.textContent = nn.mental ? `${nn.mental} [${d.hasJournal ? '✓' : '✗'}]` : 'Not set at 07:00';
+      if (memC) memC.textContent = nn.cash ? `${nn.cash} [${d.cashScore > 0 ? '✓' : '✗'}]` : 'Not set at 07:00';
+      if (memA) memA.textContent = nn.agency ? `${nn.agency} [${d.agencyScore > 0 ? '✓' : '✗'}]` : 'Not set at 07:00';
+
+      const bootStatus = document.getElementById('boot-lock-status');
+      if (bootStatus) {
+        const locked = state.overseer.bootLockedDate === state.date;
+        bootStatus.textContent = locked ? 'LOCKED ✓' : 'UNLOCKED';
+        bootStatus.className = locked
+          ? 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500'
+          : 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700';
+      }
+
+      // 13:00 Mid-Day indicators
+      const midGym = document.getElementById('midday-gym-indicator');
+      const midCash = document.getElementById('midday-cash-indicator');
+      const midJrn = document.getElementById('midday-journal-indicator');
+      const midStatus = document.getElementById('midday-lock-status');
+      if (midGym) {
+        midGym.textContent = d.hasGym ? 'LOCKED IN ✓' : 'NOT LOCKED ✗';
+        midGym.className = d.hasGym ? 'font-bold text-emerald-400' : 'font-bold text-red-400';
+      }
+      if (midCash) {
+        midCash.textContent = d.totalCashHabits > 0 ? `MOVING (${d.totalCashHabits} CONDUITS) ✓` : 'STALLED (0 ACTIONS) ✗';
+        midCash.className = d.totalCashHabits > 0 ? 'font-bold text-cyan-300' : 'font-bold text-red-400';
+      }
+      if (midJrn) {
+        midJrn.textContent = d.hasJournal ? 'LOGGED ✓' : 'NOT LOGGED ✗';
+        midJrn.className = d.hasJournal ? 'font-bold text-purple-300' : 'font-bold text-red-400';
+      }
+      if (midStatus) {
+        const checked = state.overseer.middayCheckedDate === state.date;
+        midStatus.textContent = checked ? 'REPORTED ✓' : 'PENDING';
+        midStatus.className = checked
+          ? 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500'
+          : 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700';
+      }
+
+      // 21:00 De-Brief Preview
+      const dbScore = document.getElementById('debrief-preview-score');
+      const dbPen = document.getElementById('debrief-preview-penalty');
+      const dbStatus = document.getElementById('debrief-lock-status');
+      if (dbScore) dbScore.textContent = `${d.machineScore}%`;
+      if (dbPen) {
+        dbPen.textContent = d.penaltyAtRisk > 0 ? `-${d.penaltyAtRisk} XP AT RISK` : '0 XP PENALTY (LOCKED)';
+        dbPen.className = d.penaltyAtRisk > 0 ? 'text-xs font-bold text-red-400' : 'text-xs font-bold text-emerald-400';
+      }
+      if (dbStatus) {
+        const sub = state.overseer.debriefSubmittedDate === state.date;
+        dbStatus.textContent = sub ? `SUBMITTED (${state.overseer.lastMachineScore}%) ✓` : 'AWAITING 21:00';
+        dbStatus.className = sub
+          ? 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500'
+          : 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-700';
+      }
+
+      // Telegram / Webhook / LLM config inputs
+      const tgTokEl = document.getElementById('overseer-tg-token');
+      const tgChatEl = document.getElementById('overseer-tg-chatid');
+      const llmKeyEl = document.getElementById('overseer-llm-key');
+      const whUrlEl = document.getElementById('overseer-webhook-url');
+      if (tgTokEl && !tgTokEl.value && state.overseer.tgToken) tgTokEl.value = state.overseer.tgToken;
+      if (tgChatEl && !tgChatEl.value && state.overseer.tgChatId) tgChatEl.value = state.overseer.tgChatId;
+      if (llmKeyEl && !llmKeyEl.value && state.overseer.llmApiKey) llmKeyEl.value = state.overseer.llmApiKey;
+      if (whUrlEl && !whUrlEl.value && state.overseer.webhookUrl) whUrlEl.value = state.overseer.webhookUrl;
+
+      // Render Audit Transmission Stream
+      const auditContainer = document.getElementById('overseer-audit-log');
+      if (auditContainer) {
+        if (!state.overseer.auditLogs || state.overseer.auditLogs.length === 0) {
+          auditContainer.innerHTML = `<div class="text-slate-500 italic p-2">No audit transmissions recorded yet today. Schedule armed for 07:00, 13:00, and 21:00.</div>`;
+        } else {
+          auditContainer.innerHTML = state.overseer.auditLogs.map(item => `
+            <div class="p-2 rounded bg-slate-950/90 border border-slate-800">
+              <div class="flex items-center justify-between text-[10px] text-amber-400 mb-0.5">
+                <span class="font-bold">[${item.tag}]</span>
+                <span class="text-slate-500">${item.time}</span>
+              </div>
+              <div class="text-slate-300 whitespace-pre-line text-[11px]">${item.message}</div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Render Cognitive Journal Archive
+      const journalContainer = document.getElementById('journal-entries-list');
+      if (journalContainer) {
+        if (!state.overseer.journalLogs || state.overseer.journalLogs.length === 0) {
+          journalContainer.innerHTML = `<div class="text-slate-500 italic p-2">No alignment journal entries logged yet. Skipping journaling incurs -150 XP Discipline Penalty.</div>`;
+        } else {
+          journalContainer.innerHTML = state.overseer.journalLogs.map(j => `
+            <div class="p-2.5 rounded bg-slate-950/90 border border-purple-900/50">
+              <div class="flex items-center justify-between text-[10px] text-purple-400 mb-1">
+                <span class="font-bold">ALIGNMENT LOG // ${j.date}</span>
+                <span class="text-slate-500">${j.time}</span>
+              </div>
+              <div class="text-slate-200 whitespace-pre-line">${j.text}</div>
+            </div>
+          `).join('');
+        }
+      }
     }
 
     function spawnFloatingXP(targetEl, xp) {
@@ -2641,6 +5031,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         completedHabits: [],
         lastAcknowledgedLevel: 1
       };
+      ensureOverseerState(state);
 
       bioState = {
         logs: [],
@@ -2654,9 +5045,10 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       // 3. UI Synchronization
       closeResetModal();
       setBioLoggingDate('today');
-      renderHUD();
       renderCheckboxes();
+      renderHUD();
       renderBioDeck();
+      renderOverseerDeck();
       currentPsyIndex = getRandomPsyIndex();
       renderPsyQuote();
 

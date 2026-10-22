@@ -49,3 +49,32 @@ We are executing a strict **Dual-Track Operating Model** to solve a dual constra
 - **Phase 1: Market Saturation & Gut-Check** (Why it gets ignored/hung up on; prospect psychology).
 - **Phase 2: Structural Failure Analysis** (Core offer/positioning weakness; delivery and economics flaws).
 - **Phase 3: The Blue-Ocean Pivot** (Exact restructured offer, high-converting script, or value-first entry point; risk reversal).
+
+---
+
+## OVERSEER AI Supervisor: Holistic 4-Domain Discipline Engine
+
+The OVERSEER audits four operational domains daily. Failure in any domain drags down the global Operator Rank and Daily Machine Score (0–100%):
+
+1. **Domain 1: Biological Priming (Physical — 25% Weight)**
+   - Gym / Hard physical conditioning session (`h_workout`, +150 XP; skipping incurs -150 XP Discipline Penalty).
+   - Hydration and metabolic clearing protocols (`h_wake` + cannabis taper / bio-clearance compliance `<=15mg`, +100 XP).
+2. **Domain 2: Cognitive Calibration (Mental/Mindset — 25% Weight)**
+   - Daily journaling / psychological alignment log (`h_journal`, +150 XP; skipping incurs -150 XP Discipline Penalty).
+   - Zero-distraction focus walks or deep-state reviews (`h_walk`, +100 XP).
+3. **Domain 3: Track 1 (The Runway Engine — 25% Weight)**
+   - Immediate cash-generation tasks, micro-projects, Loom audits, and direct outreach quotas.
+4. **Domain 4: Track 2 (Brand to Audience — 25% Weight)**
+   - Long-term agency infrastructure (`h_track2_infra`), positioning, and authority asset creation (`h_track2_asset`).
+
+### Mobile Notification & Audit Schedule (Telegram / Webhook):
+- **Time-Zone & Scheduler Lock:** Pinned to the operator's local timezone (`America/Toronto` / `UTC-4`) via `APScheduler` (`CronTrigger` at `07:00`, `13:00`, `21:00`) and precision `ZoneInfo` cron loop in `overseer_scheduler.py`.
+- **07:00 AM — MORNING SYSTEM BOOT:**
+  `"[OVERSEER] System boot. State today's non-negotiables: 1. Physical Protocol (Gym/Conditioning), 2. Mental Protocol (Journaling), 3. Cash Target, 4. Agency Target. Zero excuses."`
+- **01:00 PM — MID-DAY VELOCITY CHECK:**
+  `"[OVERSEER] Mid-day audit. Has the gym session been locked in? Are the cash pipelines moving? Report status."`
+- **09:00 PM — OMNI-DOMAIN DE-BRIEF (Interactive 07:00 Memory & Comparison Loop):**
+  Retrieves the exact `07:00 AM` targets set that morning, lists all 4 back explicitly in the message/modal, and asks for individual confirmation on each one (*Did you lift? Did you journal? What revenue actions were executed? Was your Agency target completed?*), calculating the holistic **Daily Machine Score (0–100%)** across all four domains.
+- **Two-Way Mobile Conversation & Ruthless LLM Interrogator (`overseer_state.json` Single Source of Truth):**
+  - Uses the ruthless Drill Sergeant system prompt (`OVERSEER_SYSTEM_PROMPT`) with multi-turn session memory (`chatHistory`) to interrogate vague claims, reject pleasantries, and calculate exact XP rewards or Discipline Penalties.
+  - Synchronizes bi-directionally in real time via `overseer_state.json` and the local HTTP + Server-Sent Events (SSE) server (`http://127.0.0.1:8765/api/state` and `/api/stream`) so Telegram updates immediately move the web terminal's gauges, checkmarks, and Daily Machine Score (0–100%) without a manual refresh.
