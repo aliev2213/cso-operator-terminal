@@ -1092,7 +1092,75 @@ def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
     if cleaned_plain:
         return _merge_fallback_tools({"reply": cleaned_plain})
 
-    return {"reply": ""}
+    # Stage 3: Guaranteed Deterministic Drill-Sergeant Fallback
+    fallback_reply = generate_drill_sergeant_fallback("chat", record, raw_text)
+    return _merge_fallback_tools({"reply": fallback_reply})
+
+
+def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text: str = "") -> str:
+    """
+    Guaranteed fail-proof drill-sergeant generator. If external LLM gateways
+    rate-limit, timeout, or require keys, OVERSEER will NEVER freeze or go silent.
+    """
+    ov = (record.get("state") or {}).get("overseer") or {}
+    metrics = compute_holistic_machine_score(record)
+    today_locked = ov.get("todayTargetsLocked", False)
+    nn = ov.get("nonNegotiables") or {}
+    score = metrics["machine_score"]
+    cash_sc = metrics["cash_score"]
+
+    if "stalker" in context_type.lower():
+        pings = ov.get("unansweredPingCount", 1)
+        if "penalty" in context_type.lower() or pings >= 3:
+            return (
+                f"Silence has a price. You ignored {pings} persistent audits; an automatic -{EVASION_PENALTY_XP} XP "
+                f"Evasion Penalty has been executed on your record. Your score is bleeding at {score}%. "
+                "Lock your 3 Non-Negotiables and report your execution numbers immediately."
+            )
+        return (
+            f"Stop hiding from your numbers. You are at ping {pings}/{EVASION_PING_THRESHOLD} before the automatic "
+            f"-{EVASION_PENALTY_XP} XP evasion penalty strikes your record. Lock in your 3 daily non-negotiables "
+            "right now or report your execution status."
+        )
+
+    if "07:00" in context_type or "boot" in context_type.lower():
+        return (
+            "System boot initiated. The clock is running and your daily execution slate is at 0%. "
+            "State your 3 Non-Negotiables across Physical, Cash/Outreach, and Agency right now—no pleasantries, no excuses."
+        )
+    if "13:00" in context_type or "midday" in context_type.lower():
+        return (
+            f"Midday velocity audit. You are sitting at {score}% Machine Score with {cash_sc}% cash progress. "
+            "State your exact outreach numbers, gym status, and lead count right now."
+        )
+    if "16:00" in context_type or "afternoon" in context_type.lower():
+        return (
+            f"Afternoon velocity checkpoint. Current machine score is {score}% against a 70% requirement. "
+            "Deliver your pulse report immediately: exact DM count, asset deployment status, and pipeline execution."
+        )
+    if "21:00" in context_type or "night" in context_type.lower() or "debrief" in context_type.lower():
+        return (
+            f"21:00 audit window. Machine score is finalized at {score}%. Report completed habits and "
+            "justify any unmet targets before state rollover."
+        )
+
+    lower = user_text.lower().strip()
+    if not today_locked:
+        if any(w in lower for w in ("hello", "hey", "hi", "yo", "sup")):
+            return (
+                "Drop the pleasantries. Your targets are NOT locked for today and you are burning daylight at 0% execution. "
+                "State your 3 Non-Negotiables across Physical, Cash, and Agency right now."
+            )
+        return (
+            "I do not accept vague chatter. Your 3 Non-Negotiables for today are still unlocked. "
+            "Lock them in right now: specify your Gym session, Outreach count, and Agency targets."
+        )
+
+    targets_str = ", ".join([v for v in nn.values() if v]) or "locked regimen"
+    return (
+        f"Acknowledged. You are locked in on: {targets_str}. Current machine score is {score}%. "
+        "Stop talking, execute your reps, and report exact proof metrics once completed."
+    )
 
 
 def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
@@ -1145,7 +1213,10 @@ def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
         {"role": "user", "content": prompt},
     ]
     reply = _invoke_llm_providers(messages, llm_key, json_mode=False)
-    return _enforce_concise_drill_sergeant(reply, max_sentences=4)
+    cleaned = _enforce_concise_drill_sergeant(reply, max_sentences=4)
+    if cleaned:
+        return cleaned
+    return generate_drill_sergeant_fallback(slot, record)
 
 
 def call_llm_for_stalker_followup(record: dict, unanswered_count: int, penalty_applied: bool) -> str:
@@ -1186,7 +1257,11 @@ def call_llm_for_stalker_followup(record: dict, unanswered_count: int, penalty_a
         {"role": "user", "content": directive},
     ]
     reply = _invoke_llm_providers(messages, llm_key, json_mode=False)
-    return _enforce_concise_drill_sergeant(reply, max_sentences=4)
+    cleaned = _enforce_concise_drill_sergeant(reply, max_sentences=4)
+    if cleaned:
+        return cleaned
+    tag = "penalty" if penalty_applied else "stalker"
+    return generate_drill_sergeant_fallback(tag, record)
 
 
 def _clean_reply_text(text: str) -> str:

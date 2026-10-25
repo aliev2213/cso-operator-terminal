@@ -4649,7 +4649,28 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
         { role: 'user', content: rawText }
       ];
       const plainOutput = await callRawLLMCompletion(plainMessages, 0.6, false);
-      return { reply: sanitizeConversationalReply(plainOutput, rawText, 4), toolData: {} };
+      const cleanedPlain = sanitizeConversationalReply(plainOutput, rawText, 4);
+      if (cleanedPlain) {
+        return { reply: cleanedPlain, toolData: {} };
+      }
+
+      // Stage 3: Fail-safe drill-sergeant fallback so terminal never goes mute
+      const d = evaluateHolisticDomains();
+      const todayLocked = Boolean(state.overseer.todayTargetsLocked);
+      const lower = (rawText || '').toLowerCase().trim();
+      let fallbackReply = '';
+      if (!todayLocked) {
+        if (/^(hello|hey|hi|yo|sup)\b/.test(lower)) {
+          fallbackReply = 'Drop the pleasantries. Your targets are NOT locked for today and you are burning daylight at 0% execution. State your 3 Non-Negotiables across Physical, Cash, and Agency right now.';
+        } else {
+          fallbackReply = 'I do not accept vague chatter. Your 3 Non-Negotiables for today are still unlocked. Lock them in right now: specify your Gym session, Outreach count, and Agency targets.';
+        }
+      } else {
+        const nn = state.overseer.nonNegotiables || {};
+        const targetsStr = ['physical', 'cash', 'agency', 'mental'].map(k => nn[k]).filter(Boolean).join(', ') || 'locked regimen';
+        fallbackReply = `Acknowledged. You are locked in on: ${targetsStr}. Current machine score is ${d.machineScore}%. Stop talking, execute your reps, and report exact proof metrics once completed.`;
+      }
+      return { reply: fallbackReply, toolData: {} };
     }
 
     async function interrogateAndSyncOperatorMessage(rawText, sourceLabel = 'TELEGRAM', updateId = null) {
