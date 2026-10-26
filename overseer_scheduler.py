@@ -52,28 +52,9 @@ _ORIG_GETADDRINFO = socket.getaddrinfo
 _DOH_CACHE = {}
 
 
+# Optional DNS cache helper without monkeypatching socket.getaddrinfo in serverless
 def _resilient_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
-    try:
-        return _ORIG_GETADDRINFO(host, port, family, type, proto, flags)
-    except Exception:
-        if host not in _DOH_CACHE:
-            try:
-                req = urllib.request.Request(
-                    f"https://1.1.1.1/dns-query?name={host}&type=A",
-                    headers={"Accept": "application/dns-json"},
-                )
-                with urllib.request.urlopen(req, timeout=4) as r:
-                    ans = json.loads(r.read().decode("utf-8")).get("Answer") or []
-                    ips = [a["data"] for a in ans if a.get("type") == 1 and a.get("data")]
-                    if ips:
-                        _DOH_CACHE[host] = ips[0]
-            except Exception:
-                pass
-        resolved = _DOH_CACHE.get(host, host)
-        return _ORIG_GETADDRINFO(resolved, port, family, type, proto, flags)
-
-
-socket.getaddrinfo = _resilient_getaddrinfo
+    return _ORIG_GETADDRINFO(host, port, family, type, proto, flags)
 
 # =============================================================================
 # 1. CONFIGURATION, PERSONA & COMMAND BRIDGE REGIMEN
