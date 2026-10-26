@@ -1,4 +1,4 @@
-name: Render 24/7 Keep-Alive & Cloud Watchdog
+name: Render 24/7 Keep-Alive
 
 on:
   schedule:
@@ -31,18 +31,3 @@ jobs:
             curl -s -m 30 "$CLEAN_URL/" > /dev/null || true
           fi
           echo "Render keep-alive ping successful. Service kept awake."
-
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Cloud Watchdog Sweep (Schedules & Stalker Loop)
-        env:
-          TELEGRAM_BOT_TOKEN: '8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM'
-          TELEGRAM_CHAT_ID: '5441024587'
-        run: |
-          python overseer_bot.py --cron-sweep || true

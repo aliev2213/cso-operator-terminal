@@ -1,8 +1,3 @@
-﻿{
-  "cleanUrls": true,
-  "git": {
-    "deploymentEnabled": {
-      "overseer-state": false
-    }
-  }
+{
+  "cleanUrls": true
 }

@@ -891,8 +891,8 @@ def _enforce_concise_drill_sergeant(text: str, user_text: str = "", max_sentence
 def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
     """
     Deterministic fallback extractor for non-negotiables, partial completions (e.g., '15 out of 30 DMs',
-    '5/10 outreaches'), completed habits, and missed habits so state math is 100% accurate even if
-    an upstream LLM returns plain text or omits a field.
+    '5/10 outreaches'), completed habits, and missed habits so state math is 100% accurate.
+    Guarantees questions, past remarks ('already gave you'), and inquiries are NEVER falsely locked as targets.
     """
     text = (raw_text or "").strip()
     if not text:
@@ -900,62 +900,71 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
     lower = text.lower()
     out = {}
 
-    # 1. Non-Negotiables extraction
+    is_question = "?" in text or any(lower.startswith(q) for q in (
+        "what", "what're", "what are", "what is", "whats", "where", "when", "how", "why",
+        "show me", "tell me", "did i", "have i", "can i", "should i"
+    ))
+    is_conversational_remark = any(p in lower for p in (
+        "already given", "already gave", "already told", "already locked", "already set",
+        "told you", "gave you", "what're my", "what are my", "what is my"
+    ))
+
+    # 1. Non-Negotiables extraction (ONLY if operator is actually declaring fresh targets)
     nn = {}
-    raw_lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    bullet_items = []
-    for ln in raw_lines:
-        cleaned = re.sub(r"^(\s*[-*•]+\s*|\s*\d+[\.\)]\s*|\s*[A-Za-z][\.\)]\s*)", "", ln).strip()
-        cl_lower = cleaned.lower()
-        if any(cl_lower.startswith(p) for p in (
-            "hello", "hey", "hi", "yo", "my three", "my 3", "my non", "non negotiable",
-            "non-negotiable", "targets for today", "today targets", "these are my", "here are my"
-        )):
-            continue
-        if cleaned:
-            bullet_items.append(cleaned)
+    if not is_question and not is_conversational_remark:
+        raw_lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+        bullet_items = []
+        for ln in raw_lines:
+            cleaned = re.sub(r"^(\s*[-*•]+\s*|\s*\d+[\.\)]\s*|\s*[A-Za-z][\.\)]\s*)", "", ln).strip()
+            cl_lower = cleaned.lower()
+            if any(cl_lower.startswith(p) for p in (
+                "hello", "hey", "hi", "yo", "my three", "my 3", "my non", "non negotiable",
+                "non-negotiable", "targets for today", "today targets", "these are my", "here are my"
+            )):
+                continue
+            if cleaned and len(cleaned) > 2:
+                bullet_items.append(cleaned)
 
-    # Fallback for inline comma/semicolon/numbered formats
-    if len(bullet_items) < 3 and ("non negotiable" in lower or "non-negotiable" in lower or "targets" in lower):
-        candidates = [re.sub(r"^(\s*[-*•]+\s*|\s*\d+[\.\)]\s*)", "", p).strip() for p in re.split(r"[,;]", text) if p.strip()]
-        filtered = [c for c in candidates if not any(c.lower().startswith(p) for p in ("hello", "hey", "hi", "my three", "my 3", "my non", "non negotiable"))]
-        if len(filtered) >= 3:
-            bullet_items = filtered
+        if len(bullet_items) < 3 and ("non negotiable" in lower or "non-negotiable" in lower or "targets" in lower) and ("," in text or ";" in text):
+            candidates = [re.sub(r"^(\s*[-*•]+\s*|\s*\d+[\.\)]\s*)", "", p).strip() for p in re.split(r"[,;]", text) if p.strip()]
+            filtered = [c for c in candidates if not any(c.lower().startswith(p) for p in ("hello", "hey", "hi", "my three", "my 3", "my non", "non negotiable"))]
+            if len(filtered) >= 2:
+                bullet_items = filtered
 
-    if "non negotiable" in lower or "non-negotiable" in lower or "targets" in lower or len(bullet_items) >= 3:
-        used = set()
-        for item in bullet_items:
-            il = item.lower()
-            if any(w in il for w in ("gym", "lift", "workout", "run", "conditioning", "physical", "cardio")) and "physical" not in nn:
-                nn["physical"] = item
-                used.add(item)
-            elif any(w in il for w in ("outreach", "dm", "lead", "loom", "call", "email", "cash", "stripe", "client", "sales")) and "cash" not in nn:
-                nn["cash"] = item
-                used.add(item)
-            elif any(w in il for w in ("brand2audience", "b2a", "agency", "asset", "vsl", "case study", "infra", "deploy")) and "agency" not in nn:
-                nn["agency"] = item
-                used.add(item)
-            elif any(w in il for w in ("journal", "walk", "meditat", "mental", "mindset", "weed", "clean", "focus", "diet", "sober", "water", "sleep")) and "mental" not in nn:
-                nn["mental"] = item
-                used.add(item)
+        # Must have at least 2 distinct items or an explicit target declaration with items
+        if len(bullet_items) >= 2 or (len(bullet_items) == 1 and any(w in lower for w in ("gym", "outreach", "dm", "workout")) and ("target" in lower or "non negotiable" in lower)):
+            used = set()
+            for item in bullet_items:
+                il = item.lower()
+                if any(w in il for w in ("gym", "lift", "workout", "run", "conditioning", "physical", "cardio")) and "physical" not in nn:
+                    nn["physical"] = item
+                    used.add(item)
+                elif any(w in il for w in ("outreach", "dm", "lead", "loom", "call", "email", "cash", "stripe", "client", "sales")) and "cash" not in nn:
+                    nn["cash"] = item
+                    used.add(item)
+                elif any(w in il for w in ("brand2audience", "b2a", "agency", "asset", "vsl", "case study", "infra", "deploy")) and "agency" not in nn:
+                    nn["agency"] = item
+                    used.add(item)
+                elif any(w in il for w in ("journal", "walk", "meditat", "mental", "mindset", "weed", "clean", "focus", "diet", "sober", "water", "sleep")) and "mental" not in nn:
+                    nn["mental"] = item
+                    used.add(item)
 
-        remaining = [b for b in bullet_items if b not in used]
-        for domain in ("physical", "cash", "mental", "agency"):
-            if domain not in nn and remaining:
-                nn[domain] = remaining.pop(0)
+            remaining = [b for b in bullet_items if b not in used]
+            for domain in ("physical", "cash", "mental", "agency"):
+                if domain not in nn and remaining:
+                    nn[domain] = remaining.pop(0)
 
-        if "agency" not in nn and "cash" in nn:
-            nn["agency"] = nn["cash"]
+            if "agency" not in nn and "cash" in nn:
+                nn["agency"] = nn["cash"]
 
     if nn:
         out["non_negotiables"] = nn
 
-    # 2. Partial ratio extraction (e.g. "15 out of 30 DMs", "15/30 DMs", "sent 15 DMs", "5/10 outreaches", "2 out of 5 looms")
+    # 2. Partial ratio extraction (e.g. '15 out of 30 DMs', '15/30 DMs', 'sent 15 DMs')
     partial = {}
     completed = []
     missed = []
 
-    # Check explicit X out of Y or X/Y patterns
     frac_matches = re.finditer(
         r"(\d+(?:\.\d+)?)\s*(?:out\s+of|of|/)\s*(\d+(?:\.\d+)?)\s*(dms?|outreach(?:es)?|leads?|looms?|pings?|calls?|emails?|mins?|minutes?)",
         lower,
@@ -977,8 +986,8 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
             elif "min" in unit and any(w in lower for w in ("gym", "lift", "workout")):
                 partial["h_workout"] = max(partial.get("h_workout", 0.0), ratio)
 
-    # Check single count patterns like "sent 15 DMs" or "did 15 outreaches" (when not locking targets)
-    if not nn and "?" not in lower and not any(w in lower for w in ("want to", "going to", "will do", "my target", "non negotiable", "should i", "what time")):
+    # Check single count patterns when not declaring targets and not asking questions
+    if not nn and not is_question and not any(w in lower for w in ("want to", "going to", "will do", "my target", "non negotiable")):
         single_dm = re.search(r"(?:sent|did|completed|fired|knocked\s+out|done)\s+(\d+)\s*(?:overflow\s+)?(dms?|outreach(?:es)?)", lower)
         if single_dm and "h_agency_dm" not in partial:
             cnt = float(single_dm.group(1))
@@ -1006,9 +1015,9 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
             partial["h_workout"] = max(0.0, min(1.0, mins / 60.0))
 
         # Check binary habit completions & negations
-        if any(p in lower for p in ("skipped gym", "no gym", "didn't lift", "didnt lift", "missed gym", "skipped workout")):
+        if any(p in lower for p in ("missed my gym", "missed gym", "skipped gym", "no gym", "didn't lift", "didnt lift", "skipped workout")):
             missed.append("h_workout")
-        elif any(p in lower for p in ("hit the gym", "finished gym", "finished my gym", "gym done", "lifted", "completed gym", "crushed gym", "did my gym", "workout done", "finished workout")):
+        elif any(p in lower for p in ("hit the gym", "finished gym", "finished my gym", "gym done", "lifted", "completed gym", "crushed gym", "did my gym", "workout done", "finished workout", "did a little bit of exercise")):
             completed.append("h_workout")
 
         if any(p in lower for p in ("skipped journal", "didn't journal", "didnt journal", "no journal", "missed journal")):
@@ -1033,8 +1042,6 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
     if missed:
         out["missed_habits"] = missed
     return out
-
-
 def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
     """
     Passes the operator's raw text (or transcribed voice note) + live state + last 15 messages
@@ -1141,10 +1148,11 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
     """
     Guaranteed fail-proof drill-sergeant generator. If external LLM gateways
     rate-limit, timeout, or require keys, OVERSEER will NEVER freeze or output canned boilerplate.
+    Handles inquiries, excuses, questions, and progress conversationally.
     """
     ov = (record.get("state") or {}).get("overseer") or {}
     metrics = compute_holistic_machine_score(record)
-    today_locked = ov.get("todayTargetsLocked", False)
+    today_locked = is_today_targets_locked(ov, today_iso())
     nn = ov.get("nonNegotiables") or {}
     score = metrics["machine_score"]
     cash_sc = metrics["cash_score"]
@@ -1186,7 +1194,33 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
 
     lower = user_text.lower().strip()
 
-    # Offline-safe understanding: if the operator just stated targets / progress, acknowledge THAT
+    # 1. User asking what their targets are: "what are my 3 non negotiables", "what are my targets"
+    if any(p in lower for p in ("what are my", "what're my", "what is my", "show my", "tell me my")) and any(w in lower for w in ("target", "non negotiable", "non-negotiable", "goals")):
+        if today_locked and nn:
+            t_str = ", ".join([_scrub_substance_references(v) for v in nn.values() if v])
+            return f"Your locked targets for today are: {t_str}. Holistic machine score is at {score}%. Stop asking what you already know and report execution proof."
+        return "Your 3 Non-Negotiables for today are NOT locked in the system yet. State your Gym session, Outreach count, and Agency target right now."
+
+    # 2. User claims "I've already given you the 3 non negotiable"
+    if any(p in lower for p in ("already given", "already gave", "already told", "already set", "told you")):
+        if today_locked and nn:
+            t_str = ", ".join([_scrub_substance_references(v) for v in nn.values() if v])
+            return f"They are on record: {t_str}. Words are cheap; proof is what counts. Report back with exact numbers the moment each one is completed."
+        return "Nothing is locked in the system for today—the slate reset at 00:00 midnight. Give me your 3 Non-Negotiables right now so they are logged."
+
+    # 3. User says "what should I do now?" or reports small exercise
+    if any(w in lower for w in ("what should i do", "what do i do", "whats next", "what now", "what next")):
+        if any(w in lower for w in ("exercise", "gym", "workout")):
+            return "Log your exercise numbers: how many minutes or sets did you complete? Next rep: execute your 30 outreach DMs or client pipeline."
+        if not today_locked:
+            return "Step one is locking your 3 Non-Negotiables across Physical, Cash, and Agency. State them right now so we can track execution."
+        return f"Next rep: fire your 30 outreach DMs or execute your training session. Current machine score is {score}%. Stop deliberating and ship."
+
+    # 4. Fatigue / excuses / missed gym
+    if any(w in lower for w in ("missed my gym", "missed gym", "skip the gym", "tired", "exhausted", "lazy", "tomorrow")):
+        return "Fatigue is the mind negotiating down. Missing a rep costs momentum. Drop the excuse and make up for it on your outreach targets right now."
+
+    # 5. Offline-safe target extraction check (when operator ACTUALLY declares targets)
     try:
         ext = _extract_tool_updates_from_text(user_text, record)
     except Exception:
@@ -1207,6 +1241,7 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
             "Report back with exact numbers the moment your first target is completed."
         )
 
+    # 6. Habit completion / partial progress logged
     if ext.get("partial_progress") or ext.get("completed_habits") or ext.get("missed_habits"):
         bits = []
         for hid, r in (ext.get("partial_progress") or {}).items():
@@ -1215,31 +1250,21 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
         bits += [f"{h.replace('h_', '')} MISSED" for h in ext.get("missed_habits") or []]
         return f"Logged: {', '.join(bits)}. Holistic machine score is now {score}%. Halfway is not the finish line. What is your next rep?"
 
-    # Contextual responses to questions and conversation
+    # 7. Asking about gym / schedule / timing
     if any(w in lower for w in ("what time", "when should i", "schedule", "hit the gym", "go to the gym")):
         return (
             "Command Bridge regimen specifies Morning Activation (07:00-08:00) or Midday conditioning. "
             "Stop debating the clock. Get into the gym, execute your session, and report back your minutes."
         )
 
-    if any(w in lower for w in ("whats next", "what's next", "what next", "what should i do", "what now", "where do i start")):
-        if not today_locked:
-            return (
-                "Step one is locking your 3 Non-Negotiables across Physical, Cash, and Agency. "
-                "State your exact targets right now so the regimen can track you."
-            )
-        return f"Next rep: fire your 30 outreach DMs or execute your training session. Current machine score is {score}%. Stop asking and start shipping."
-
-    if any(w in lower for w in ("tired", "exhausted", "skip", "dont feel like", "don't feel like", "tomorrow", "lazy", "can i skip", "give up")):
-        return "Fatigue is the mind negotiating down. The standard is non-negotiable. Drop the excuse, get on the floor, and execute your first rep right now."
-
+    # 8. Score / telemetry inquiry
     if any(w in lower for w in ("score", "status", "metrics", "how am i doing", "how's my", "progress")):
         return (
             f"Telemetry audit: Holistic Machine Score is {score}%. Physical: {metrics['physical_score']}%, Cash: {cash_sc}%, "
             f"Agency: {metrics['agency_score']}%. Stop checking the dashboard and generate output."
         )
 
-    # Word-boundary check so "hit", "this", "think", "you" never falsely trigger greeting demands
+    # 9. Greetings & chatter
     has_greeting = bool(re.search(r"\b(hello|hey|hi|yo|sup|good\s+morning|good\s+afternoon|good\s+evening)\b", lower))
 
     if not today_locked:
@@ -1261,8 +1286,6 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
         f"Acknowledged. You are locked in on: {targets_str}. Current machine score is {score}%. "
         "Stop talking, execute your reps, and report exact proof metrics once completed."
     )
-
-
 def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
     """
     Dynamically generates the 07:00, 13:00, 16:00, or 21:00 audit callout via the LLM API
@@ -1413,8 +1436,22 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
 
     # 2. Gemini API if configured (tries gemini-2.0-flash, gemini-1.5-flash)
     if llm_key.startswith("AIza"):
-        convo = "\n\n".join(f"{m['role'].upper()}: {m['content']}" for m in messages)
-        body = {"contents": [{"parts": [{"text": convo}]}]}
+        system_text = ""
+        contents = []
+        for m in messages:
+            r = m.get("role", "user")
+            t = m.get("content", "")
+            if r == "system":
+                system_text += t + "\n\n"
+            elif r == "assistant":
+                contents.append({"role": "model", "parts": [{"text": t}]})
+            else:
+                contents.append({"role": "user", "parts": [{"text": t}]})
+        if not contents:
+            contents = [{"role": "user", "parts": [{"text": "Acknowledge status and command the next rep."}]}]
+        body = {"contents": contents}
+        if system_text:
+            body["systemInstruction"] = {"parts": [{"text": system_text.strip()}]}
         if json_mode:
             body["generationConfig"] = {"responseMimeType": "application/json"}
         payload_bytes = json.dumps(body).encode("utf-8")
@@ -1426,7 +1463,7 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
                     data=payload_bytes,
                     headers={"Content-Type": "application/json"},
                 )
-                with urllib.request.urlopen(req, timeout=8) as resp:
+                with urllib.request.urlopen(req, timeout=10) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                     cand = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
                     if cand:
@@ -2062,6 +2099,8 @@ def process_operator_message_turn(text: str, rec: dict, source_tag: str = "OVERS
             pids.append(upd_id)
         ov["processedUpdateIds"] = pids[-100:]
 
+    ov["unansweredPingCount"] = 0
+    ov["awaitingOperatorReply"] = False
     ov["lastOperatorReplyTimestamp"] = time.time()
     ov["lastPingTimestamp"] = time.time()
     actionable = apply_silent_llm_tool_updates(rec, llm_result)
