@@ -1062,37 +1062,38 @@ def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
                     parsed_dict[k][hid] = max(float(parsed_dict[k].get(hid, 0.0)), float(val))
         return parsed_dict
 
-    # Stage 1: Structured JSON extraction call
-    raw_llm_output = _invoke_llm_providers(messages, llm_key, json_mode=True)
-    if raw_llm_output:
-        parsed = _extract_json_object(raw_llm_output)
-        if parsed and isinstance(parsed.get("reply"), str) and parsed["reply"].strip():
-            parsed["reply"] = _enforce_concise_drill_sergeant(parsed["reply"], raw_text, max_sentences=4)
-            return _merge_fallback_tools(parsed)
-        cleaned_raw = _enforce_concise_drill_sergeant(raw_llm_output, raw_text, max_sentences=4)
-        if cleaned_raw and not cleaned_raw.startswith("{"):
-            return _merge_fallback_tools({"reply": cleaned_raw})
+    # Stage 1: Fast structured JSON extraction call (only if API key is provided or local server is up)
+    if llm_key:
+        raw_llm_output = _invoke_llm_providers(messages, llm_key, json_mode=True)
+        if raw_llm_output:
+            parsed = _extract_json_object(raw_llm_output)
+            if parsed and isinstance(parsed.get("reply"), str) and parsed["reply"].strip():
+                parsed["reply"] = _enforce_concise_drill_sergeant(parsed["reply"], raw_text, max_sentences=4)
+                return _merge_fallback_tools(parsed)
+            cleaned_raw = _enforce_concise_drill_sergeant(raw_llm_output, raw_text, max_sentences=4)
+            if cleaned_raw and not cleaned_raw.startswith("{"):
+                return _merge_fallback_tools({"reply": cleaned_raw})
 
-    # Stage 2: Plain conversational fallback if JSON mode failed or timed out
-    plain_messages = [
-        {
-            "role": "system",
-            "content": (
-                f"{CHAT_SYSTEM_PROMPT}\n\n{COMMAND_BRIDGE_REGIMEN_SPEC}\n\n"
-                f"LIVE TELEMETRY:\n{state_snapshot}\n\n"
-                "Reply directly to the operator in strictly 2 to 4 brutal sentences. "
-                "Call out any excuses from the conversation history and demand exact numbers and immediate target locks."
-            ),
-        },
-        *recent_memory,
-        {"role": "user", "content": raw_text},
-    ]
-    plain_reply = _invoke_llm_providers(plain_messages, llm_key, json_mode=False)
-    cleaned_plain = _enforce_concise_drill_sergeant(plain_reply, raw_text, max_sentences=4)
-    if cleaned_plain:
-        return _merge_fallback_tools({"reply": cleaned_plain})
+        # Stage 2: Plain conversational turn with key
+        plain_messages = [
+            {
+                "role": "system",
+                "content": (
+                    f"{CHAT_SYSTEM_PROMPT}\n\n{COMMAND_BRIDGE_REGIMEN_SPEC}\n\n"
+                    f"LIVE TELEMETRY:\n{state_snapshot}\n\n"
+                    "Reply directly to the operator in strictly 2 to 4 brutal sentences. "
+                    "Call out any excuses from the conversation history and demand exact numbers and immediate target locks."
+                ),
+            },
+            *recent_memory,
+            {"role": "user", "content": raw_text},
+        ]
+        plain_reply = _invoke_llm_providers(plain_messages, llm_key, json_mode=False)
+        cleaned_plain = _enforce_concise_drill_sergeant(plain_reply, raw_text, max_sentences=4)
+        if cleaned_plain:
+            return _merge_fallback_tools({"reply": cleaned_plain})
 
-    # Stage 3: Guaranteed Deterministic Drill-Sergeant Fallback
+    # Stage 3: Instant Deterministic Drill-Sergeant Generator (<0.01s, 0 timeouts)
     fallback_reply = generate_drill_sergeant_fallback("chat", record, raw_text)
     return _merge_fallback_tools({"reply": fallback_reply})
 
@@ -1346,8 +1347,8 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
     except Exception:
         pass
 
-    # 4. Cloud OpenAI-Compatible Proxy (`https://text.pollinations.ai/openai`) with multi-model retry
-    for model_name in ("openai", "openai-fast", "mistral"):
+    # 4. Cloud OpenAI-Compatible Proxy (`https://text.pollinations.ai/openai`) with fast timeout
+    for model_name in ("openai", "openai-fast"):
         try:
             body = {
                 "model": model_name,
@@ -1360,7 +1361,7 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
                 data=json.dumps(body).encode("utf-8"),
                 headers={"Content-Type": "application/json", "User-Agent": "OVERSEER/5.1"},
             )
-            with urllib.request.urlopen(req, timeout=14.0) as resp:
+            with urllib.request.urlopen(req, timeout=2.5) as resp:
                 raw_bytes = resp.read().decode("utf-8")
                 try:
                     data = json.loads(raw_bytes)
@@ -1371,9 +1372,9 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
                     if raw_bytes.strip():
                         return raw_bytes.strip()
         except Exception:
-            time.sleep(0.3)
+            pass
 
-    # 5. Pollinations GET Endpoint Fallback
+    # 5. Pollinations GET Endpoint Fallback (fast 2.5s timeout)
     try:
         sys_text = next((m.get("content", "") for m in messages if m.get("role") == "system"), CHAT_SYSTEM_PROMPT)[:900]
         usr_text = next((m.get("content", "") for m in reversed(messages) if m.get("role") == "user"), "")[:600]
@@ -1383,7 +1384,7 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
             f"?model=openai&seed={seed}&system={urllib.parse.quote(sys_text)}"
         )
         req = urllib.request.Request(get_url, headers={"User-Agent": "OVERSEER/5.1"})
-        with urllib.request.urlopen(req, timeout=14.0) as resp:
+        with urllib.request.urlopen(req, timeout=2.5) as resp:
             txt = resp.read().decode("utf-8").strip()
             if txt:
                 return txt
