@@ -1246,28 +1246,63 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
             "right now or report your execution status."
         )
 
-    if "07:00" in context_type or "boot" in context_type.lower():
+    if "08:00" in context_type or "07:00" in context_type or "boot" in context_type.lower() or "reveille" in context_type.lower():
         return (
-            "System boot initiated. The clock is running and your daily execution slate is at 0%. "
-            "State your 3 Non-Negotiables across Physical, Cash/Outreach, and Agency right now—no pleasantries, no excuses."
+            "08:00 Reveille. Daily execution slate is at 0%. State your 3 Non-Negotiables across Physical/Gym, "
+            "Cash/B2A Outreach, and Agency right now, and confirm your Vyvanse intake before the 10:00 AM cutoff."
         )
-    if "13:00" in context_type or "midday" in context_type.lower():
+    if "09:00" in context_type or "gym" in context_type.lower():
         return (
-            f"Midday velocity audit. You are sitting at {score}% Machine Score with {cash_sc}% cash progress. "
-            "State your exact outreach numbers, gym status, and lead count right now."
+            "09:00 Gym Deployment. Breakfast and morning prep are done. Deploy to the gym for 60 minutes of hard conditioning right now."
         )
-    if "16:00" in context_type or "afternoon" in context_type.lower():
+    if "10:00" in context_type or "cutoff" in context_type.lower():
         return (
-            f"Afternoon velocity checkpoint. Current machine score is {score}% against a 70% requirement. "
-            "Deliver your pulse report immediately: exact DM count, asset deployment status, and pipeline execution."
+            "10:00 AM Vyvanse cutoff is closed. If you have not taken it, push through unmedicated today. Report your workout completion now."
         )
-    if "21:00" in context_type or "night" in context_type.lower() or "debrief" in context_type.lower():
+    if "11:30" in context_type:
         return (
-            f"21:00 audit window. Machine score is finalized at {score}%. Report completed habits and "
-            "justify any unmet targets before state rollover."
+            "11:30 B2A Outreach sprint launch. Deep work window open: fire off your 10 to 30 outreaches and Loom audits immediately."
+        )
+    if "13:30" in context_type or "13:00" in context_type or "midday" in context_type.lower():
+        return (
+            f"13:30 Midday velocity audit. Machine Score is at {score}% with {cash_sc}% cash progress. State your exact outreach numbers and lead count right now."
+        )
+    if "15:30" in context_type or "16:00" in context_type or "afternoon" in context_type.lower():
+        return (
+            f"15:30 Afternoon momentum check. Current machine score is {score}%. Push your 20-DM surge and Loom video audits immediately."
+        )
+    if "17:30" in context_type:
+        return (
+            "17:30 Track 2 Agency Build. State which infrastructure asset or client proof deliverable you are shipping for Brand2Audience before evening."
+        )
+    if "20:00" in context_type or "evening" in context_type.lower() or "clearance" in context_type.lower():
+        return (
+            "20:00 Evening clearance audit. Which of your 3 Non-Negotiables are 100% completed? Report proof immediately."
+        )
+    if "21:30" in context_type or "21:00" in context_type or "night" in context_type.lower() or "debrief" in context_type.lower():
+        return (
+            f"21:30 Night Debrief. Machine score is finalized at {score}%. Report completed habits and submit your debrief before 08:00 AM reveille tomorrow."
         )
 
     lower = user_text.lower().strip()
+
+    # Vyvanse inquiries fallback
+    if any(w in lower for w in ("vyvanse", "meds", "medication")):
+        vy = ov.get("vyvanse") or {}
+        cur_h = now_local().strftime("%H:%M")
+        if vy.get("taken"):
+            return f"Vyvanse was taken at {vy.get('takenTime')} (ON TIME). Window locked. Focus on execution."
+        if cur_h >= "10:00":
+            return f"10:00 AM cutoff has passed (Current: {cur_h}). Do NOT take Vyvanse late--push through unmedicated."
+        return f"Vyvanse is PENDING. You have until 10:00 AM (Current: {cur_h}). Take it right now."
+
+    # Schedule inquiries fallback
+    if any(w in lower for w in ("schedule", "routine", "regimen", "timeline")):
+        return (
+            "OPERATOR REGIMEN: 08:00 Reveille & Vyvanse (cutoff 10:00), 09:00 Gym Deployment, "
+            "10:00 Vyvanse Cutoff & Gym audit, 11:30 B2A Sprint, 13:30 Midday Velocity, "
+            "15:30 Afternoon Momentum, 17:30 Agency Build, 20:00 Evening Clearance, 21:30 Night Debrief."
+        )
 
     # 1. User asking what their targets are: "what are my 3 non negotiables", "what are my targets"
     if any(p in lower for p in ("what are my", "what're my", "what is my", "show my", "tell me my")) and any(w in lower for w in ("target", "non negotiable", "non-negotiable", "goals")):
