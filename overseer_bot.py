@@ -1411,24 +1411,28 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
         except Exception:
             pass
 
-    # 2. Gemini API if configured
+    # 2. Gemini API if configured (tries gemini-2.0-flash, gemini-1.5-flash)
     if llm_key.startswith("AIza"):
-        try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={llm_key}"
-            convo = "\n\n".join(f"{m['role'].upper()}: {m['content']}" for m in messages)
-            body = {"contents": [{"parts": [{"text": convo}]}]}
-            if json_mode:
-                body["generationConfig"] = {"responseMimeType": "application/json"}
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(body).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-            )
-            with urllib.request.urlopen(req, timeout=14) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-                return data["candidates"][0]["content"]["parts"][0]["text"].strip()
-        except Exception:
-            pass
+        convo = "\n\n".join(f"{m['role'].upper()}: {m['content']}" for m in messages)
+        body = {"contents": [{"parts": [{"text": convo}]}]}
+        if json_mode:
+            body["generationConfig"] = {"responseMimeType": "application/json"}
+        payload_bytes = json.dumps(body).encode("utf-8")
+        for gem_model in ("gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"):
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{gem_model}:generateContent?key={llm_key}"
+                req = urllib.request.Request(
+                    url,
+                    data=payload_bytes,
+                    headers={"Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(req, timeout=8) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    cand = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+                    if cand:
+                        return cand
+            except Exception:
+                continue
 
     # 3. Local LM Studio (`http://127.0.0.1:1234/v1/chat/completions`)
     try:
