@@ -2824,7 +2824,9 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
     const DEFAULT_TG_BOT_TOKEN = '8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM';
     const DEFAULT_TG_CHAT_ID = '5441024587';
-    const LOCAL_OVERSEER_API = 'http://127.0.0.1:8765';
+    const LOCAL_OVERSEER_API = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+      ? 'http://127.0.0.1:8765'
+      : 'https://overseer-backend-w9uu.onrender.com';
     const OVERSEER_DRILL_SYSTEM_PROMPT =
       "You are OVERSEER. Your sole mission is driving the operator to maximum human execution. If the operator gives weak excuses, dodges questions, or goes silent, call it out directly. Do not accept pleasantries or vague answers. Demand exact numbers and immediate target locks. STRICT CONCISENESS RULE: Keep every response punchy, brutal, and conversational — strictly 2 to 4 sentences max per message. Never output huge walls of text, giant schedule dumps, robotic data cards, or code blocks unless explicitly asked.";
 

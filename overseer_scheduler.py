@@ -2110,6 +2110,7 @@ def process_operator_message_turn(text: str, rec: dict, source_tag: str = "OVERS
 
     ov["unansweredPingCount"] = 0
     ov["awaitingOperatorReply"] = False
+    ov["pendingAuditSlot"] = None
     ov["lastOperatorReplyTimestamp"] = time.time()
     ov["lastPingTimestamp"] = time.time()
     actionable = apply_silent_llm_tool_updates(rec, llm_result)
@@ -2323,6 +2324,37 @@ def run_actions_loop() -> None:
     print("[OVERSEER ACTIONS] window complete; handing over to next run.", flush=True)
 
 
+def start_self_keep_alive_thread() -> None:
+    """
+    Prevents Render Free tier from spinning down after 15 minutes of HTTP inactivity.
+    Continuously pings the public `/health` endpoint every 5 minutes (300 seconds) in a background thread.
+    """
+    raw_url = (
+        os.getenv("RENDER_EXTERNAL_URL")
+        or os.getenv("RENDER_URL")
+        or "https://overseer-backend-w9uu.onrender.com"
+    ).rstrip("/")
+    health_url = f"{raw_url}/health"
+
+    def _loop():
+        time.sleep(20)
+        print(f"[OVERSEER KEEPALIVE] Self-ping watchdog active -> {health_url} (every 300s)", flush=True)
+        while True:
+            try:
+                req = urllib.request.Request(
+                    health_url,
+                    headers={"User-Agent": "OVERSEER-Self-KeepAlive/2.2"},
+                )
+                with urllib.request.urlopen(req, timeout=20) as resp:
+                    _ = resp.read()
+            except Exception:
+                pass
+            time.sleep(300)
+
+    t = threading.Thread(target=_loop, daemon=True, name="OverseerKeepAlive")
+    t.start()
+
+
 def start_daemon() -> None:
     if "--actions-loop" in sys.argv:
         run_actions_loop()
@@ -2363,6 +2395,7 @@ def start_daemon() -> None:
     server = ThreadingHTTPServer((HOST, PORT), OverseerRequestHandler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     threading.Thread(target=file_watcher_loop, daemon=True).start()
+    start_self_keep_alive_thread()
 
     print(f"[OVERSEER] Pure LLM Bot, Velocity Scheduler & Stalker Engine active on http://{HOST}:{PORT}", flush=True)
     print(

@@ -2,8 +2,8 @@ name: Render 24/7 Keep-Alive
 
 on:
   schedule:
-    # Runs every 10 minutes around the clock to permanently prevent Render Free tier from sleeping
-    - cron: '*/10 * * * *'
+    # Runs every 5 minutes around the clock to permanently prevent Render Free tier from sleeping
+    - cron: '*/5 * * * *'
   workflow_dispatch:
     inputs:
       render_url:
@@ -24,10 +24,15 @@ jobs:
           TARGET="${RENDER_URL:-https://overseer-backend-w9uu.onrender.com}"
           CLEAN_URL="${TARGET%/}"
           echo "Pinging live Render service at $CLEAN_URL/health ..."
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "$CLEAN_URL/health" || true)
-          echo "Health endpoint response code: $HTTP_CODE"
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Attempting root URL fallback ping..."
-            curl -s -m 30 "$CLEAN_URL/" > /dev/null || true
-          fi
-          echo "Render keep-alive ping successful. Service kept awake."
+          for i in 1 2 3; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 45 "$CLEAN_URL/health" || true)
+            echo "Attempt $i: Health endpoint response code: $HTTP_CODE"
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Render keep-alive verified healthy."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Fallback pinging root URL..."
+          curl -s -m 45 "$CLEAN_URL/" > /dev/null || true
+          echo "Render keep-alive ping routine complete."
