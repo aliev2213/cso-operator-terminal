@@ -81,6 +81,10 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 LOCAL_LLM_URL = os.getenv("LOCAL_LLM_URL", "http://127.0.0.1:1234/v1/chat/completions")
 POLLINATIONS_OPENAI_URL = "https://text.pollinations.ai/openai"
+LLM7_URL = "https://api.llm7.io/v1/chat/completions"
+LLM_ENABLED = os.getenv("OVERSEER_LLM_ENABLED", "1") != "0"
+LLM7_TOKEN = os.getenv("LLM7_TOKEN", "unused")
+LLM7_MODELS = [m.strip() for m in os.getenv("LLM7_MODELS", "default").split(",") if m.strip()]
 
 # Stalker Engine interval: defaults to 30 minutes (1800s), configurable via env
 STALKER_INTERVAL_SEC = int(os.getenv("OVERSEER_STALKER_INTERVAL_SEC", "1800"))
@@ -680,6 +684,10 @@ def apply_silent_llm_tool_updates(record: dict, tool_args: dict) -> bool:
         updated_keys = []
         for k in ("physical", "mental", "cash", "agency"):
             val = str(nn_update.get(k) or "").strip()
+            if val and _scrub_substance_references(val) != val:
+                # Public dashboard safety: never store substance wording; keep the commitment, neutralize the label
+                val = _scrub_substance_references(val)
+                val = (val if len(val) > 3 else "Personal discipline commitment (private)")
             if val:
                 cur_nn[k] = val
                 updated_keys.append(k)
@@ -837,10 +845,15 @@ def build_live_state_snapshot(record: dict) -> str:
 def _scrub_substance_references(text: str) -> str:
     if not text:
         return ""
-    scrubbed = re.sub(r"\s*and\s+taper\s+your\s+thc[^.!?]*", "", text, flags=re.IGNORECASE)
-    scrubbed = re.sub(r"\b(weed|cannabis|marijuana|thc|vape|vaping|taper|tapering)\b", "", scrubbed, flags=re.IGNORECASE)
-    scrubbed = re.sub(r"\s{2,}", " ", scrubbed).strip()
-    return scrubbed
+    lower = text.lower()
+    if any(w in lower for w in ("weed", "cannabis", "marijuana", "thc", "vape", "vaping", "joint", "edible", "smoke", "smoking", "taper", "tapering")):
+        scrubbed = re.sub(r"\s*and\s+taper\s+your\s+thc[^.!?]*", "", text, flags=re.IGNORECASE)
+        scrubbed = re.sub(r"\b(weed|cannabis|marijuana|thc|vape|vaping|joint|edible|smoke|smoking|taper|tapering)\b", "", scrubbed, flags=re.IGNORECASE)
+        scrubbed = re.sub(r"\s{2,}", " ", scrubbed).strip()
+        if scrubbed.lower() in ("", "no", "no all day", "all day", "zero", "clean", "none", "abstain"):
+            return "Personal discipline commitment"
+        return scrubbed
+    return text.strip()
 
 
 def _get_recent_chat_memory(record: dict, limit: int = CHAT_MEMORY_LIMIT) -> list:
@@ -888,25 +901,51 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
 
     # 1. Non-Negotiables extraction
     nn = {}
-    lines = [re.sub(r"^[\s\-*•\d.)]+", "", ln).strip() for ln in text.splitlines() if ln.strip()]
-    bullet_items = [ln for ln in lines if not ln.lower().startswith("my non")]
+    raw_lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    bullet_items = []
+    for ln in raw_lines:
+        cleaned = re.sub(r"^(\s*[-*•]+\s*|\s*\d+[\.\)]\s*|\s*[A-Za-z][\.\)]\s*)", "", ln).strip()
+        cl_lower = cleaned.lower()
+        if any(cl_lower.startswith(p) for p in (
+            "hello", "hey", "hi", "yo", "my three", "my 3", "my non", "non negotiable",
+            "non-negotiable", "targets for today", "today targets", "these are my", "here are my"
+        )):
+            continue
+        if cleaned:
+            bullet_items.append(cleaned)
 
-    if "non negotiable" in lower or "non-negotiable" in lower or "targets for today" in lower or len(bullet_items) >= 3:
+    # Fallback for inline comma/semicolon/numbered formats
+    if len(bullet_items) < 3 and ("non negotiable" in lower or "non-negotiable" in lower or "targets" in lower):
+        candidates = [re.sub(r"^(\s*[-*•]+\s*|\s*\d+[\.\)]\s*)", "", p).strip() for p in re.split(r"[,;]", text) if p.strip()]
+        filtered = [c for c in candidates if not any(c.lower().startswith(p) for p in ("hello", "hey", "hi", "my three", "my 3", "my non", "non negotiable"))]
+        if len(filtered) >= 3:
+            bullet_items = filtered
+
+    if "non negotiable" in lower or "non-negotiable" in lower or "targets" in lower or len(bullet_items) >= 3:
+        used = set()
         for item in bullet_items:
             il = item.lower()
-            if any(w in il for w in ("gym", "lift", "workout", "run", "conditioning", "physical")):
-                nn.setdefault("physical", item)
-            elif any(w in il for w in ("journal", "walk", "meditat", "mental", "mindset")):
-                nn.setdefault("mental", item)
-            elif any(w in il for w in ("outreach", "dm", "lead", "loom", "call", "email", "cash", "stripe", "client")):
-                nn.setdefault("cash", item)
-            elif any(w in il for w in ("brand2audience", "agency", "asset", "vsl", "case study", "infra")):
-                nn.setdefault("agency", item)
-        if "cash" in nn and "agency" not in nn and ("brand2audience" in lower or "agency" in lower):
+            if any(w in il for w in ("gym", "lift", "workout", "run", "conditioning", "physical", "cardio")) and "physical" not in nn:
+                nn["physical"] = item
+                used.add(item)
+            elif any(w in il for w in ("outreach", "dm", "lead", "loom", "call", "email", "cash", "stripe", "client", "sales")) and "cash" not in nn:
+                nn["cash"] = item
+                used.add(item)
+            elif any(w in il for w in ("brand2audience", "b2a", "agency", "asset", "vsl", "case study", "infra", "deploy")) and "agency" not in nn:
+                nn["agency"] = item
+                used.add(item)
+            elif any(w in il for w in ("journal", "walk", "meditat", "mental", "mindset", "weed", "clean", "focus", "diet", "sober", "water", "sleep")) and "mental" not in nn:
+                nn["mental"] = item
+                used.add(item)
+
+        remaining = [b for b in bullet_items if b not in used]
+        for domain in ("physical", "cash", "mental", "agency"):
+            if domain not in nn and remaining:
+                nn[domain] = remaining.pop(0)
+
+        if "agency" not in nn and "cash" in nn:
             nn["agency"] = nn["cash"]
-        if len(nn) < 3 and len(bullet_items) >= 3:
-            for key, item in zip(("physical", "mental", "cash", "agency"), bullet_items[:4]):
-                nn.setdefault(key, item)
+
     if nn:
         out["non_negotiables"] = nn
 
@@ -938,11 +977,10 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
                 partial["h_workout"] = max(partial.get("h_workout", 0.0), ratio)
 
     # Check single count patterns like "sent 15 DMs" or "did 15 outreaches" (when not locking targets)
-    if not nn and not any(w in lower for w in ("want to", "going to", "will do", "my target", "non negotiable")):
+    if not nn and "?" not in lower and not any(w in lower for w in ("want to", "going to", "will do", "my target", "non negotiable", "should i", "what time")):
         single_dm = re.search(r"(?:sent|did|completed|fired|knocked\s+out|done)\s+(\d+)\s*(?:overflow\s+)?(dms?|outreach(?:es)?)", lower)
         if single_dm and "h_agency_dm" not in partial:
             cnt = float(single_dm.group(1))
-            # Check if user locked a specific outreach quota in nonNegotiables (e.g. 10 outreaches), else default 30
             quota = 30.0
             if record:
                 cash_nn = str((((record.get("state") or {}).get("overseer") or {}).get("nonNegotiables") or {}).get("cash") or "")
@@ -969,18 +1007,18 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
         # Check binary habit completions & negations
         if any(p in lower for p in ("skipped gym", "no gym", "didn't lift", "didnt lift", "missed gym", "skipped workout")):
             missed.append("h_workout")
-        elif any(p in lower for p in ("hit the gym", "finished gym", "gym done", "lifted", "completed gym", "crushed gym", "did my gym")):
+        elif any(p in lower for p in ("hit the gym", "finished gym", "finished my gym", "gym done", "lifted", "completed gym", "crushed gym", "did my gym", "workout done", "finished workout")):
             completed.append("h_workout")
 
         if any(p in lower for p in ("skipped journal", "didn't journal", "didnt journal", "no journal", "missed journal")):
             missed.append("h_journal")
-        elif any(p in lower for p in ("journaled", "finished journal", "journal done", "completed journal", "wrote in my journal", "did my journal")):
+        elif any(p in lower for p in ("journaled", "finished journal", "finished my journal", "journal done", "completed journal", "wrote in my journal", "did my journal")):
             completed.append("h_journal")
 
         if any(p in lower for p in ("drank 1l", "electrolytes done", "hydrated", "morning hydration done")):
             completed.append("h_wake")
 
-        if any(p in lower for p in ("focus walk done", "did my walk", "20m walk", "20 min walk", "finished walk")):
+        if any(p in lower for p in ("focus walk done", "did my walk", "20m walk", "20 min walk", "finished walk", "walk done")):
             completed.append("h_walk")
 
     for hid, r in list(partial.items()):
@@ -999,7 +1037,7 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
 def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
     """
     Passes the operator's raw text (or transcribed voice note) + live state + last 15 messages
-    of chatHistory directly to the LLM using `CHAT_SYSTEM_PROMPT`.
+    of chatHistory directly to the LLM using CHAT_SYSTEM_PROMPT.
     Enforces a strict 2-4 sentence punchy drill-sergeant output and extracts both binary
     and partial habit completions.
     """
@@ -1007,31 +1045,6 @@ def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
     llm_key = GEMINI_API_KEY or OPENAI_API_KEY or overseer.get("llmApiKey") or ""
     state_snapshot = build_live_state_snapshot(record)
     recent_memory = _get_recent_chat_memory(record, limit=CHAT_MEMORY_LIMIT)
-
-    system_instruction = (
-        f"{CHAT_SYSTEM_PROMPT}\n\n"
-        f"{COMMAND_BRIDGE_REGIMEN_SPEC}\n\n"
-        f"CURRENT `overseer_state.json` TELEMETRY:\n{state_snapshot}\n\n"
-        "Respond with a valid JSON object matching this exact schema (no markdown fences):\n"
-        "{\n"
-        '  "reply": "Your single punchy, brutal, conversational response (STRICTLY 2 TO 4 SENTENCES MAX). '
-        "Reference past excuses or wake-up times from chat history if relevant. "
-        "If `todayTargetsLocked` is false, demand their 3 Non-Negotiables (Physical/Gym, Cash/Outreach, Agency/Mental) right now. "
-        'Never output walls of text or schedule dumps.",\n'
-        '  "non_negotiables": {"physical": "", "mental": "", "cash": "", "agency": ""},\n'
-        '  "partial_progress": {"h_agency_dm": 0.5},\n'
-        '  "completed_habits": [],\n'
-        '  "missed_habits": [],\n'
-        '  "cash_added": 0,\n'
-        '  "journal_entry": ""\n'
-        "}\n"
-        "Rules for `partial_progress`: If the operator reports partial completion (e.g., '15 out of 30 DMs' = 0.5 on h_agency_dm, "
-        "'2 of 5 Looms' = 0.4 on h_loom, 'half my gym workout' = 0.5 on h_workout), set the float ratio (0.0 to 1.0) in `partial_progress`.\n"
-        "Valid habit IDs: h_workout, h_wake, h_journal, h_walk, h_source, h_agency_dm, h_warm_network, "
-        "h_loom, h_inbox, h_stripe, h_deliver, h_track2_infra, h_track2_asset, h_sunset."
-    )
-
-    messages = [{"role": "system", "content": system_instruction}, *recent_memory, {"role": "user", "content": raw_text}]
     fallback_tools = _extract_tool_updates_from_text(raw_text, record)
 
     def _merge_fallback_tools(parsed_dict: dict) -> dict:
@@ -1043,46 +1056,90 @@ def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
                     parsed_dict[k][hid] = max(float(parsed_dict[k].get(hid, 0.0)), float(val))
         return parsed_dict
 
-    # Stage 1: Fast structured JSON extraction call (only if API key is provided or local server is up)
-    if llm_key:
-        raw_llm_output = _invoke_llm_providers(messages, llm_key, json_mode=True)
-        if raw_llm_output:
-            parsed = _extract_json_object(raw_llm_output)
-            if parsed and isinstance(parsed.get("reply"), str) and parsed["reply"].strip():
-                parsed["reply"] = _enforce_concise_drill_sergeant(parsed["reply"], raw_text, max_sentences=4)
-                return _merge_fallback_tools(parsed)
-            cleaned_raw = _enforce_concise_drill_sergeant(raw_llm_output, raw_text, max_sentences=4)
-            if cleaned_raw and not cleaned_raw.startswith("{"):
-                return _merge_fallback_tools({"reply": cleaned_raw})
+    if LLM_ENABLED:
+        reply = _llm_conversation_reply(raw_text, record, llm_key, state_snapshot, recent_memory)
+        if reply:
+            return _merge_fallback_tools({"reply": reply})
 
-        # Stage 2: Plain conversational turn with key
-        plain_messages = [
-            {
-                "role": "system",
-                "content": (
-                    f"{CHAT_SYSTEM_PROMPT}\n\n{COMMAND_BRIDGE_REGIMEN_SPEC}\n\n"
-                    f"LIVE TELEMETRY:\n{state_snapshot}\n\n"
-                    "Reply directly to the operator in strictly 2 to 4 brutal sentences. "
-                    "Call out any excuses from the conversation history and demand exact numbers and immediate target locks."
-                ),
-            },
-            *recent_memory,
-            {"role": "user", "content": raw_text},
-        ]
-        plain_reply = _invoke_llm_providers(plain_messages, llm_key, json_mode=False)
-        cleaned_plain = _enforce_concise_drill_sergeant(plain_reply, raw_text, max_sentences=4)
-        if cleaned_plain:
-            return _merge_fallback_tools({"reply": cleaned_plain})
-
-    # Stage 3: Instant Deterministic Drill-Sergeant Generator (<0.01s, 0 timeouts)
+    # Offline-safe deterministic fallback (when LLMs rate limit or timeout)
     fallback_reply = generate_drill_sergeant_fallback("chat", record, raw_text)
     return _merge_fallback_tools({"reply": fallback_reply})
+
+
+def _last_assistant_message(record: dict) -> str:
+    hist = (((record or {}).get("state") or {}).get("overseer") or {}).get("chatHistory") or []
+    for turn in reversed(hist):
+        if turn.get("role") == "assistant" and (turn.get("content") or "").strip():
+            return turn["content"].strip()
+    return ""
+
+
+def _llm_conversation_reply(raw_text: str, record: dict, llm_key: str, state_snapshot: str, recent_memory: list) -> str:
+    last_bot = _last_assistant_message(record)
+    system = (
+        f"{CHAT_SYSTEM_PROMPT}\n\n"
+        f"{COMMAND_BRIDGE_REGIMEN_SPEC}\n\n"
+        f"LIVE STATE (ground truth): {state_snapshot}\n\n"
+        "HOW TO RESPOND:\n"
+        "- Reply to EXACTLY what the operator just said. Do not give a generic greeting or a generic demand.\n"
+        "- If they stated their targets, repeat them back by name, accept them, and force each one to be measurable "
+        "(a number and a deadline). Do NOT ask for targets they already gave.\n"
+        "- If they asked a question (what to do, what time, what next), answer it concretely using the Command Bridge regimen and the current time, then give one command.\n"
+        "- If they report progress, acknowledge precisely with their numbers and push the next rep.\n"
+        "- If they make excuses or refuse, dismantle the excuse in one sentence and give the immediate next action.\n"
+        "- 2 to 4 sentences. Plain text only. No lists, no JSON, no emojis, no headers.\n"
+        + (f"- Your previous message was: \"{last_bot[:220]}\". Never reuse its wording or structure.\n" if last_bot else "")
+    )
+    history = [m for m in recent_memory[-8:]]
+    messages = [{"role": "system", "content": system}, *history, {"role": "user", "content": raw_text}]
+    out = _invoke_llm_providers(messages, llm_key, json_mode=False)
+    cleaned = _enforce_concise_drill_sergeant(out, raw_text, max_sentences=4)
+    if cleaned.startswith("{"):
+        return ""
+    return cleaned
+
+
+def _llm_extract_tools(raw_text: str, record: dict, llm_key: str) -> dict:
+    system = (
+        "You convert one message from a person tracking their day into JSON. Output ONLY a JSON object, nothing else.\n"
+        "Schema: {\"non_negotiables\": {\"physical\": \"\", \"mental\": \"\", \"cash\": \"\", \"agency\": \"\"}, "
+        "\"partial_progress\": {}, \"completed_habits\": [], \"missed_habits\": [], \"cash_added\": 0, \"journal_entry\": \"\"}\n"
+        "Rules:\n"
+        "- non_negotiables: ONLY if the person states what they commit to do TODAY. physical = gym/training/sleep/health; "
+        "mental = journaling/focus/discipline/abstaining from something; cash = outreach/sales/revenue work; agency = building/shipping/marketing agency work. "
+        "Put each stated target in the single best-fitting domain; leave unmentioned domains empty strings. Never invent targets.\n"
+        "- completed_habits ONLY for things already finished 100%: h_workout, h_wake, h_journal, h_walk, h_source, h_agency_dm, "
+        "h_warm_network, h_loom, h_inbox, h_stripe, h_deliver, h_track2_infra, h_track2_asset, h_sunset.\n"
+        "- partial_progress: habit id -> ratio 0.01-0.99 for partial work (15 of 30 DMs -> {\"h_agency_dm\": 0.5}).\n"
+        "- missed_habits: things they say they skipped or did not do.\n"
+        "- A question or a plan is NOT progress. Empty arrays/objects when nothing applies."
+    )
+    messages = [{"role": "system", "content": system}, {"role": "user", "content": raw_text}]
+    out = _invoke_llm_providers(messages, llm_key, json_mode=True)
+    parsed = _extract_json_object(out) if out else {}
+    clean = {}
+    nn = parsed.get("non_negotiables")
+    if isinstance(nn, dict) and any(str(v).strip() for v in nn.values()):
+        clean["non_negotiables"] = {k: str(nn.get(k) or "").strip() for k in ("physical", "mental", "cash", "agency")}
+    if isinstance(parsed.get("partial_progress"), dict) and parsed["partial_progress"]:
+        clean["partial_progress"] = parsed["partial_progress"]
+    for k in ("completed_habits", "missed_habits"):
+        if isinstance(parsed.get(k), list) and parsed[k]:
+            clean[k] = [h for h in parsed[k] if isinstance(h, str)]
+    try:
+        if float(parsed.get("cash_added") or 0) > 0:
+            clean["cash_added"] = float(parsed["cash_added"])
+    except Exception:
+        pass
+    if isinstance(parsed.get("journal_entry"), str) and parsed["journal_entry"].strip():
+        clean["journal_entry"] = parsed["journal_entry"].strip()
+    return clean
 
 
 def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text: str = "") -> str:
     """
     Guaranteed fail-proof drill-sergeant generator. If external LLM gateways
-    rate-limit, timeout, or require keys, OVERSEER will NEVER freeze or go silent.
+    rate-limit, timeout, or require keys, OVERSEER will NEVER freeze or output canned boilerplate.
     """
     ov = (record.get("state") or {}).get("overseer") or {}
     metrics = compute_holistic_machine_score(record)
@@ -1127,8 +1184,65 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
         )
 
     lower = user_text.lower().strip()
+
+    # Offline-safe understanding: if the operator just stated targets / progress, acknowledge THAT
+    try:
+        ext = _extract_tool_updates_from_text(user_text, record)
+    except Exception:
+        ext = {}
+    ext_nn = ext.get("non_negotiables") or {}
+    if ext_nn:
+        labels = []
+        for k in ("physical", "cash", "agency", "mental"):
+            val = ext_nn.get(k)
+            if val:
+                c = _scrub_substance_references(val)
+                label = c if len(c) > 3 else "Personal discipline commitment"
+                if label not in labels:
+                    labels.append(label)
+        got_str = "; ".join(labels)
+        return (
+            f"Targets locked: {got_str}. The clock is running and words are worthless without execution. "
+            "Report back with exact numbers the moment your first target is completed."
+        )
+
+    if ext.get("partial_progress") or ext.get("completed_habits") or ext.get("missed_habits"):
+        bits = []
+        for hid, r in (ext.get("partial_progress") or {}).items():
+            bits.append(f"{hid.replace('h_', '')} at {int(round(float(r) * 100))}%")
+        bits += [f"{h.replace('h_', '')} done" for h in ext.get("completed_habits") or []]
+        bits += [f"{h.replace('h_', '')} MISSED" for h in ext.get("missed_habits") or []]
+        return f"Logged: {', '.join(bits)}. Holistic machine score is now {score}%. Halfway is not the finish line. What is your next rep?"
+
+    # Contextual responses to questions and conversation
+    if any(w in lower for w in ("what time", "when should i", "schedule", "hit the gym", "go to the gym")):
+        return (
+            "Command Bridge regimen specifies Morning Activation (07:00-08:00) or Midday conditioning. "
+            "Stop debating the clock. Get into the gym, execute your session, and report back your minutes."
+        )
+
+    if any(w in lower for w in ("whats next", "what's next", "what next", "what should i do", "what now", "where do i start")):
+        if not today_locked:
+            return (
+                "Step one is locking your 3 Non-Negotiables across Physical, Cash, and Agency. "
+                "State your exact targets right now so the regimen can track you."
+            )
+        return f"Next rep: fire your 30 outreach DMs or execute your training session. Current machine score is {score}%. Stop asking and start shipping."
+
+    if any(w in lower for w in ("tired", "exhausted", "skip", "dont feel like", "don't feel like", "tomorrow", "lazy", "can i skip", "give up")):
+        return "Fatigue is the mind negotiating down. The standard is non-negotiable. Drop the excuse, get on the floor, and execute your first rep right now."
+
+    if any(w in lower for w in ("score", "status", "metrics", "how am i doing", "how's my", "progress")):
+        return (
+            f"Telemetry audit: Holistic Machine Score is {score}%. Physical: {metrics['physical_score']}%, Cash: {cash_sc}%, "
+            f"Agency: {metrics['agency_score']}%. Stop checking the dashboard and generate output."
+        )
+
+    # Word-boundary check so "hit", "this", "think", "you" never falsely trigger greeting demands
+    has_greeting = bool(re.search(r"\b(hello|hey|hi|yo|sup|good\s+morning|good\s+afternoon|good\s+evening)\b", lower))
+
     if not today_locked:
-        if any(w in lower for w in ("hello", "hey", "hi", "yo", "sup")):
+        if has_greeting:
             return (
                 "Drop the pleasantries. Your targets are NOT locked for today and you are burning daylight at 0% execution. "
                 "State your 3 Non-Negotiables across Physical, Cash, and Agency right now."
@@ -1138,7 +1252,10 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
             "Lock them in right now: specify your Gym session, Outreach count, and Agency targets."
         )
 
-    targets_str = ", ".join([v for v in nn.values() if v]) or "locked regimen"
+    targets_str = ", ".join([_scrub_substance_references(v) for v in nn.values() if v]) or "locked regimen"
+    if has_greeting:
+        return f"Pleasantries waste daylight. You are locked in on: {targets_str}. Current machine score is {score}%. Report execution proof."
+
     return (
         f"Acknowledged. You are locked in on: {targets_str}. Current machine score is {score}%. "
         "Stop talking, execute your reps, and report exact proof metrics once completed."
@@ -1327,6 +1444,29 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
                 return content
     except Exception:
         pass
+
+    # 3b. LLM7.io: free, keyless, OpenAI-compatible gateway (works from GitHub Actions / any cloud).
+    # Honors 429 "retry_after" so a brief rate limit never drops a reply.
+    for model_name in LLM7_MODELS:
+        try:
+            body = {"model": model_name, "messages": messages, "temperature": 0.7}
+            req = urllib.request.Request(
+                LLM7_URL,
+                data=json.dumps(body).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {LLM7_TOKEN}",
+                    "User-Agent": "Mozilla/5.0 OVERSEER/6.0",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=2.5) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                content = ((data.get("choices") or [{}])[0].get("message") or {}).get("content", "")
+                content = (content or "").strip()
+                if content:
+                    return content
+        except Exception:
+            pass
 
     # 4. Cloud OpenAI-Compatible Proxy (`https://text.pollinations.ai/openai`) with fast timeout
     for model_name in ("openai", "openai-fast"):
@@ -2022,7 +2162,110 @@ def free_port_if_in_use(port: int) -> None:
             pass
 
 
+def _run_git(args: list, cwd: str, timeout: int = 90) -> bool:
+    try:
+        r = subprocess.run(["git"] + args, cwd=cwd, capture_output=True, text=True, timeout=timeout)
+        return r.returncode == 0
+    except Exception:
+        return False
+
+
+class ActionsStateSync:
+    """
+    Persists overseer_state.json to the `overseer-state` git branch (checked out at STATE_WT) so the
+    GitHub Actions runner keeps memory across restarts, and the web dashboard can read the latest state.
+    Commits carry [skip ci] so Vercel never redeploys on state changes.
+    """
+
+    def __init__(self, worktree: str):
+        self.wt = worktree
+        self.wt_file = os.path.join(worktree, "overseer_state.json")
+        self.last_hash = None
+        self.last_push = 0.0
+
+    def _hash(self, path: str):
+        try:
+            import hashlib
+            with open(path, "rb") as f:
+                raw = json.loads(f.read().decode("utf-8"))
+            raw.pop("updated_at", None)
+            raw.pop("server_polls_telegram", None)
+            return hashlib.sha1(json.dumps(raw, sort_keys=True).encode("utf-8")).hexdigest()
+        except Exception:
+            return None
+
+    def pull(self) -> None:
+        if os.path.exists(self.wt_file):
+            try:
+                import shutil
+                shutil.copyfile(self.wt_file, STATE_FILE)
+                shutil.copyfile(self.wt_file, LEGACY_STATE_FILE)
+            except Exception:
+                pass
+        self.last_hash = self._hash(STATE_FILE)
+
+    def push_if_changed(self, force: bool = False) -> bool:
+        cur = self._hash(STATE_FILE)
+        if cur is None or (cur == self.last_hash and not force):
+            return False
+        if not force and (time.time() - self.last_push) < 20.0:
+            return False
+        try:
+            import shutil
+            shutil.copyfile(STATE_FILE, self.wt_file)
+        except Exception:
+            return False
+        _run_git(["add", "overseer_state.json"], self.wt)
+        stamp = now_local().strftime("%Y-%m-%d %H:%M:%S")
+        if not _run_git(["commit", "-m", f"overseer state {stamp} [skip ci]"], self.wt):
+            self.last_hash = cur
+            return False
+        ok = _run_git(["push", "origin", "HEAD:overseer-state"], self.wt)
+        if not ok:
+            _run_git(["pull", "--rebase", "origin", "overseer-state"], self.wt)
+            ok = _run_git(["push", "origin", "HEAD:overseer-state"], self.wt)
+        if ok:
+            self.last_hash = cur
+            self.last_push = time.time()
+        return ok
+
+
+def run_actions_loop() -> None:
+    """Always-on loop for GitHub Actions: Telegram long-poll, scheduled audits, midnight rollover, stalker."""
+    wt = os.getenv("STATE_WT", "")
+    run_seconds = int(os.getenv("OVERSEER_RUN_SECONDS", "21000"))
+    sync = ActionsStateSync(wt) if wt and os.path.isdir(wt) else None
+    if sync:
+        sync.pull()
+    load_state_file()
+    deadline = time.time() + run_seconds
+    print(
+        f"[OVERSEER ACTIONS] online {now_local().strftime('%Y-%m-%d %H:%M:%S')} {TIMEZONE_NAME} "
+        f"| persistence={'git' if sync else 'none'} | runs {run_seconds}s",
+        flush=True,
+    )
+    while time.time() < deadline:
+        try:
+            check_midnight_rollover_cron()
+            poll_telegram_direct_once()
+            hm = now_local().strftime("%H:%M")
+            if hm in SCHEDULE_LABELS:
+                trigger_scheduled_llm_window(hm)
+            execute_stalker_followup_ping(force=False)
+            if sync:
+                sync.push_if_changed()
+        except Exception as e:
+            print(f"[OVERSEER ACTIONS] loop error: {e!r}", flush=True)
+        time.sleep(2.0)
+    if sync:
+        sync.push_if_changed(force=True)
+    print("[OVERSEER ACTIONS] window complete; handing over to next run.", flush=True)
+
+
 def start_daemon() -> None:
+    if "--actions-loop" in sys.argv:
+        run_actions_loop()
+        return
     if "--cron-sweep" in sys.argv or "--tick" in sys.argv:
         # Cloud / GitHub Actions tick: runs midnight rollover check, schedules, and stalker checks once
         rec = load_state_file()

@@ -2958,9 +2958,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
 
       // 2. If computer/local daemon is sleeping or unreachable, seamlessly pull from Cloud state
       try {
-        const cloudUrl = window.location.hostname.includes('vercel.app')
-          ? `/overseer_state.json?t=${Date.now()}`
-          : `https://raw.githubusercontent.com/aliev2213/cso-operator-terminal/main/overseer_state.json?t=${Date.now()}`;
+        const cloudUrl = `https://raw.githubusercontent.com/aliev2213/cso-operator-terminal/overseer-state/overseer_state.json?t=${Date.now()}`;
         const resp = await fetch(cloudUrl, { cache: 'no-store' });
         if (resp.ok) {
           const rec = await resp.json();
