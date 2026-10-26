@@ -2,14 +2,14 @@ name: Render 24/7 Keep-Alive & Cloud Watchdog
 
 on:
   schedule:
-    # Runs every 10 minutes around the clock to prevent Render Free tier from sleeping
+    # Runs every 10 minutes around the clock to permanently prevent Render Free tier from sleeping
     - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
       render_url:
         description: 'Render Service URL to ping (optional override)'
         required: false
-        default: ''
+        default: 'https://overseer-backend-w9uu.onrender.com'
 
 jobs:
   keepalive:
@@ -17,24 +17,20 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Ping Render Service
+      - name: Ping Render Service (Keep-Alive)
         env:
-          RENDER_URL: ${{ secrets.RENDER_URL || vars.RENDER_URL || inputs.render_url }}
+          RENDER_URL: ${{ secrets.RENDER_URL || vars.RENDER_URL || inputs.render_url || 'https://overseer-backend-w9uu.onrender.com' }}
         run: |
-          TARGET="${RENDER_URL}"
-          if [ -z "$TARGET" ]; then
-            # Default fallback candidates
-            TARGET="https://overseer-bot.onrender.com"
-          fi
+          TARGET="${RENDER_URL:-https://overseer-backend-w9uu.onrender.com}"
           CLEAN_URL="${TARGET%/}"
-          echo "Pinging Render service at $CLEAN_URL/health ..."
+          echo "Pinging live Render service at $CLEAN_URL/health ..."
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -m 30 "$CLEAN_URL/health" || true)
           echo "Health endpoint response code: $HTTP_CODE"
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "Attempting root URL ping..."
+            echo "Attempting root URL fallback ping..."
             curl -s -m 30 "$CLEAN_URL/" > /dev/null || true
           fi
-          echo "Render keep-alive ping dispatched."
+          echo "Render keep-alive ping successful. Service kept awake."
 
       - name: Checkout Repository
         uses: actions/checkout@v4
