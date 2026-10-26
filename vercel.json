@@ -1,3 +1,13 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/webhook", "destination": "/api/webhook.py" },
+    { "source": "/api/cron", "destination": "/api/cron.py" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 11 * * *"
+    }
+  ]
 }

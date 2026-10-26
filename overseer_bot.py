@@ -2041,6 +2041,23 @@ def free_port_if_in_use(port: int) -> None:
 
 
 def start_daemon() -> None:
+    if "--cron-sweep" in sys.argv or "--tick" in sys.argv:
+        # Cloud / GitHub Actions tick: runs midnight rollover check, schedules, and stalker checks once
+        rec = load_state_file()
+        check_midnight_rollover_cron()
+        hm = now_local().strftime("%H:%M")
+        if hm in SCHEDULE_LABELS or "--force-schedule" in sys.argv:
+            slot = sys.argv[sys.argv.index("--force-schedule") + 1] if "--force-schedule" in sys.argv else hm
+            trigger_scheduled_llm_window(slot, force=True)
+        execute_stalker_followup_ping(force=False)
+        print(f"[OVERSEER CLOUD] Swept cron/stalker tick at {now_local().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
+        return
+    if "--poll-once" in sys.argv:
+        rec = load_state_file()
+        check_midnight_rollover_cron()
+        poll_telegram_direct_once()
+        print("[OVERSEER CLOUD] Polled Telegram once.", flush=True)
+        return
     if "--stalker-once" in sys.argv:
         load_state_file()
         execute_stalker_followup_ping(force=True)
