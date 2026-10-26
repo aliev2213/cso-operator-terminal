@@ -5252,6 +5252,11 @@ ALTER PUBLICATION supabase_realtime ADD TABLE operator_terminal;</pre>
       saveState();
       saveBioState();
 
+      // Notify backend cloud daemon to wipe cloud state
+      try {
+        fetch(`${LOCAL_OVERSEER_API}/api/reset`, { method: 'POST' }).catch(() => {});
+      } catch (_) {}
+
       // 3. UI Synchronization
       closeResetModal();
       setBioLoggingDate('today');

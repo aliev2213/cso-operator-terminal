@@ -21,16 +21,21 @@
       "middayNote": "",
       "debriefSubmittedDate": "2026-10-21",
       "lastMachineScore": 0,
-      "enforcedPenaltyXP": 350,
+      "enforcedPenaltyXP": 0,
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
-      "awaitingOperatorReply": false,
-      "pendingAuditSlot": "07:00",
-      "lastPingTimestamp": 1793038160.2369506,
-      "lastOperatorReplyTimestamp": 1792957955.0033746,
+      "awaitingOperatorReply": true,
+      "pendingAuditSlot": "08:00",
+      "lastPingTimestamp": 1793047041.305976,
+      "lastOperatorReplyTimestamp": 1793047041.3059764,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-10-26 16:37:21",
+          "tag": "SLATE RESET",
+          "message": "Manual slate & cache reset executed. Fresh baseline established for 08:00 AM."
+        },
         {
           "time": "2026-10-26 14:09:20",
           "tag": "EVASION PENALTY (-100 XP)",
@@ -44,7 +49,7 @@
         {
           "time": "2026-10-26 12:39:15",
           "tag": "STALKER PING #1",
-          "message": "You\u2019re avoiding accountability and hiding behind excuses. With 1/3 unanswered ping, the -100\u202fXP penalty is looming\u2014this is your last warning. Lock your 3 Non\u2011Negotiables or report your exact status now. No more silence."
+          "message": "You’re avoiding accountability and hiding behind excuses. With 1/3 unanswered ping, the -100 XP penalty is looming—this is your last warning. Lock your 3 Non‑Negotiables or report your exact status now. No more silence."
         },
         {
           "time": "2026-10-26 12:09:00",
@@ -54,32 +59,32 @@
         {
           "time": "2026-10-25 18:01:01",
           "tag": "STALKER PING #4",
-          "message": "You\u2019ve ignored the audit and crossed the 4/3 unanswered ping threshold\u2014an automatic -100\u202fXP evasion penalty is about to hit. Stop hiding, lock your three Non\u2011Negotiables now or report your exact status immediately. No more excuses, or the penalty will bleed your score."
+          "message": "You’ve ignored the audit and crossed the 4/3 unanswered ping threshold—an automatic -100 XP evasion penalty is about to hit. Stop hiding, lock your three Non‑Negotiables now or report your exact status immediately. No more excuses, or the penalty will bleed your score."
         },
         {
           "time": "2026-10-25 17:30:47",
           "tag": "EVASION PENALTY (-100 XP)",
-          "message": "You just triggered the evasion penalty \u2013 100 XP ripped off, your score bleeding while you sit in silence. Your 3 Non\u2011Negotiables are still empty, and you\u2019ve failed to log any physical, cash, or agency output. Tell me the exact numbers for each: gym minutes, outreach count, and asset delivery, or you\u2019ll face the next penalty. Stop hiding, lock the targets now."
+          "message": "You just triggered the evasion penalty – 100 XP ripped off, your score bleeding while you sit in silence. Your 3 Non‑Negotiables are still empty, and you’ve failed to log any physical, cash, or agency output. Tell me the exact numbers for each: gym minutes, outreach count, and asset delivery, or you’ll face the next penalty. Stop hiding, lock the targets now."
         },
         {
           "time": "2026-10-25 17:00:33",
           "tag": "STALKER PING #2",
-          "message": "You\u2019re dodging accountability, hiding behind excuses. With 2/3 unanswered pings, the next hit is a -100 XP penalty. Lock your 3 Non\u2011Negotiables now or report your exact status immediately. No more silence."
+          "message": "You’re dodging accountability, hiding behind excuses. With 2/3 unanswered pings, the next hit is a -100 XP penalty. Lock your 3 Non‑Negotiables now or report your exact status immediately. No more silence."
         },
         {
           "time": "2026-10-25 16:30:22",
           "tag": "STALKER PING #1",
-          "message": "You\u2019re dodging accountability and hiding behind vague excuses. You\u2019re at the 1/3 unanswered ping threshold\u2014one more silence and you\u2019ll incur a 100 XP penalty. Lock your 3 Non\u2011Negotiables now or report your exact status; stop making excuses."
+          "message": "You’re dodging accountability and hiding behind vague excuses. You’re at the 1/3 unanswered ping threshold—one more silence and you’ll incur a 100 XP penalty. Lock your 3 Non‑Negotiables now or report your exact status; stop making excuses."
         },
         {
           "time": "2026-10-25 16:00:10",
           "tag": "LLM 16:00",
-          "message": "DM count: 0/10, gym: 0/1, journaling: 0/1, asset: 0/1. You\u2019re at 0% on every target. Immediate warning: you\u2019re lagging 70% behind. Send a pulse report now with exact numbers or face the penalty."
+          "message": "DM count: 0/10, gym: 0/1, journaling: 0/1, asset: 0/1. You’re at 0% on every target. Immediate warning: you’re lagging 70% behind. Send a pulse report now with exact numbers or face the penalty."
         },
         {
           "time": "2026-10-25 15:52:35",
           "tag": "OVERSEER LLM",
-          "message": "OPERATOR: Im not setting any targets today\nYou can\u2019t just say no; lock your 3 Non\u2011Negotiables now or face the penalty. Tell me Physical, Cash, and Agency targets immediately."
+          "message": "OPERATOR: Im not setting any targets today\nYou can’t just say no; lock your 3 Non‑Negotiables now or face the penalty. Tell me Physical, Cash, and Agency targets immediately."
         },
         {
           "time": "2026-10-25 15:37:29",
@@ -89,7 +94,7 @@
         {
           "time": "2026-10-25 15:35:50",
           "tag": "OVERSEER LLM",
-          "message": "OPERATOR: Hello\nYou said hello, but I need your Non\u2011Negotiables locked now: 1) Physical (Gym), 2) Cash/Outreach (10 Brand2Audience outreach), 3) Agency/Mental (Asset delivery). No excuses, no delays. Tell me the exact numbers or I'll apply the penalty."
+          "message": "OPERATOR: Hello\nYou said hello, but I need your Non‑Negotiables locked now: 1) Physical (Gym), 2) Cash/Outreach (10 Brand2Audience outreach), 3) Agency/Mental (Asset delivery). No excuses, no delays. Tell me the exact numbers or I'll apply the penalty."
         },
         {
           "time": "2026-10-25 15:27:55",
@@ -99,12 +104,12 @@
         {
           "time": "2026-10-22 13:30:34",
           "tag": "STALKER PING #1",
-          "message": "You\u2019re at 13:30, audit still unanswered, 1 of 3 pings ignored\u2014this is your final warning. No excuses, no hiding; you\u2019re dodging accountability. Report your 10 outreach count or lock the non\u2011negotiables now, or the -100 XP penalty will hit. Stop stalling, act."
+          "message": "You’re at 13:30, audit still unanswered, 1 of 3 pings ignored—this is your final warning. No excuses, no hiding; you’re dodging accountability. Report your 10 outreach count or lock the non‑negotiables now, or the -100 XP penalty will hit. Stop stalling, act."
         },
         {
           "time": "2026-10-22 13:00:15",
           "tag": "LLM 13:00",
-          "message": "You\u2019re at 0% on every front \u2013 0 DM hits, no gym logged, journaling untouched, asset still in the queue. This is a 45% shortfall; you\u2019re not halfway to the 10 outreach target, nor have you shipped the Brand2Audience asset. Immediate corrective action: pull the phone, log the workout now, send the first 10 outreach emails, and log a 15\u2011minute journal entry. Send me a pulse report with exact counts and timestamps right now."
+          "message": "You’re at 0% on every front – 0 DM hits, no gym logged, journaling untouched, asset still in the queue. This is a 45% shortfall; you’re not halfway to the 10 outreach target, nor have you shipped the Brand2Audience asset. Immediate corrective action: pull the phone, log the workout now, send the first 10 outreach emails, and log a 15‑minute journal entry. Send me a pulse report with exact counts and timestamps right now."
         },
         {
           "time": "2026-10-22 10:43:08",
@@ -114,7 +119,7 @@
         {
           "time": "2026-10-22 10:21:11",
           "tag": "OVERSEER LLM",
-          "message": "OPERATOR: I just started my day but I finally woke up at 8 am today.\nWake up at 8:00? That\u2019s a 2-hour delay from the 6:00 target. First, drink a liter of electrolytes, hit the gym for hard conditioning, and lock your non-negotiables in the alignment journal. Tell me the non-negotiables you\u2019re locking for today: physical, mental, cash, agency. No excuses."
+          "message": "OPERATOR: I just started my day but I finally woke up at 8 am today.\nWake up at 8:00? That’s a 2-hour delay from the 6:00 target. First, drink a liter of electrolytes, hit the gym for hard conditioning, and lock your non-negotiables in the alignment journal. Tell me the non-negotiables you’re locking for today: physical, mental, cash, agency. No excuses."
         },
         {
           "time": "2026-10-22 09:49:01",
@@ -128,92 +133,8 @@
       "lastTgUpdateId": 595333236,
       "chatHistory": [
         {
-          "role": "user",
-          "content": "Hello"
-        },
-        {
           "role": "assistant",
-          "content": "You say hello, but I need results. Did you hit the gym? Hydrate? Journal? Send outreach? Tell me the numbers, not the pleasantries."
-        },
-        {
-          "role": "user",
-          "content": "I just started my day but I finally woke up at 8 am today."
-        },
-        {
-          "role": "assistant",
-          "content": "Wake up at 8:00? That\u2019s a 2-hour delay from the 6:00 target. First, drink a liter of electrolytes, hit the gym for hard conditioning, and lock your non-negotiables in the alignment journal. Tell me the non-negotiables you\u2019re locking for today: physical, mental, cash, agency. No excuses."
-        },
-        {
-          "role": "user",
-          "content": "My non negotiables for today are: \n\n- I want to hit a gym session \n\n- I want to have my first journaling day \n\n- at least 10 outreaches for Brand2Audience (my marketing agency)"
-        },
-        {
-          "role": "assistant",
-          "content": "- Gym: 60 min, 3 sets each major lift, max weight revision recorded. - Journal: 15-min stream, lock 3 core Non-Negotiables into the log. - Outreach: 10 cold emails + calls, 1 for Brand2Audience per hour. No delays."
-        },
-        {
-          "role": "assistant",
-          "content": "You\u2019re at 0% on every front \u2013 0 DM hits, no gym logged, journaling untouched, asset still in the queue. This is a 45% shortfall; you\u2019re not halfway to the 10 outreach target, nor have you shipped the Brand2Audience asset. Immediate corrective action: pull the phone, log the workout now, send the first 10 outreach emails, and log a 15\u2011minute journal entry. Send me a pulse report with exact counts and timestamps right now."
-        },
-        {
-          "role": "assistant",
-          "content": "You\u2019re at 13:30, audit still unanswered, 1 of 3 pings ignored\u2014this is your final warning. No excuses, no hiding; you\u2019re dodging accountability. Report your 10 outreach count or lock the non\u2011negotiables now, or the -100 XP penalty will hit. Stop stalling, act."
-        },
-        {
-          "role": "user",
-          "content": "Hello"
-        },
-        {
-          "role": "assistant",
-          "content": "You said hello, but I need your Non\u2011Negotiables locked now: 1) Physical (Gym), 2) Cash/Outreach (10 Brand2Audience outreach), 3) Agency/Mental (Asset delivery). No excuses, no delays. Tell me the exact numbers or I'll apply the penalty."
-        },
-        {
-          "role": "user",
-          "content": "Hello"
-        },
-        {
-          "role": "assistant",
-          "content": "Drop the pleasantries. Your targets are NOT locked for today and you are burning daylight at 0% execution. State your 3 Non-Negotiables across Physical, Cash, and Agency right now."
-        },
-        {
-          "role": "user",
-          "content": "Im not setting any targets today"
-        },
-        {
-          "role": "assistant",
-          "content": "You can\u2019t just say no; lock your 3 Non\u2011Negotiables now or face the penalty. Tell me Physical, Cash, and Agency targets immediately."
-        },
-        {
-          "role": "assistant",
-          "content": "DM count: 0/10, gym: 0/1, journaling: 0/1, asset: 0/1. You\u2019re at 0% on every target. Immediate warning: you\u2019re lagging 70% behind. Send a pulse report now with exact numbers or face the penalty."
-        },
-        {
-          "role": "assistant",
-          "content": "You\u2019re dodging accountability and hiding behind vague excuses. You\u2019re at the 1/3 unanswered ping threshold\u2014one more silence and you\u2019ll incur a 100 XP penalty. Lock your 3 Non\u2011Negotiables now or report your exact status; stop making excuses."
-        },
-        {
-          "role": "assistant",
-          "content": "You\u2019re dodging accountability, hiding behind excuses. With 2/3 unanswered pings, the next hit is a -100 XP penalty. Lock your 3 Non\u2011Negotiables now or report your exact status immediately. No more silence."
-        },
-        {
-          "role": "assistant",
-          "content": "You just triggered the evasion penalty \u2013 100 XP ripped off, your score bleeding while you sit in silence. Your 3 Non\u2011Negotiables are still empty, and you\u2019ve failed to log any physical, cash, or agency output. Tell me the exact numbers for each: gym minutes, outreach count, and asset delivery, or you\u2019ll face the next penalty. Stop hiding, lock the targets now."
-        },
-        {
-          "role": "assistant",
-          "content": "You\u2019ve ignored the audit and crossed the 4/3 unanswered ping threshold\u2014an automatic -100\u202fXP evasion penalty is about to hit. Stop hiding, lock your three Non\u2011Negotiables now or report your exact status immediately. No more excuses, or the penalty will bleed your score."
-        },
-        {
-          "role": "assistant",
-          "content": "You\u2019re avoiding accountability and hiding behind excuses. With 1/3 unanswered ping, the -100\u202fXP penalty is looming\u2014this is your last warning. Lock your 3 Non\u2011Negotiables or report your exact status now. No more silence."
-        },
-        {
-          "role": "assistant",
-          "content": "Stop hiding from your numbers. You are at ping 2/3 before the automatic -100 XP evasion penalty strikes your record. Lock in your 3 daily non-negotiables right now or report your execution status."
-        },
-        {
-          "role": "assistant",
-          "content": "I do not accept vague chatter. Your 3 Non-Negotiables for today are still unlocked. Lock them in right now: specify your Gym session, Outreach count, and Agency targets."
+          "content": "SYSTEM RESET: Slate wiped completely clean. Ready for 08:00 AM Reveille."
         }
       ],
       "processedUpdateIds": [
@@ -279,10 +200,17 @@
           "enforced_penalty_xp": 150
         }
       ],
-      "dayStartXP": 0
+      "dayStartXP": 0,
+      "vyvanse": {
+        "taken": false,
+        "takenTime": null,
+        "cutoffTime": "10:00",
+        "status": "pending",
+        "date": "2026-10-26"
+      }
     }
   },
-  "updated_at": "2026-10-26T14:09:20.237046-04:00",
+  "updated_at": "2026-10-26T16:37:21.306034-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -304,5 +232,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": true
+  "server_polls_telegram": false
 }

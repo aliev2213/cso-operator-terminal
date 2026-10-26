@@ -423,6 +423,52 @@ def compute_holistic_machine_score(record: dict) -> dict:
     }
 
 
+def reset_to_fresh_slate(record: dict) -> dict:
+    """
+    Clears all temporary test data, resets today's non-negotiables, habit progress,
+    Vyvanse intake status, ping counters, and evasion penalties so the operator can start completely fresh.
+    """
+    today_str = today_iso()
+    st = record.setdefault("state", {})
+    st["completedHabits"] = []
+    st["date"] = today_str
+
+    ov = st.setdefault("overseer", {})
+    ov["todayTargetsLocked"] = False
+    ov["todayTargets"] = []
+    ov["nonNegotiables"] = {"physical": "", "mental": "", "cash": "", "agency": ""}
+    ov["habitProgress"] = {}
+    ov["awardedHabitXP"] = {}
+    ov["enforcedPenaltyXP"] = 0
+    ov["evasionPenaltyCountToday"] = 0
+    ov["unansweredPingCount"] = 0
+    ov["awaitingOperatorReply"] = True
+    ov["pendingAuditSlot"] = "08:00"
+    ov["lastMachineScore"] = 0
+    ov["lastPingTimestamp"] = time.time()
+    ov["lastOperatorReplyTimestamp"] = time.time()
+    ov["vyvanse"] = {
+        "taken": False,
+        "takenTime": None,
+        "cutoffTime": "10:00",
+        "status": "pending",
+        "date": today_str,
+    }
+    ov["chatHistory"] = [
+        {"role": "assistant", "content": "SYSTEM RESET: Slate wiped completely clean. Ready for 08:00 AM Reveille."}
+    ]
+    ov.setdefault("auditLogs", []).insert(
+        0,
+        {
+            "time": now_local().strftime("%Y-%m-%d %H:%M:%S"),
+            "tag": "SLATE RESET",
+            "message": "Manual slate & cache reset executed. Fresh baseline established for 08:00 AM.",
+        },
+    )
+    save_state_file(record, broadcast=True)
+    return record
+
+
 def perform_midnight_rollover(record: dict, new_date_str: str) -> dict:
     """
     Strict 00:00 Midnight Rollover:
@@ -1900,6 +1946,16 @@ class OverseerRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path in ("/api/reset", "/api/clearcache", "/reset"):
+            rec = load_state_file()
+            reset_to_fresh_slate(rec)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self._send_cors_headers()
+            self.end_headers()
+            self.wfile.write(b'{"ok":true,"message":"Slate wiped clean. Ready for 08:00 AM Reveille."}\n')
+            return
+
         if parsed.path in ("/health", "/healthz", "/ping", "/status"):
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -1966,6 +2022,17 @@ class OverseerRequestHandler(SimpleHTTPRequestHandler):
             payload = json.loads(raw_body)
         except Exception:
             payload = {}
+
+        if parsed.path in ("/api/reset", "/api/clearcache", "/reset"):
+            rec = load_state_file()
+            reset_to_fresh_slate(rec)
+            body = json.dumps({"ok": True, "message": "Slate wiped clean. Ready for 08:00 AM Reveille.", "record": rec}, ensure_ascii=False).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self._send_cors_headers()
+            self.end_headers()
+            self.wfile.write(body)
+            return
 
         if parsed.path == "/api/claim_update":
             upd_id = payload.get("update_id")
@@ -2279,6 +2346,20 @@ def process_operator_message_turn(text: str, rec: dict, source_tag: str = "OVERS
     """
     ov = rec.setdefault("state", {}).setdefault("overseer", {})
     cmd = text.lower().strip()
+    if cmd in ("/reset", "/fresh", "/clearcache", "/clear_cache", "/clear", "/clean", "/wipe"):
+        reset_to_fresh_slate(rec)
+        reset_reply = (
+            "SLATE WIPED CLEAN & CACHE CLEARED.\n\n"
+            "- Targets: Unlocked (reset to 0)\n"
+            "- Habits & Outreach Quotas: Cleared\n"
+            "- Evasion Penalties & Ping Counters: Reset to 0\n"
+            "- Vyvanse Tracking: Armed for morning window (cutoff 10:00 AM)\n"
+            "- Machine Score: Reset to 0% baseline\n\n"
+            "You are starting with a 100% fresh slate for tomorrow morning's 08:00 AM Reveille."
+        )
+        send_telegram_single_message(reset_reply, rec)
+        return reset_reply, False
+
     if cmd in ("/bridge", "/terminal", "/website"):
         bridge_reply = (
             "COMMAND BRIDGE TERMINAL: https://cso-operator-terminal.vercel.app\n"
