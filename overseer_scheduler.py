@@ -113,17 +113,18 @@ CHAT_SYSTEM_PROMPT = (
 )
 
 COMMAND_BRIDGE_REGIMEN_SPEC = """OPERATOR DAILY REGIMEN & SCHEDULE (Strict ground truth -- 2 to 4 sentences max per message):
-- 08:00 REVEILLE & NON-NEGOTIABLES: Wake up at 08:00 AM sharp, 1L electrolytes/hydration, breakfast prep, and lock 3 Non-Negotiables (Gym, Cash/B2A Outreaches, Agency/Personal Discipline).
+- COMMAND BRIDGE & JOURNAL PROTOCOL (URL: https://cso-operator-terminal.vercel.app): Remind the operator regularly to open and update their Command Bridge website (https://cso-operator-terminal.vercel.app), log their daily habits, track live outreach numbers, and write their morning and night journal entries.
+- 08:00 REVEILLE & NON-NEGOTIABLES: Wake up at 08:00 AM sharp, 1L electrolytes/hydration, breakfast prep, complete morning alignment journal, and lock 3 Non-Negotiables on Command Bridge (https://cso-operator-terminal.vercel.app).
 - VYVANSE PROTOCOL (CRITICAL): Must be taken strictly BEFORE 10:00 AM cutoff. Never take after 10:00 AM under any circumstance (to protect sleep architecture). Always confirm intake status.
 - 09:00 GYM DEPLOYMENT: Deploy to Gym / Workout at 09:00 AM after getting ready in the morning. 60 min session. Demand workout proof.
 - 10:00 VYVANSE CUTOFF & GYM COMPLETION: 10:00 AM is the absolute deadline for Vyvanse and gym wrap-up. If not taken by 10:00 AM, user must push through unmedicated.
 - 11:30 TRACK 1 B2A CASH RUNWAY SPRINT: Brand2Audience outreach launch (10 to 30 outreaches, 5 Loom audits, sub-5m inbox replies). Demand first batch sent.
-- 13:30 MIDDAY VELOCITY AUDIT: Check outreach count against quota, client replies, and cash pipeline.
-- 15:30 AFTERNOON MOMENTUM CHECK: Push through afternoon fatigue with 20-DM surge and Loom videos.
+- 13:30 MIDDAY VELOCITY AUDIT: Check outreach count against quota, client replies, and remind operator to log numbers on Command Bridge.
+- 15:30 AFTERNOON MOMENTUM CHECK: Push through afternoon fatigue with 20-DM surge and Loom videos; update dashboard metrics.
 - 17:30 TRACK 2 AGENCY BUILD: Brand2Audience infrastructure, case study/VSL proof asset, client deliverables.
 - 20:00 EVENING CLEARANCE: Review the 3 Non-Negotiables: verify what is 100% completed before nightfall.
-- 21:30 NIGHT DEBRIEF & SCORE: Daily reflection, holistic machine score finalized, prep for 08:00 AM reveille tomorrow.
-When asked for schedule, provide this exact timeline. During conversation, keep driving the operator to the next scheduled milestone."""
+- 21:30 NIGHT DEBRIEF & SCORE: Open https://cso-operator-terminal.vercel.app, log all final metrics, write the evening debrief journal entry, finalize Machine Score, and prep for 08:00 AM reveille tomorrow.
+When asked for schedule, provide this exact timeline. During conversation, keep driving the operator to the next scheduled milestone and remind them to keep their Command Bridge logged."""
 
 SCHEDULE_LABELS = {
     "08:00": "08:00 Reveille, Vyvanse & Non-Negotiables Lock",
@@ -1103,6 +1104,18 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
     if missed:
         out["missed_habits"] = missed
 
+    # Journal Entry extraction (e.g. "Journal: ...", "Reflection: ...")
+    if not is_question:
+        j_match = re.search(r"^(?:journal|reflection|debrief|log):\s*(.+)$", text, re.IGNORECASE | re.MULTILINE)
+        if j_match:
+            j_text = j_match.group(1).strip()
+            if len(j_text) > 10:
+                out["journal_entry"] = j_text
+                if "completed_habits" not in out:
+                    out["completed_habits"] = []
+                if "h_journal" not in out["completed_habits"]:
+                    out["completed_habits"].append("h_journal")
+
     # Vyvanse Intake extraction (only if operator states intake, not asking questions)
     if not is_question:
         vy_phrases = (
@@ -1424,9 +1437,9 @@ def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
             f"08:00 MORNING REVEILLE [{slot_label}]. `todayTargetsLocked` is {overseer.get('todayTargetsLocked')}. {vy_str}. "
             f"Live state: {state_snapshot}. "
             "Send a brutal, high-intensity 2-to-4 sentence wake-up call for an 8:00 AM wake: "
-            "1. Demand they lock their 3 Non-Negotiables for today (Physical/Gym, Cash/B2A Outreach Quota, Agency/Mental Target) immediately. "
+            "1. Demand they lock their 3 Non-Negotiables for today (Physical/Gym, Cash/B2A Outreach Quota, Agency/Mental Target). "
             "2. Demand confirmation that they are taking their Vyvanse before the 10:00 AM cutoff. "
-            "3. Command them to hydrate, eat breakfast, and get geared up for 09:00 AM gym deployment."
+            "3. Remind them to open their Command Bridge terminal (https://cso-operator-terminal.vercel.app) to log their morning routine and complete their morning alignment journal."
         )
     elif slot == "09:00":
         prompt = (
@@ -1457,7 +1470,8 @@ def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
             f"VELOCITY AUDIT [{slot_label}]. "
             f"Live state: {state_snapshot}. "
             f"Interrogate their progress: how many Brand2Audience outreaches have been dispatched so far (expected: at least {expected_outreach})? "
-            "Audit responses, Loom audits, and client pipeline. If they are slacking or lagging behind, call them out brutally and demand an immediate pulse report."
+            "Audit responses, Loom audits, and client pipeline. Remind them to update their numbers on the Command Bridge website (https://cso-operator-terminal.vercel.app). "
+            "If they are lagging behind pace, call them out brutally and demand an immediate pulse report."
         )
     elif slot == "17:30":
         prompt = (
@@ -1476,8 +1490,8 @@ def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
         prompt = (
             f"21:30 NIGHT DEBRIEF AUDIT [{slot_label}]. "
             f"Live state: {state_snapshot}. "
-            "Final interrogation of the day. Review the 3 Non-Negotiables, calculate total execution, demand final debrief notes, "
-            "and instruct them to prep for 08:00 AM wake tomorrow."
+            "Final interrogation of the day. Command the operator to open their Command Bridge terminal (https://cso-operator-terminal.vercel.app) right now, "
+            "log all final numbers across every domain, write their evening debrief journal entry, review their Machine Score, and prep for 08:00 AM reveille tomorrow."
         )
 
     messages = [
@@ -1508,6 +1522,7 @@ def call_llm_for_progress_pulse(record: dict) -> str:
         f"Live state: {state_snapshot}. "
         "Fire a punchy, sharp check-in (STRICTLY 2 TO 4 SENTENCES MAX). "
         "Demand an immediate progress report on their current outreach count, client pipeline, or agency asset. "
+        "Remind them to update their numbers on their Command Bridge terminal (https://cso-operator-terminal.vercel.app). "
         "Remind them that silence is where discipline dies, and demand their current numbers right now."
     )
 
@@ -2264,6 +2279,23 @@ def process_operator_message_turn(text: str, rec: dict, source_tag: str = "OVERS
     """
     ov = rec.setdefault("state", {}).setdefault("overseer", {})
     cmd = text.lower().strip()
+    if cmd in ("/bridge", "/terminal", "/website"):
+        bridge_reply = (
+            "COMMAND BRIDGE TERMINAL: https://cso-operator-terminal.vercel.app\n"
+            "Open your terminal now to check off habits, log outreach numbers, and record your journal entries."
+        )
+        send_telegram_single_message(bridge_reply, rec)
+        return bridge_reply, False
+
+    if cmd == "/journal":
+        j_reply = (
+            "ALIGNMENT & DEBRIEF JOURNAL:\n"
+            "Open your Command Bridge terminal at https://cso-operator-terminal.vercel.app to write your journal entry, "
+            "or text it to me directly starting with 'Journal: [your entry]' to log it into your permanent state."
+        )
+        send_telegram_single_message(j_reply, rec)
+        return j_reply, False
+
     if cmd == "/schedule":
         schedule_text = """OPERATOR REGIMEN:
 08:00 - Reveille & Lock 3 Non-Negotiables (Vyvanse cutoff 10:00)
