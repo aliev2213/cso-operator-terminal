@@ -112,21 +112,29 @@ CHAT_SYSTEM_PROMPT = (
     "STRICT PRIVACY RULE: NEVER mention weed, cannabis, marijuana, THC, smoking, vaping, or substance tapering under any circumstances."
 )
 
-COMMAND_BRIDGE_REGIMEN_SPEC = (
-    "COMMAND BRIDGE CONTEXT (Use for situational awareness; DO NOT dump the whole list at once — stay 2-4 sentences max): "
-    "(1) 06:00-07:45 PHYSICAL: h_wake (06:00 wakeup + 1L electrolytes & morning hydration), h_workout (Gym/Hard Conditioning). "
-    "(2) 07:15-08:00 MENTAL: h_journal (Alignment Journal + lock 3 Non-Negotiables), h_walk (20m silent Focus Walk). "
-    "(3) 08:00-16:30 TRACK 1 CASH RUNWAY (50% upfront Stripe deposit, zero retainers): h_source (30 leads), h_agency_dm (30 Overflow DMs), "
-    "h_warm_network (10 warm pings), h_loom (5 Loom audits), h_inbox (<5m reply), h_stripe (50% deposit link), h_deliver (2h sprint/20-DM surge). "
-    "(4) 16:30-22:00 TRACK 2 AGENCY: h_track2_infra (agency infra/positioning), h_track2_asset (Case Study/VSL proof asset), h_sunset (21:00 Debrief). "
-    "NON-NEGOTIABLES RULE: When `todayTargetsLocked` is false, demand the operator lock their 3 Non-Negotiables for today (1. Physical/Gym, 2. Cash/Outreach Quota, 3. Agency/Mental Target) and direct their immediate next move in 2-4 sharp sentences."
-)
+COMMAND_BRIDGE_REGIMEN_SPEC = """OPERATOR DAILY REGIMEN & SCHEDULE (Strict ground truth -- 2 to 4 sentences max per message):
+- 08:00 REVEILLE & NON-NEGOTIABLES: Wake up at 08:00 AM sharp, 1L electrolytes/hydration, breakfast prep, and lock 3 Non-Negotiables (Gym, Cash/B2A Outreaches, Agency/Personal Discipline).
+- VYVANSE PROTOCOL (CRITICAL): Must be taken strictly BEFORE 10:00 AM cutoff. Never take after 10:00 AM under any circumstance (to protect sleep architecture). Always confirm intake status.
+- 09:00 GYM DEPLOYMENT: Deploy to Gym / Workout at 09:00 AM after getting ready in the morning. 60 min session. Demand workout proof.
+- 10:00 VYVANSE CUTOFF & GYM COMPLETION: 10:00 AM is the absolute deadline for Vyvanse and gym wrap-up. If not taken by 10:00 AM, user must push through unmedicated.
+- 11:30 TRACK 1 B2A CASH RUNWAY SPRINT: Brand2Audience outreach launch (10 to 30 outreaches, 5 Loom audits, sub-5m inbox replies). Demand first batch sent.
+- 13:30 MIDDAY VELOCITY AUDIT: Check outreach count against quota, client replies, and cash pipeline.
+- 15:30 AFTERNOON MOMENTUM CHECK: Push through afternoon fatigue with 20-DM surge and Loom videos.
+- 17:30 TRACK 2 AGENCY BUILD: Brand2Audience infrastructure, case study/VSL proof asset, client deliverables.
+- 20:00 EVENING CLEARANCE: Review the 3 Non-Negotiables: verify what is 100% completed before nightfall.
+- 21:30 NIGHT DEBRIEF & SCORE: Daily reflection, holistic machine score finalized, prep for 08:00 AM reveille tomorrow.
+When asked for schedule, provide this exact timeline. During conversation, keep driving the operator to the next scheduled milestone."""
 
 SCHEDULE_LABELS = {
-    "07:00": "07:00 Morning Target Setting",
-    "13:00": "13:00 Midday Velocity Check",
-    "16:00": "16:00 Afternoon Velocity & Pace Check",
-    "21:00": "21:00 Night Audit",
+    "08:00": "08:00 Reveille, Vyvanse & Non-Negotiables Lock",
+    "09:00": "09:00 Gym & Physical Deployment",
+    "10:00": "10:00 Vyvanse Cutoff & Gym Completion Audit",
+    "11:30": "11:30 B2A Outreach & Cash Runway Sprint Launch",
+    "13:30": "13:30 Midday Velocity & Outreach Count Audit",
+    "15:30": "15:30 Afternoon Momentum & Loom Check",
+    "17:30": "17:30 Agency Asset & Delivery Check",
+    "20:00": "20:00 Evening Target Clearance Audit",
+    "21:30": "21:30 Night Debrief & Holistic Machine Score",
 }
 
 RANKS = [
@@ -273,7 +281,8 @@ def default_record() -> dict:
                 "evasionPenaltyCountToday": 0,
                 "unansweredPingCount": 0,
                 "awaitingOperatorReply": True,
-                "pendingAuditSlot": "07:00",
+                "pendingAuditSlot": "08:00",
+                "vyvanse": {"taken": False, "takenTime": None, "cutoffTime": "10:00", "status": "pending", "date": today_str},
                 "lastPingTimestamp": now_ts,
                 "lastOperatorReplyTimestamp": 0.0,
                 "lastRevenueSummary": "",
@@ -468,7 +477,8 @@ def perform_midnight_rollover(record: dict, new_date_str: str) -> dict:
     ov["lastMachineScore"] = 0
     ov["unansweredPingCount"] = 0
     ov["evasionPenaltyCountToday"] = 0
-    ov["pendingAuditSlot"] = "07:00"
+    ov["pendingAuditSlot"] = "08:00"
+    ov["vyvanse"] = {"taken": False, "takenTime": None, "cutoffTime": "10:00", "status": "pending", "date": new_date_str}
     ov["awaitingOperatorReply"] = True
     ov["lastPingTimestamp"] = time.time()
     ov.setdefault("auditLogs", []).insert(
@@ -524,7 +534,8 @@ def ensure_record_structure(data: dict) -> dict:
     locked_today = is_today_targets_locked(ov, today_str)
     ov["todayTargetsLocked"] = locked_today
     ov.setdefault("awaitingOperatorReply", not locked_today)
-    ov.setdefault("pendingAuditSlot", None if locked_today else "07:00")
+    ov.setdefault("pendingAuditSlot", None if locked_today else "08:00")
+    ov.setdefault("vyvanse", {"taken": False, "takenTime": None, "cutoffTime": "10:00", "status": "pending", "date": today_str})
 
     if not ov.get("lastPingTimestamp"):
         ov["lastPingTimestamp"] = time.time()
@@ -774,6 +785,36 @@ def apply_silent_llm_tool_updates(record: dict, tool_args: dict) -> bool:
         )
         _set_habit_progress_and_xp("h_journal", 1.0)
 
+    # 7. Vyvanse Intake Tracking
+    if tool_args.get("vyvanse_taken"):
+        actionable_update = True
+        v_raw = str(tool_args.get("vyvanse_time") or now_local().strftime("%H:%M")).strip()
+        try:
+            parts = v_raw.lower().replace("am", "").replace("pm", "").strip().split(":")
+            h, m = int(parts[0]), int(parts[1]) if len(parts) > 1 else 0
+            v_time = f"{h:02d}:{m:02d}"
+            on_time = (h * 60 + m) <= 600  # 10:00 AM is 600 minutes
+        except Exception:
+            v_time = v_raw
+            on_time = True
+        overseer["vyvanse"] = {
+            "taken": True,
+            "takenTime": v_time,
+            "cutoffTime": "10:00",
+            "status": "taken_on_time" if on_time else "taken_late",
+            "date": today_str,
+        }
+        if on_time:
+            xp += 50
+        overseer.setdefault("auditLogs", []).insert(
+            0,
+            {
+                "time": now_local().strftime("%Y-%m-%d %H:%M:%S"),
+                "tag": "VYVANSE INTAKE",
+                "message": f"Vyvanse confirmed taken at {v_time} ({'ON TIME before 10:00 AM cutoff' if on_time else 'LATE past 10:00 AM cutoff'}).",
+            },
+        )
+
     state["completedHabits"] = completed
     state["xp"] = xp
     state["lastActiveDate"] = today_str
@@ -818,6 +859,14 @@ def build_live_state_snapshot(record: dict) -> str:
     targets_locked_today = is_today_targets_locked(overseer, today_str)
     completed = list(state.get("completedHabits") or [])
     habit_progress = overseer.get("habitProgress") or {}
+    vyvanse = overseer.get("vyvanse") or {}
+    cur_time = now_local().strftime("%H:%M")
+    vy_taken = bool(vyvanse.get("taken"))
+    if vy_taken:
+        vy_status = f"TAKEN at {vyvanse.get('takenTime')} (ON TIME)" if vyvanse.get("status") == "taken_on_time" else f"TAKEN LATE at {vyvanse.get('takenTime')} (Past 10:00 AM cutoff!)"
+    else:
+        vy_status = "MISSED (Past 10:00 AM cutoff - do NOT take)" if cur_time >= "10:00" else f"PENDING (Must take before 10:00 AM cutoff. Current: {cur_time})"
+
     all_ids = [
         "h_wake", "h_workout", "h_journal", "h_walk",
         "h_source", "h_agency_dm", "h_warm_network", "h_loom", "h_inbox", "h_stripe", "h_deliver",
@@ -832,6 +881,8 @@ def build_live_state_snapshot(record: dict) -> str:
             "enforced_penalty_xp": int(overseer.get("enforcedPenaltyXP") or 0),
             "evasion_penalties_today": int(overseer.get("evasionPenaltyCountToday") or 0),
             "unanswered_ping_count": int(overseer.get("unansweredPingCount") or 0),
+            "vyvanse_status": vy_status,
+            "vyvanse_taken": vy_taken,
             "pending_audit_slot": overseer.get("pendingAuditSlot"),
             "rank": f"T{metrics['rank_level']}:{metrics['rank_title']}",
             "cash_usd": state.get("cash", 0),
@@ -1051,6 +1102,20 @@ def _extract_tool_updates_from_text(raw_text: str, record: dict = None) -> dict:
         out["completed_habits"] = completed
     if missed:
         out["missed_habits"] = missed
+
+    # Vyvanse Intake extraction (only if operator states intake, not asking questions)
+    if not is_question:
+        vy_phrases = (
+            "took vyvanse", "taken vyvanse", "had vyvanse", "popped vyvanse", "took my vyvanse",
+            "had my vyvanse", "vyvanse taken", "vyvanse in", "vyvanse down", "took meds",
+            "took my meds", "took medication", "took my medication"
+        )
+        if any(p in lower for p in vy_phrases):
+            t_match = re.search(r"\bat\s+(\d{1,2}(?::\d{2})?(?:\s*[ap]m)?)\b", lower)
+            t_str = t_match.group(1).strip() if t_match else now_local().strftime("%H:%M")
+            out["vyvanse_taken"] = True
+            out["vyvanse_time"] = t_str
+
     return out
 def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
     """
@@ -1066,7 +1131,7 @@ def call_llm_for_chat_turn(raw_text: str, record: dict) -> dict:
     fallback_tools = _extract_tool_updates_from_text(raw_text, record)
 
     def _merge_fallback_tools(parsed_dict: dict) -> dict:
-        for k in ("non_negotiables", "partial_progress", "completed_habits", "missed_habits"):
+        for k in ("non_negotiables", "partial_progress", "completed_habits", "missed_habits", "vyvanse_taken", "vyvanse_time"):
             if fallback_tools.get(k) and not parsed_dict.get(k):
                 parsed_dict[k] = fallback_tools[k]
             elif k == "partial_progress" and isinstance(fallback_tools.get(k), dict) and isinstance(parsed_dict.get(k), dict):
@@ -1298,10 +1363,16 @@ def generate_drill_sergeant_fallback(context_type: str, record: dict, user_text:
     )
 def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
     """
-    Dynamically generates the 07:00, 13:00, 16:00, or 21:00 audit callout via the LLM API
-    with full 15-message conversational memory and strict 2-4 sentence conciseness.
-    For 13:00 and 16:00 Midday/Afternoon Velocity Checks, evaluates current `overseer_state.json`
-    targets against expected pace and issues an immediate warning if lagging.
+    Dynamically generates scheduled checkpoint callouts via Gemini / LLM:
+    - 08:00 Reveille, Vyvanse & Non-Negotiables Lock
+    - 09:00 Gym & Physical Deployment Check
+    - 10:00 Vyvanse Cutoff & Gym Completion Audit
+    - 11:30 B2A Outreach & Cash Runway Sprint Launch
+    - 13:30 Midday Velocity & Outreach Count Audit
+    - 15:30 Afternoon Momentum & Loom Check
+    - 17:30 Agency Asset & Delivery Check
+    - 20:00 Evening Target Clearance Audit
+    - 21:30 Night Debrief & Holistic Machine Score
     """
     overseer = ((record or {}).get("state") or {}).get("overseer") or {}
     llm_key = GEMINI_API_KEY or OPENAI_API_KEY or overseer.get("llmApiKey") or ""
@@ -1309,35 +1380,69 @@ def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
     metrics = compute_holistic_machine_score(record)
     state_snapshot = build_live_state_snapshot(record)
     recent_memory = _get_recent_chat_memory(record, limit=CHAT_MEMORY_LIMIT)
+    vyvanse_info = overseer.get("vyvanse") or {}
+    vy_taken = bool(vyvanse_info.get("taken"))
+    vy_str = f"Vyvanse: TAKEN at {vyvanse_info.get('takenTime')}" if vy_taken else "Vyvanse: NOT TAKEN YET (Cutoff is strictly 10:00 AM)"
 
-    if slot in ("13:00", "16:00"):
-        expected_score = 45 if slot == "13:00" else 70
-        lagging = metrics["machine_score"] < expected_score or not metrics["has_gym"] or metrics["cash_score"] < 50
-        lag_status = (
-            f"WARNING — OPERATOR IS LAGGING BEHIND PACE (Machine Score: {metrics['machine_score']}% vs {expected_score}% expected by {slot}; "
-            f"Physical: {metrics['physical_score']}%, Cash: {metrics['cash_score']}%, Agency: {metrics['agency_score']}%)."
-            if lagging
-            else f"ON PACE (Machine Score: {metrics['machine_score']}%)."
-        )
+    if slot == "08:00":
         prompt = (
-            f"SPONTANEOUS MID-DAY VELOCITY CHECK [{slot_label}]. {lag_status} "
-            f"Review today's locked targets and progress in `overseer_state.json`: {state_snapshot}. "
-            "Fire a punchy, high-aggression progress check (STRICTLY 2 TO 4 SENTENCES MAX) auditing their exact DM/outreach count, "
-            "gym status, journaling, and asset shipping progress against the targets they locked this morning. "
-            "If they are lagging behind pace, issue an immediate warning and demand a mid-day pulse report right now."
-        )
-    elif slot == "07:00":
-        prompt = (
-            f"MORNING SYSTEM BOOT [{slot_label}]. `todayTargetsLocked` is {overseer.get('todayTargetsLocked')}. "
+            f"08:00 MORNING REVEILLE [{slot_label}]. `todayTargetsLocked` is {overseer.get('todayTargetsLocked')}. {vy_str}. "
             f"Live state: {state_snapshot}. "
-            "Send a sharp, brutal 2-to-4 sentence morning wake-up call demanding the operator lock their 3 fresh Non-Negotiables "
-            "for today (1. Physical/Gym, 2. Mental/Journal, 3. Cash/Agency Outreach) immediately."
+            "Send a brutal, high-intensity 2-to-4 sentence wake-up call for an 8:00 AM wake: "
+            "1. Demand they lock their 3 Non-Negotiables for today (Physical/Gym, Cash/B2A Outreach Quota, Agency/Mental Target) immediately. "
+            "2. Demand confirmation that they are taking their Vyvanse before the 10:00 AM cutoff. "
+            "3. Command them to hydrate, eat breakfast, and get geared up for 09:00 AM gym deployment."
         )
-    else:
+    elif slot == "09:00":
         prompt = (
-            f"NIGHT DEBRIEF AUDIT [{slot_label}]. Review today's locked morning targets and current execution in `overseer_state.json`: {state_snapshot}. "
-            "Send a brutal 2-to-4 sentence end-of-day interrogation explicitly referencing the morning targets they set and demanding final confirmation "
-            "on Gym, Journal, Cash outreach count, and Agency progress."
+            f"09:00 GYM DEPLOYMENT CHECK [{slot_label}]. {vy_str}. "
+            f"Live state: {state_snapshot}. "
+            "It is 09:00 AM. Breakfast and prep are done. Command the operator to deploy to the gym right now for their workout. "
+            + ("Warn them they have only 60 minutes left before the 10:00 AM Vyvanse cutoff closes permanently. " if not vy_taken else "")
+            + "Demand they report when they step onto the gym floor."
+        )
+    elif slot == "10:00":
+        prompt = (
+            f"10:00 VYVANSE CUTOFF & GYM AUDIT [{slot_label}]. {vy_str}. "
+            f"Live state: {state_snapshot}. "
+            "It is 10:00 AM. The Vyvanse window is now closed. "
+            + ("Inform them the 10:00 AM cutoff has passed--if they didn't take it, they must push through unmedicated today with zero excuses. " if not vy_taken else "Acknowledge Vyvanse taken on time. ")
+            + "Audit their gym session completion: demand their exact lift numbers and workout proof."
+        )
+    elif slot == "11:30":
+        prompt = (
+            f"11:30 B2A CASH RUNWAY SPRINT [{slot_label}]. "
+            f"Live state: {state_snapshot}. "
+            "The morning physical phase is closed. Time for Track 1 Cash Runway: Brand2Audience outreach. "
+            "Command them to begin their outreach sprint immediately: 10 to 30 outreaches and Loom audits. Demand their first 5 sent within the hour."
+        )
+    elif slot in ("13:30", "15:30"):
+        expected_outreach = 10 if slot == "13:30" else 20
+        prompt = (
+            f"VELOCITY AUDIT [{slot_label}]. "
+            f"Live state: {state_snapshot}. "
+            f"Interrogate their progress: how many Brand2Audience outreaches have been dispatched so far (expected: at least {expected_outreach})? "
+            "Audit responses, Loom audits, and client pipeline. If they are slacking or lagging behind, call them out brutally and demand an immediate pulse report."
+        )
+    elif slot == "17:30":
+        prompt = (
+            f"17:30 AGENCY BUILD AUDIT [{slot_label}]. "
+            f"Live state: {state_snapshot}. "
+            "Track 2 Agency phase: what infrastructure asset, case study, or client deliverable are they finishing for Brand2Audience before evening? Demand exact proof."
+        )
+    elif slot == "20:00":
+        prompt = (
+            f"20:00 EVENING CLEARANCE AUDIT [{slot_label}]. "
+            f"Live state: {state_snapshot}. "
+            "Evening target review: check all 3 of their locked Non-Negotiables for today. "
+            "Demand confirmation of which ones are 100% completed and call out any pending items before nightfall."
+        )
+    else:  # 21:30
+        prompt = (
+            f"21:30 NIGHT DEBRIEF AUDIT [{slot_label}]. "
+            f"Live state: {state_snapshot}. "
+            "Final interrogation of the day. Review the 3 Non-Negotiables, calculate total execution, demand final debrief notes, "
+            "and instruct them to prep for 08:00 AM wake tomorrow."
         )
 
     messages = [
@@ -1351,6 +1456,36 @@ def call_llm_for_scheduled_reminder(slot: str, record: dict) -> str:
         return cleaned
     return generate_drill_sergeant_fallback(slot, record)
 
+
+def call_llm_for_progress_pulse(record: dict) -> str:
+    """
+    Continuous daytime accountability:
+    Proactively checks in on the operator when they have locked targets but been silent for >= 2 hours.
+    Demands live outreach numbers, workout status, and current execution against today's non-negotiables.
+    """
+    overseer = ((record or {}).get("state") or {}).get("overseer") or {}
+    llm_key = GEMINI_API_KEY or OPENAI_API_KEY or overseer.get("llmApiKey") or ""
+    state_snapshot = build_live_state_snapshot(record)
+    recent_memory = _get_recent_chat_memory(record, limit=CHAT_MEMORY_LIMIT)
+
+    prompt = (
+        f"DAYTIME EXECUTION PULSE CHECK. The operator locked targets but has been silent for 2 hours during peak working hours. "
+        f"Live state: {state_snapshot}. "
+        "Fire a punchy, sharp check-in (STRICTLY 2 TO 4 SENTENCES MAX). "
+        "Demand an immediate progress report on their current outreach count, client pipeline, or agency asset. "
+        "Remind them that silence is where discipline dies, and demand their current numbers right now."
+    )
+
+    messages = [
+        {"role": "system", "content": f"{CHAT_SYSTEM_PROMPT}\n\n{COMMAND_BRIDGE_REGIMEN_SPEC}"},
+        *recent_memory,
+        {"role": "user", "content": prompt},
+    ]
+    reply = _invoke_llm_providers(messages, llm_key, json_mode=False)
+    cleaned = _enforce_concise_drill_sergeant(reply, max_sentences=4)
+    if cleaned:
+        return cleaned
+    return "Two hours of silence during peak execution hours. Report your current outreach tally and workout status right now. Do not hide from your numbers."
 
 def call_llm_for_stalker_followup(record: dict, unanswered_count: int, penalty_applied: bool) -> str:
     """
@@ -2019,7 +2154,17 @@ def execute_stalker_followup_ping(force: bool = False) -> bool:
     pending_audit = bool(ov.get("pendingAuditSlot") or ov.get("awaitingOperatorReply"))
 
     if not force:
+        # Proactive Daytime Execution Check (if operator locked targets but has gone silent for >= 2 hours during execution hours)
+        is_daytime_execution = 10 <= cur_hour < 20
+        silence_sec = time.time() - reference_ts
         if targets_locked and not pending_audit:
+            if is_daytime_execution and silence_sec >= 7200:  # 2 hours
+                reply = call_llm_for_progress_pulse(rec)
+                if reply and send_telegram_single_message(reply, rec):
+                    ov["lastPingTimestamp"] = time.time()
+                    ov.setdefault("chatHistory", []).append({"role": "assistant", "content": reply})
+                    save_state_file(rec, broadcast=True)
+                    return True
             return False
         cur_hour = now_local().hour
         if cur_hour < 6 or cur_hour >= 23:
@@ -2084,7 +2229,34 @@ def process_operator_message_turn(text: str, rec: dict, source_tag: str = "OVERS
     """
     ov = rec.setdefault("state", {}).setdefault("overseer", {})
     cmd = text.lower().strip()
+    if cmd == "/schedule":
+        schedule_text = """OPERATOR REGIMEN:
+08:00 - Reveille & Lock 3 Non-Negotiables (Vyvanse cutoff 10:00)
+09:00 - Gym & Morning Physical Routine
+10:00 - Vyvanse Cutoff & Gym Completion Check
+11:30 - Track 1 B2A Outreach Sprint Launch (10-30 DMs)
+13:30 - Midday Velocity & Outreach Count Audit
+15:30 - Afternoon Momentum & Loom Check
+17:30 - Agency Asset & Deliverables Sprint
+20:00 - Evening Clearance Audit
+21:30 - Night Debrief & Machine Score"""
+        send_telegram_single_message(schedule_text, rec)
+        return schedule_text, False
+
+    if cmd == "/vyvanse":
+        vy = ov.get("vyvanse") or {}
+        cur_h = now_local().strftime("%H:%M")
+        if vy.get("taken"):
+            v_rep = f"Vyvanse confirmed TAKEN at {vy.get('takenTime')} (ON TIME). Window locked."
+        elif cur_h >= "10:00":
+            v_rep = f"Vyvanse cutoff EXPIRED at 10:00 AM (Current: {cur_h}). Do NOT take it late--push through unmedicated."
+        else:
+            v_rep = f"Vyvanse PENDING. Current time is {cur_h}. Hard cutoff is 10:00 AM--take it now."
+        send_telegram_single_message(v_rep, rec)
+        return v_rep, False
+
     if cmd in ("/boot", "/midday", "/velocity", "/debrief"):
+        slot = "08:00" if cmd == "/boot" else ("13:30" if cmd == "/midday" else ("15:30" if cmd == "/velocity" else "21:30"))
         slot = "07:00" if cmd == "/boot" else ("13:00" if cmd == "/midday" else ("16:00" if cmd == "/velocity" else "21:00"))
         reply = call_llm_for_scheduled_reminder(slot, rec)
         llm_result = {"reply": reply}
