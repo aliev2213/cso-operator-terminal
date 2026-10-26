@@ -2350,12 +2350,13 @@ def process_operator_message_turn(text: str, rec: dict, source_tag: str = "OVERS
         reset_to_fresh_slate(rec)
         reset_reply = (
             "SLATE WIPED CLEAN & CACHE CLEARED.\n\n"
-            "- Targets: Unlocked (reset to 0)\n"
-            "- Habits & Outreach Quotas: Cleared\n"
+            "- Cumulative XP & Rank: PRESERVED (Career progression stays intact)\n"
+            "- Cash Vault & Streak: PRESERVED\n"
+            "- Daily Targets: Unlocked for fresh entry\n"
+            "- Daily Habit Checkboxes: Reset for the new day\n"
             "- Evasion Penalties & Ping Counters: Reset to 0\n"
-            "- Vyvanse Tracking: Armed for morning window (cutoff 10:00 AM)\n"
-            "- Machine Score: Reset to 0% baseline\n\n"
-            "You are starting with a 100% fresh slate for tomorrow morning's 08:00 AM Reveille."
+            "- Vyvanse Tracking: Armed for morning window (cutoff 10:00 AM)\n\n"
+            "You are starting with a clean daily board for tomorrow morning's 08:00 AM Reveille."
         )
         send_telegram_single_message(reset_reply, rec)
         return reset_reply, False
