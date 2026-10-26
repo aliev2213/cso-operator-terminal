@@ -1434,8 +1434,8 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
         except Exception:
             pass
 
-    # 2. Gemini API if configured (tries gemini-2.0-flash, gemini-1.5-flash)
-    if llm_key.startswith("AIza"):
+    # 2. Gemini API if configured (supports AIza... and AQ... keys with high-performance Gemini 3.5/3.8 Flash)
+    if llm_key and (llm_key.startswith("AIza") or llm_key.startswith("AQ.") or len(llm_key) > 25):
         system_text = ""
         contents = []
         for m in messages:
@@ -1455,7 +1455,7 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
         if json_mode:
             body["generationConfig"] = {"responseMimeType": "application/json"}
         payload_bytes = json.dumps(body).encode("utf-8")
-        for gem_model in ("gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash"):
+        for gem_model in ("gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.6-flash", "gemini-flash-latest"):
             try:
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/{gem_model}:generateContent?key={llm_key}"
                 req = urllib.request.Request(
@@ -1463,14 +1463,13 @@ def _invoke_llm_providers(messages: list, llm_key: str = "", json_mode: bool = F
                     data=payload_bytes,
                     headers={"Content-Type": "application/json"},
                 )
-                with urllib.request.urlopen(req, timeout=10) as resp:
+                with urllib.request.urlopen(req, timeout=8) as resp:
                     data = json.loads(resp.read().decode("utf-8"))
                     cand = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
                     if cand:
                         return cand
             except Exception:
                 continue
-
     # 3. Local LM Studio (`http://127.0.0.1:1234/v1/chat/completions`)
     try:
         body = {"model": "openai", "messages": messages, "temperature": 0.65}
