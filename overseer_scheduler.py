@@ -65,7 +65,8 @@ try:
 except Exception:
     LOCAL_TZ = datetime.datetime.now().astimezone().tzinfo
 
-PORT = int(os.getenv("OVERSEER_PORT", "8765"))
+PORT = int(os.getenv("PORT", os.getenv("OVERSEER_PORT", "8765")))
+HOST = os.getenv("OVERSEER_HOST", "0.0.0.0")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "overseer_state.json")
 LEGACY_STATE_FILE = os.path.join(BASE_DIR, "overseer_local_state.json")
@@ -1664,6 +1665,14 @@ class OverseerRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path in ("/health", "/healthz", "/ping", "/status"):
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self._send_cors_headers()
+            self.end_headers()
+            self.wfile.write(b'{"status":"ok","service":"overseer-bot"}\n')
+            return
+
         if parsed.path in ("/api/state", "/overseer_state.json", "/overseer_local_state.json"):
             rec = load_state_file()
             rec["metrics"] = compute_holistic_machine_score(rec)
@@ -2299,11 +2308,11 @@ def start_daemon() -> None:
 
     free_port_if_in_use(PORT)
     load_state_file()
-    server = ThreadingHTTPServer(("127.0.0.1", PORT), OverseerRequestHandler)
+    server = ThreadingHTTPServer((HOST, PORT), OverseerRequestHandler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     threading.Thread(target=file_watcher_loop, daemon=True).start()
 
-    print(f"[OVERSEER] Pure LLM Bot, Velocity Scheduler & Stalker Engine active on http://127.0.0.1:{PORT}", flush=True)
+    print(f"[OVERSEER] Pure LLM Bot, Velocity Scheduler & Stalker Engine active on http://{HOST}:{PORT}", flush=True)
     print(
         f"[OVERSEER] State File: {STATE_FILE} | Timezone: {TIMEZONE_NAME} | Schedules: 00:00, 07:00, 13:00, 16:00, 21:00 | Stalker: {STALKER_INTERVAL_SEC}s",
         flush=True,
