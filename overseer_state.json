@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1793073601.5184894,
+      "pendingAuditSlot": "10:00",
+      "lastPingTimestamp": 1793109616.0730438,
       "lastOperatorReplyTimestamp": 1793062245.2635167,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-10-27 10:00:16",
+          "tag": "LLM 10:00",
+          "message": "The 10:00 AM cutoff has officially slammed shut, meaning you missed the Vyvanse window and must execute completely unmedicated today with zero excuses. Demand exact lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately to log your failed status and prep for the Brand2Audience cash runway sprint."
+        },
+        {
+          "time": "2026-10-27 09:00:06",
+          "tag": "LLM 09:00",
+          "message": "Swallow your Vyvanse right this second before the 10:00 AM cutoff locks you out permanently. Lace up your shoes and deploy to the gym right now for your 60-minute session. Open https://cso-operator-terminal.vercel.app, log your movement, and report back the exact second you step onto that gym floor."
+        },
+        {
+          "time": "2026-10-27 08:00:03",
+          "tag": "LLM 08:00",
+          "message": "Reveille is locked at 08:00 AM sharp, meaning zero hesitation and zero excuses today. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately to log your morning routine and complete your alignment journal. Lock your three Non-Negotiables for Physical, Cash, and Agency right now, and confirm your Vyvanse is swallowed before the 10:00 AM hard cutoff."
+        },
         {
           "time": "2026-10-27 00:00:01",
           "tag": "00:00 ROLLOVER",
@@ -250,6 +265,18 @@
         {
           "role": "assistant",
           "content": "Zero habits completed, zero dollars, and a pathetic 0% machine score with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right now, log this absolute failure of a day in your evening debrief, and prep for 08:00 AM reveille."
+        },
+        {
+          "role": "assistant",
+          "content": "Reveille is locked at 08:00 AM sharp, meaning zero hesitation and zero excuses today. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately to log your morning routine and complete your alignment journal. Lock your three Non-Negotiables for Physical, Cash, and Agency right now, and confirm your Vyvanse is swallowed before the 10:00 AM hard cutoff."
+        },
+        {
+          "role": "assistant",
+          "content": "Swallow your Vyvanse right this second before the 10:00 AM cutoff locks you out permanently. Lace up your shoes and deploy to the gym right now for your 60-minute session. Open https://cso-operator-terminal.vercel.app, log your movement, and report back the exact second you step onto that gym floor."
+        },
+        {
+          "role": "assistant",
+          "content": "The 10:00 AM cutoff has officially slammed shut, meaning you missed the Vyvanse window and must execute completely unmedicated today with zero excuses. Demand exact lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately to log your failed status and prep for the Brand2Audience cash runway sprint."
         }
       ],
       "processedUpdateIds": [
@@ -349,7 +376,7 @@
       }
     }
   },
-  "updated_at": "2026-10-27T00:00:01.518536-04:00",
+  "updated_at": "2026-10-27T10:00:16.073143-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -371,5 +398,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": false
+  "server_polls_telegram": true
 }
