@@ -5,7 +5,7 @@
     "cash": 0,
     "streak": 0,
     "date": "2026-10-26",
-    "lastActiveDate": "2026-10-25",
+    "lastActiveDate": "2026-10-26",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
     "overseer": {
@@ -23,14 +23,34 @@
       "lastMachineScore": 0,
       "enforcedPenaltyXP": 250,
       "evasionPenaltyCountToday": 0,
-      "unansweredPingCount": 1,
+      "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "07:00",
-      "lastPingTimestamp": 1793032755.19606,
-      "lastOperatorReplyTimestamp": 1792957955.0033746,
+      "pendingAuditSlot": "21:30",
+      "lastPingTimestamp": 1793064605.6340642,
+      "lastOperatorReplyTimestamp": 1793062245.2635167,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-10-26 21:30:05",
+          "tag": "LLM 21:30",
+          "message": "Zero habits completed, zero dollars, and a pathetic 0% machine score with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right now, log this absolute failure of a day in your evening debrief, and prep for 08:00 AM reveille."
+        },
+        {
+          "time": "2026-10-26 20:50:45",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: I just want to smoke\nCut that garbage thought out of your head and focus. It is 20:50 and your dashboard is sitting at absolute zero with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app immediately to log your evening debrief and face the damage you caused today."
+        },
+        {
+          "time": "2026-10-26 20:50:22",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: Bro I want to smoke weed so bad right now\nDrop the excuses and cut the noise immediately. You are sitting at 0% across the board while begging for an escape route instead of executing. Open your Command Bridge at https://cso-operator-terminal.vercel.app right now and start logging your evening debrief."
+        },
+        {
+          "time": "2026-10-26 20:00:07",
+          "tag": "LLM 20:00",
+          "message": "It's 20:00 and your dashboard is an absolute disaster zone at 0% across the board, with zero habits completed and 250 XP in penalties. You didn't lock targets, you missed the Vyvanse window, and you completely ghosted the day's execution. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately, face the damage, and log your evening debrief."
+        },
         {
           "time": "2026-10-26 12:39:15",
           "tag": "STALKER PING #1",
@@ -115,7 +135,7 @@
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
       "tgChatId": "5441024587",
       "webhookUrl": "",
-      "lastTgUpdateId": 595333236,
+      "lastTgUpdateId": 595333248,
       "chatHistory": [
         {
           "role": "user",
@@ -196,6 +216,30 @@
         {
           "role": "assistant",
           "content": "You’re avoiding accountability and hiding behind excuses. With 1/3 unanswered ping, the -100 XP penalty is looming—this is your last warning. Lock your 3 Non‑Negotiables or report your exact status now. No more silence."
+        },
+        {
+          "role": "assistant",
+          "content": "It's 20:00 and your dashboard is an absolute disaster zone at 0% across the board, with zero habits completed and 250 XP in penalties. You didn't lock targets, you missed the Vyvanse window, and you completely ghosted the day's execution. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately, face the damage, and log your evening debrief."
+        },
+        {
+          "role": "user",
+          "content": "Bro I want to smoke weed so bad right now"
+        },
+        {
+          "role": "assistant",
+          "content": "Drop the excuses and cut the noise immediately. You are sitting at 0% across the board while begging for an escape route instead of executing. Open your Command Bridge at https://cso-operator-terminal.vercel.app right now and start logging your evening debrief."
+        },
+        {
+          "role": "user",
+          "content": "I just want to smoke"
+        },
+        {
+          "role": "assistant",
+          "content": "Cut that garbage thought out of your head and focus. It is 20:50 and your dashboard is sitting at absolute zero with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app immediately to log your evening debrief and face the damage you caused today."
+        },
+        {
+          "role": "assistant",
+          "content": "Zero habits completed, zero dollars, and a pathetic 0% machine score with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right now, log this absolute failure of a day in your evening debrief, and prep for 08:00 AM reveille."
         }
       ],
       "processedUpdateIds": [
@@ -205,7 +249,9 @@
         595333231,
         595333233,
         595333235,
-        595333236
+        595333236,
+        595333247,
+        595333248
       ],
       "todayTargets": [],
       "habitProgress": {},
@@ -261,10 +307,17 @@
           "enforced_penalty_xp": 150
         }
       ],
-      "dayStartXP": 0
+      "dayStartXP": 0,
+      "vyvanse": {
+        "taken": false,
+        "takenTime": null,
+        "cutoffTime": "10:00",
+        "status": "pending",
+        "date": "2026-10-26"
+      }
     }
   },
-  "updated_at": "2026-10-26T12:39:15.196141-04:00",
+  "updated_at": "2026-10-26T21:30:05.634110-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
