@@ -4,7 +4,7 @@
     "xp": 0,
     "cash": 0,
     "streak": 0,
-    "date": "2026-10-29",
+    "date": "2026-10-30",
     "lastActiveDate": "2026-10-26",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
@@ -25,12 +25,22 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "21:30",
-      "lastPingTimestamp": 1793323856.8761435,
+      "pendingAuditSlot": "08:00",
+      "lastPingTimestamp": 1793332803.9287984,
       "lastOperatorReplyTimestamp": 1793062245.2635167,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-10-30 00:00:03",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-10-30. Previous day archived; todayTargetsLocked reset to False."
+        },
+        {
+          "time": "2026-10-30 00:00:01",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-10-30. Previous day archived; todayTargetsLocked reset to False."
+        },
         {
           "time": "2026-10-29 21:30:56",
           "tag": "LLM 21:30",
@@ -170,61 +180,6 @@
           "time": "2026-10-27 11:30:22",
           "tag": "LLM 11:30",
           "message": "Your morning phase was a complete zero—missed Vyvanse and zero targets locked. Stop dwelling on the failure because Track 1 B2A Cash Runway Sprint starts now. Send your first 5 outreaches within the hour toward today's 10 to 30 goal. Open https://cso-operator-terminal.vercel.app immediately, lock your targets, and report when batch one is live."
-        },
-        {
-          "time": "2026-10-27 10:00:16",
-          "tag": "LLM 10:00",
-          "message": "The 10:00 AM cutoff has officially slammed shut, meaning you missed the Vyvanse window and must execute completely unmedicated today with zero excuses. Demand exact lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately to log your failed status and prep for the Brand2Audience cash runway sprint."
-        },
-        {
-          "time": "2026-10-27 09:00:06",
-          "tag": "LLM 09:00",
-          "message": "Swallow your Vyvanse right this second before the 10:00 AM cutoff locks you out permanently. Lace up your shoes and deploy to the gym right now for your 60-minute session. Open https://cso-operator-terminal.vercel.app, log your movement, and report back the exact second you step onto that gym floor."
-        },
-        {
-          "time": "2026-10-27 08:00:03",
-          "tag": "LLM 08:00",
-          "message": "Reveille is locked at 08:00 AM sharp, meaning zero hesitation and zero excuses today. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately to log your morning routine and complete your alignment journal. Lock your three Non-Negotiables for Physical, Cash, and Agency right now, and confirm your Vyvanse is swallowed before the 10:00 AM hard cutoff."
-        },
-        {
-          "time": "2026-10-27 00:00:01",
-          "tag": "00:00 ROLLOVER",
-          "message": "Midnight rollover complete for 2026-10-27. Previous day archived; todayTargetsLocked reset to False."
-        },
-        {
-          "time": "2026-10-27 00:00:01",
-          "tag": "00:00 ROLLOVER",
-          "message": "Midnight rollover complete for 2026-10-27. Previous day archived; todayTargetsLocked reset to False."
-        },
-        {
-          "time": "2026-10-26 21:30:05",
-          "tag": "LLM 21:30",
-          "message": "Zero habits completed, zero dollars, and a pathetic 0% machine score with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right now, log this absolute failure of a day in your evening debrief, and prep for 08:00 AM reveille."
-        },
-        {
-          "time": "2026-10-26 20:50:45",
-          "tag": "OVERSEER LLM",
-          "message": "OPERATOR: I just want to smoke\nCut that garbage thought out of your head and focus. It is 20:50 and your dashboard is sitting at absolute zero with 250 XP in penalties. Open https://cso-operator-terminal.vercel.app immediately to log your evening debrief and face the damage you caused today."
-        },
-        {
-          "time": "2026-10-26 20:50:22",
-          "tag": "OVERSEER LLM",
-          "message": "OPERATOR: Bro I want to smoke weed so bad right now\nDrop the excuses and cut the noise immediately. You are sitting at 0% across the board while begging for an escape route instead of executing. Open your Command Bridge at https://cso-operator-terminal.vercel.app right now and start logging your evening debrief."
-        },
-        {
-          "time": "2026-10-26 20:00:07",
-          "tag": "LLM 20:00",
-          "message": "It's 20:00 and your dashboard is an absolute disaster zone at 0% across the board, with zero habits completed and 250 XP in penalties. You didn't lock targets, you missed the Vyvanse window, and you completely ghosted the day's execution. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately, face the damage, and log your evening debrief."
-        },
-        {
-          "time": "2026-10-26 12:39:15",
-          "tag": "STALKER PING #1",
-          "message": "You’re avoiding accountability and hiding behind excuses. With 1/3 unanswered ping, the -100 XP penalty is looming—this is your last warning. Lock your 3 Non‑Negotiables or report your exact status now. No more silence."
-        },
-        {
-          "time": "2026-10-26 12:09:00",
-          "tag": "00:00 ROLLOVER",
-          "message": "Midnight rollover complete for 2026-10-26. Previous day archived; todayTargetsLocked reset to False."
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
@@ -369,6 +324,28 @@
       "awardedHabitXP": {},
       "dailyHistory": [
         {
+          "date": "2026-10-29",
+          "archived_at": "2026-10-30T00:00:01.926362-04:00",
+          "final_machine_score": 0,
+          "physical_score": 0,
+          "mental_score": 0,
+          "cash_score": 0,
+          "agency_score": 0,
+          "domains_cleared": 0,
+          "completed_habits": [],
+          "habit_progress": {},
+          "non_negotiables": {
+            "physical": "",
+            "mental": "",
+            "cash": "",
+            "agency": ""
+          },
+          "today_targets": [],
+          "end_xp": 0,
+          "xp_delta": 0,
+          "enforced_penalty_xp": 250
+        },
+        {
           "date": "2026-10-28",
           "archived_at": "2026-10-29T00:00:01.305721-04:00",
           "final_machine_score": 0,
@@ -490,11 +467,11 @@
         "takenTime": null,
         "cutoffTime": "10:00",
         "status": "pending",
-        "date": "2026-10-29"
+        "date": "2026-10-30"
       }
     }
   },
-  "updated_at": "2026-10-29T21:30:56.876208-04:00",
+  "updated_at": "2026-10-30T00:00:03.928858-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
