@@ -25,12 +25,22 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1793419202.716625,
+      "pendingAuditSlot": "09:00",
+      "lastPingTimestamp": 1793451621.901196,
       "lastOperatorReplyTimestamp": 1793062245.2635167,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-10-31 09:00:21",
+          "tag": "LLM 09:00",
+          "message": "Stop staring at your screen and deploy to the gym floor right this second to log your 60-minute session. Your physical domain score is sitting at a pathetic 0%, and you are running out of time before the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app, swallow your Vyvanse before that clock strikes ten, and report back the exact minute you start lifting iron."
+        },
+        {
+          "time": "2026-10-31 08:00:29",
+          "tag": "LLM 08:00",
+          "message": "Open https://cso-operator-terminal.vercel.app immediately, log your reveille, and complete your morning alignment journal right this second. Lock in your 3 non-negotiables for physical, cash, and agency before I slap another penalty on your rotting rank. Swallow your Vyvanse before the 10:00 AM cutoff slams shut, and get your boots moving toward the gym floor."
+        },
         {
           "time": "2026-10-31 00:00:02",
           "tag": "00:00 ROLLOVER",
@@ -189,14 +199,6 @@
       "chatHistory": [
         {
           "role": "assistant",
-          "content": "It is 17:30 and your machine score is still sitting at an embarrassing 0% with 250 XP in penalties. Stop dodging and give me exact proof of your Brand2Audience infrastructure asset or client deliverable right now. Open https://cso-operator-terminal.vercel.app immediately to log your progress before evening clearance locks you out."
-        },
-        {
-          "role": "assistant",
-          "content": "Look at this pathetic state: 0% machine score, 250 XP in penalties, and zero Non-Negotiables locked or completed. You completely blew the entire day from reveille to evening clearance. Open https://cso-operator-terminal.vercel.app immediately to log your evening debrief, face the damage, and prep for tomorrow."
-        },
-        {
-          "role": "assistant",
           "content": "Look at that absolute trainwreck of a dashboard: 0% machine score, 250 XP in penalties, and every single habit sitting uncompleted. Open https://cso-operator-terminal.vercel.app right now to log your disastrous evening debrief, face your failure, and lock in for 08:00 AM reveille tomorrow."
         },
         {
@@ -306,6 +308,14 @@
         {
           "role": "assistant",
           "content": "Look at that pathetic JSON payload: a flat 0% Machine Score, zero cash, zero habits completed, and a rotting 250 XP penalty locking your rank at Unoptimized Liability. Open https://cso-operator-terminal.vercel.app right this second to log your catastrophic failure, write your evening debrief journal entry, and face the music. Lock your final state and prep your mind for an uncompromising 08:00 AM reveille tomorrow."
+        },
+        {
+          "role": "assistant",
+          "content": "Open https://cso-operator-terminal.vercel.app immediately, log your reveille, and complete your morning alignment journal right this second. Lock in your 3 non-negotiables for physical, cash, and agency before I slap another penalty on your rotting rank. Swallow your Vyvanse before the 10:00 AM cutoff slams shut, and get your boots moving toward the gym floor."
+        },
+        {
+          "role": "assistant",
+          "content": "Stop staring at your screen and deploy to the gym floor right this second to log your 60-minute session. Your physical domain score is sitting at a pathetic 0%, and you are running out of time before the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app, swallow your Vyvanse before that clock strikes ten, and report back the exact minute you start lifting iron."
         }
       ],
       "processedUpdateIds": [
@@ -493,7 +503,7 @@
       }
     }
   },
-  "updated_at": "2026-10-31T00:00:02.716643-04:00",
+  "updated_at": "2026-10-31T09:00:21.901230-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -515,5 +525,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": false
+  "server_polls_telegram": true
 }
