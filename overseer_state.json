@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "09:00",
-      "lastPingTimestamp": 1793451621.901196,
+      "pendingAuditSlot": "13:30",
+      "lastPingTimestamp": 1793467818.230622,
       "lastOperatorReplyTimestamp": 1793062245.2635167,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-10-31 13:30:18",
+          "tag": "LLM 13:30",
+          "message": "It is 13:30, your Vyvanse window is burned, your non-negotiables are completely unlocked, and your Machine Score is rotting at 0%. You should have at least 10 Brand2Audience outreaches dispatched and custom Loom audits in the wild, but your pipeline looks totally abandoned. Open https://cso-operator-terminal.vercel.app immediately, update your metrics on the Command Bridge, and give me your exact outreach count right now. Stop hiding behind your missed morning and launch your first batch immediately."
+        },
+        {
+          "time": "2026-10-31 11:30:26",
+          "tag": "LLM 11:30",
+          "message": "Your Vyvanse window is burned and your physical score is sitting at a pathetic 0%, so you are running this sprint completely unmedicated and full of excuses. Open https://cso-operator-terminal.vercel.app right now to log your state, then deploy your first batch of Brand2Audience outreaches. I demand exact proof of your first 5 custom Loom audits launched into the inbox within the hour."
+        },
+        {
+          "time": "2026-10-31 10:00:06",
+          "tag": "LLM 10:00",
+          "message": "The 10:00 AM cutoff has slammed shut, your Vyvanse window is dead, and you are pushing through completely unmedicated today with zero excuses. Stop stalling and demand your exact gym lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately and log your physical domain score off zero before I dock you more XP."
+        },
         {
           "time": "2026-10-31 09:00:21",
           "tag": "LLM 09:00",
@@ -199,18 +214,6 @@
       "chatHistory": [
         {
           "role": "assistant",
-          "content": "Look at that absolute trainwreck of a dashboard: 0% machine score, 250 XP in penalties, and every single habit sitting uncompleted. Open https://cso-operator-terminal.vercel.app right now to log your disastrous evening debrief, face your failure, and lock in for 08:00 AM reveille tomorrow."
-        },
-        {
-          "role": "assistant",
-          "content": "Reveille is locked at 08:00 AM sharp, meaning zero hesitation and zero excuses today. Open your Command Bridge at https://cso-operator-terminal.vercel.app immediately to log your morning routine and complete your alignment journal. Lock your three Non-Negotiables for Physical, Cash, and Agency right now, and confirm your Vyvanse is swallowed before the 10:00 AM hard cutoff."
-        },
-        {
-          "role": "assistant",
-          "content": "Swallow your Vyvanse right now before you lose your window—you have exactly 60 minutes left until the 10:00 AM hard cutoff locks you out permanently. Get off your ass and deploy to the gym immediately for your 60-minute workout. Open https://cso-operator-terminal.vercel.app to log your start and confirm the exact second you step onto the gym floor."
-        },
-        {
-          "role": "assistant",
           "content": "10:00 AM Vyvanse cutoff is closed. If you have not taken it, push through unmedicated today. Report your workout completion now."
         },
         {
@@ -316,6 +319,18 @@
         {
           "role": "assistant",
           "content": "Stop staring at your screen and deploy to the gym floor right this second to log your 60-minute session. Your physical domain score is sitting at a pathetic 0%, and you are running out of time before the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app, swallow your Vyvanse before that clock strikes ten, and report back the exact minute you start lifting iron."
+        },
+        {
+          "role": "assistant",
+          "content": "The 10:00 AM cutoff has slammed shut, your Vyvanse window is dead, and you are pushing through completely unmedicated today with zero excuses. Stop stalling and demand your exact gym lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately and log your physical domain score off zero before I dock you more XP."
+        },
+        {
+          "role": "assistant",
+          "content": "Your Vyvanse window is burned and your physical score is sitting at a pathetic 0%, so you are running this sprint completely unmedicated and full of excuses. Open https://cso-operator-terminal.vercel.app right now to log your state, then deploy your first batch of Brand2Audience outreaches. I demand exact proof of your first 5 custom Loom audits launched into the inbox within the hour."
+        },
+        {
+          "role": "assistant",
+          "content": "It is 13:30, your Vyvanse window is burned, your non-negotiables are completely unlocked, and your Machine Score is rotting at 0%. You should have at least 10 Brand2Audience outreaches dispatched and custom Loom audits in the wild, but your pipeline looks totally abandoned. Open https://cso-operator-terminal.vercel.app immediately, update your metrics on the Command Bridge, and give me your exact outreach count right now. Stop hiding behind your missed morning and launch your first batch immediately."
         }
       ],
       "processedUpdateIds": [
@@ -503,7 +518,7 @@
       }
     }
   },
-  "updated_at": "2026-10-31T09:00:21.901230-04:00",
+  "updated_at": "2026-10-31T13:30:18.230692-04:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
