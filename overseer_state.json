@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "13:30",
-      "lastPingTimestamp": 1793644206.1887467,
+      "pendingAuditSlot": "20:00",
+      "lastPingTimestamp": 1793667624.6837683,
       "lastOperatorReplyTimestamp": 1793638019.361407,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-02 20:00:24",
+          "tag": "LLM 20:00",
+          "message": "Your Machine Score is a disgraceful 0% and your habits are completely abandoned. Review your three Non-Negotiables: did you actually hit 10 outreaches, maintain zero substance use, and follow up with John on the door project? Open https://cso-operator-terminal.vercel.app right now to log your status before nightfall slams shut."
+        },
+        {
+          "time": "2026-11-02 17:30:02",
+          "tag": "LLM 17:30",
+          "message": "Look at this miserable telemetry: zero habits checked, 0% Machine Score, and a rotting 250 XP penalty dragging your liability rank through the mud. It is 17:30, meaning Track 2 Agency Build is live right now. Open https://cso-operator-terminal.vercel.app and demand exact proof of the infrastructure asset, case study, or client deliverable you are finishing for Brand2Audience before nightfall."
+        },
+        {
+          "time": "2026-11-02 15:30:20",
+          "tag": "LLM 15:30",
+          "message": "Your telemetry is a complete catastrophe: 100 XP, zero habits checked, and a pathetic 0% Machine Score while the afternoon burns away. You promised at least 10 outreaches, yet your dashboard is an absolute graveyard of abandoned tasks. Open https://cso-operator-terminal.vercel.app immediately to log your actual metrics, and execute an instant 20-DM surge right this second."
+        },
         {
           "time": "2026-11-02 13:30:06",
           "tag": "LLM 13:30",
@@ -194,18 +209,6 @@
       "chatHistory": [
         {
           "role": "assistant",
-          "content": "The 10:00 AM cutoff has slammed shut, your Vyvanse window is dead, and you are pushing through completely unmedicated today with zero excuses. Stop stalling and demand your exact gym lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately and log your physical domain score off zero before I dock you more XP."
-        },
-        {
-          "role": "assistant",
-          "content": "Your Vyvanse window is burned and your physical score is sitting at a pathetic 0%, so you are running this sprint completely unmedicated and full of excuses. Open https://cso-operator-terminal.vercel.app right now to log your state, then deploy your first batch of Brand2Audience outreaches. I demand exact proof of your first 5 custom Loom audits launched into the inbox within the hour."
-        },
-        {
-          "role": "assistant",
-          "content": "It is 13:30, your Vyvanse window is burned, your non-negotiables are completely unlocked, and your Machine Score is rotting at 0%. You should have at least 10 Brand2Audience outreaches dispatched and custom Loom audits in the wild, but your pipeline looks totally abandoned. Open https://cso-operator-terminal.vercel.app immediately, update your metrics on the Command Bridge, and give me your exact outreach count right now. Stop hiding behind your missed morning and launch your first batch immediately."
-        },
-        {
-          "role": "assistant",
           "content": "Look at that catastrophic JSON payload: 0% machine score, zero cash, zero habits completed, and your Vyvanse status is permanently locked out. You are sitting at 15:30 with zero outreaches dispatched, proving you spent the afternoon hiding instead of executing the 20-DM afternoon surge. Open https://cso-operator-terminal.vercel.app immediately to log your miserable metrics, and drop your exact Loom audit tally right this second."
         },
         {
@@ -311,6 +314,18 @@
         {
           "role": "assistant",
           "content": "Look at that garbage telemetry: 0% across every single domain, zero habits checked, and a rotting 250 XP penalty dragging your unoptimized liability rank into the mud. It is 13:30, your target quota demanded at least 10 Brand2Audience outreaches by now, and your dashboard is bone dry. Open https://cso-operator-terminal.vercel.app immediately, log your metrics, and drop proof of your outreach count right this second."
+        },
+        {
+          "role": "assistant",
+          "content": "Your telemetry is a complete catastrophe: 100 XP, zero habits checked, and a pathetic 0% Machine Score while the afternoon burns away. You promised at least 10 outreaches, yet your dashboard is an absolute graveyard of abandoned tasks. Open https://cso-operator-terminal.vercel.app immediately to log your actual metrics, and execute an instant 20-DM surge right this second."
+        },
+        {
+          "role": "assistant",
+          "content": "Look at this miserable telemetry: zero habits checked, 0% Machine Score, and a rotting 250 XP penalty dragging your liability rank through the mud. It is 17:30, meaning Track 2 Agency Build is live right now. Open https://cso-operator-terminal.vercel.app and demand exact proof of the infrastructure asset, case study, or client deliverable you are finishing for Brand2Audience before nightfall."
+        },
+        {
+          "role": "assistant",
+          "content": "Your Machine Score is a disgraceful 0% and your habits are completely abandoned. Review your three Non-Negotiables: did you actually hit 10 outreaches, maintain zero substance use, and follow up with John on the door project? Open https://cso-operator-terminal.vercel.app right now to log your status before nightfall slams shut."
         }
       ],
       "processedUpdateIds": [
@@ -552,7 +567,7 @@
       }
     }
   },
-  "updated_at": "2026-11-02T13:30:06.188820-05:00",
+  "updated_at": "2026-11-02T20:00:24.683800-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
