@@ -4,18 +4,18 @@
     "xp": 100,
     "cash": 0,
     "streak": 0,
-    "date": "2026-11-02",
+    "date": "2026-11-03",
     "lastActiveDate": "2026-11-02",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
     "overseer": {
-      "bootLockedDate": "2026-11-02",
-      "todayTargetsLocked": true,
+      "bootLockedDate": null,
+      "todayTargetsLocked": false,
       "nonNegotiables": {
-        "physical": "Ok my 3 non negotiable are:",
-        "mental": "Personal discipline commitment",
-        "cash": "Follow up with John for the door project",
-        "agency": "Follow up with John for the door project"
+        "physical": "",
+        "mental": "",
+        "cash": "",
+        "agency": ""
       },
       "middayCheckedDate": null,
       "middayNote": "",
@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "20:00",
-      "lastPingTimestamp": 1793667624.6837683,
+      "pendingAuditSlot": "08:00",
+      "lastPingTimestamp": 1793682002.5154622,
       "lastOperatorReplyTimestamp": 1793638019.361407,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-03 00:00:02",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-11-03. Previous day archived; todayTargetsLocked reset to False."
+        },
+        {
+          "time": "2026-11-03 00:00:00",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-11-03. Previous day archived; todayTargetsLocked reset to False."
+        },
+        {
+          "time": "2026-11-02 21:30:12",
+          "tag": "LLM 21:30",
+          "message": "Your telemetry is an absolute disaster: a 0% Machine Score, zero habits completed, and 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right this second to write your evening debrief journal entry, log your final failure metrics, and stare at your rotting score. Fall in line and prep your gear for the 08:00 AM reveille tomorrow, or I will lock your rank into permanent unoptimized exile."
+        },
         {
           "time": "2026-11-02 20:00:24",
           "tag": "LLM 20:00",
@@ -165,41 +180,6 @@
           "time": "2026-10-31 20:41:52",
           "tag": "OVERSEER LLM",
           "message": "OPERATOR: /start\nIt is 20:41, your Machine Score is sitting at zero, and you have completely abandoned your 20:00 Evening Clearance protocol. Open https://cso-operator-terminal.vercel.app immediately to log your evening debrief journal and face your failures. Give me your exact metrics from today before I lock in another penalty for your pathetic evasion."
-        },
-        {
-          "time": "2026-10-31 20:00:09",
-          "tag": "LLM 20:00",
-          "message": "Look at that absolute garbage payload: a flat 0% Machine Score, zero cash, zero habits checked, and a rotting 250 XP penalty locking your rank at Unoptimized Liability. Your 3 Non-Negotiables are completely blank because you hid from every single target today. Open https://cso-operator-terminal.vercel.app immediately, confess which non-negotiables you failed to execute, and face the wreckage of your day before nightfall."
-        },
-        {
-          "time": "2026-10-31 17:30:17",
-          "tag": "LLM 17:30",
-          "message": "Look at that catastrophic JSON state: a flat 0% machine score, zero cash, and a rotting 250 XP penalty dragging your rank down to an unoptimized liability. Track 2 Agency Build is live right now, meaning you have zero minutes left to hide behind a missed morning and a blank dashboard. Open https://cso-operator-terminal.vercel.app immediately and drop exact proof of your finished Brand2Audience case study, VSL asset, or client deliverable right this second."
-        },
-        {
-          "time": "2026-10-31 15:30:30",
-          "tag": "LLM 15:30",
-          "message": "Look at that catastrophic JSON payload: 0% machine score, zero cash, zero habits completed, and your Vyvanse status is permanently locked out. You are sitting at 15:30 with zero outreaches dispatched, proving you spent the afternoon hiding instead of executing the 20-DM afternoon surge. Open https://cso-operator-terminal.vercel.app immediately to log your miserable metrics, and drop your exact Loom audit tally right this second."
-        },
-        {
-          "time": "2026-10-31 13:30:18",
-          "tag": "LLM 13:30",
-          "message": "It is 13:30, your Vyvanse window is burned, your non-negotiables are completely unlocked, and your Machine Score is rotting at 0%. You should have at least 10 Brand2Audience outreaches dispatched and custom Loom audits in the wild, but your pipeline looks totally abandoned. Open https://cso-operator-terminal.vercel.app immediately, update your metrics on the Command Bridge, and give me your exact outreach count right now. Stop hiding behind your missed morning and launch your first batch immediately."
-        },
-        {
-          "time": "2026-10-31 11:30:26",
-          "tag": "LLM 11:30",
-          "message": "Your Vyvanse window is burned and your physical score is sitting at a pathetic 0%, so you are running this sprint completely unmedicated and full of excuses. Open https://cso-operator-terminal.vercel.app right now to log your state, then deploy your first batch of Brand2Audience outreaches. I demand exact proof of your first 5 custom Loom audits launched into the inbox within the hour."
-        },
-        {
-          "time": "2026-10-31 10:00:06",
-          "tag": "LLM 10:00",
-          "message": "The 10:00 AM cutoff has slammed shut, your Vyvanse window is dead, and you are pushing through completely unmedicated today with zero excuses. Stop stalling and demand your exact gym lift numbers and workout proof right now. Open https://cso-operator-terminal.vercel.app immediately and log your physical domain score off zero before I dock you more XP."
-        },
-        {
-          "time": "2026-10-31 09:00:21",
-          "tag": "LLM 09:00",
-          "message": "Stop staring at your screen and deploy to the gym floor right this second to log your 60-minute session. Your physical domain score is sitting at a pathetic 0%, and you are running out of time before the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app, swallow your Vyvanse before that clock strikes ten, and report back the exact minute you start lifting iron."
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
@@ -207,10 +187,6 @@
       "webhookUrl": "",
       "lastTgUpdateId": 595333260,
       "chatHistory": [
-        {
-          "role": "assistant",
-          "content": "Look at that catastrophic JSON payload: 0% machine score, zero cash, zero habits completed, and your Vyvanse status is permanently locked out. You are sitting at 15:30 with zero outreaches dispatched, proving you spent the afternoon hiding instead of executing the 20-DM afternoon surge. Open https://cso-operator-terminal.vercel.app immediately to log your miserable metrics, and drop your exact Loom audit tally right this second."
-        },
         {
           "role": "assistant",
           "content": "Look at that catastrophic JSON state: a flat 0% machine score, zero cash, and a rotting 250 XP penalty dragging your rank down to an unoptimized liability. Track 2 Agency Build is live right now, meaning you have zero minutes left to hide behind a missed morning and a blank dashboard. Open https://cso-operator-terminal.vercel.app immediately and drop exact proof of your finished Brand2Audience case study, VSL asset, or client deliverable right this second."
@@ -326,6 +302,10 @@
         {
           "role": "assistant",
           "content": "Your Machine Score is a disgraceful 0% and your habits are completely abandoned. Review your three Non-Negotiables: did you actually hit 10 outreaches, maintain zero substance use, and follow up with John on the door project? Open https://cso-operator-terminal.vercel.app right now to log your status before nightfall slams shut."
+        },
+        {
+          "role": "assistant",
+          "content": "Your telemetry is an absolute disaster: a 0% Machine Score, zero habits completed, and 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right this second to write your evening debrief journal entry, log your final failure metrics, and stare at your rotting score. Fall in line and prep your gear for the 08:00 AM reveille tomorrow, or I will lock your rank into permanent unoptimized exile."
         }
       ],
       "processedUpdateIds": [
@@ -344,15 +324,37 @@
         595333259,
         595333260
       ],
-      "todayTargets": [
-        "Ok my 3 non negotiable are:",
-        "Personal discipline commitment",
-        "Follow up with John for the door project",
-        "Follow up with John for the door project"
-      ],
+      "todayTargets": [],
       "habitProgress": {},
       "awardedHabitXP": {},
       "dailyHistory": [
+        {
+          "date": "2026-11-02",
+          "archived_at": "2026-11-03T00:00:00.514125-05:00",
+          "final_machine_score": 0,
+          "physical_score": 0,
+          "mental_score": 0,
+          "cash_score": 0,
+          "agency_score": 0,
+          "domains_cleared": 0,
+          "completed_habits": [],
+          "habit_progress": {},
+          "non_negotiables": {
+            "physical": "Ok my 3 non negotiable are:",
+            "mental": "Personal discipline commitment",
+            "cash": "Follow up with John for the door project",
+            "agency": "Follow up with John for the door project"
+          },
+          "today_targets": [
+            "Ok my 3 non negotiable are:",
+            "Personal discipline commitment",
+            "Follow up with John for the door project",
+            "Follow up with John for the door project"
+          ],
+          "end_xp": 100,
+          "xp_delta": 100,
+          "enforced_penalty_xp": 250
+        },
         {
           "date": "2026-11-01",
           "archived_at": "2026-11-02T00:00:00.354092-05:00",
@@ -557,17 +559,17 @@
           "enforced_penalty_xp": 150
         }
       ],
-      "dayStartXP": 0,
+      "dayStartXP": 100,
       "vyvanse": {
-        "taken": true,
-        "takenTime": "09:49",
+        "taken": false,
+        "takenTime": null,
         "cutoffTime": "10:00",
-        "status": "taken_on_time",
-        "date": "2026-11-02"
+        "status": "pending",
+        "date": "2026-11-03"
       }
     }
   },
-  "updated_at": "2026-11-02T20:00:24.683800-05:00",
+  "updated_at": "2026-11-03T00:00:02.515476-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
