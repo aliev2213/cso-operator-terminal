@@ -25,12 +25,32 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "11:30",
-      "lastPingTimestamp": 1793809847.8502898,
-      "lastOperatorReplyTimestamp": 1793801789.3139262,
+      "pendingAuditSlot": "17:30",
+      "lastPingTimestamp": 1793831411.8476546,
+      "lastOperatorReplyTimestamp": 1793823329.524712,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-04 17:30:11",
+          "tag": "LLM 17:30",
+          "message": "Look at that pathetic telemetry: 0% Machine Score, zero habits checked, and a 250 XP penalty dragging your unoptimized liability rank straight into the dirt. It is 17:30, meaning Track 2 Agency Build is live and your infrastructure assets are completely delinquent. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and drop exact proof of the Brand2Audience case study or client deliverable you are finishing before nightfall."
+        },
+        {
+          "time": "2026-11-04 15:30:11",
+          "tag": "LLM 15:30",
+          "message": "Your telemetry is a pathetic disaster: a flatlined 0% Machine Score, zero completed habits, and a severe 250 XP penalty dragging your unoptimized liability rank straight into the dirt. You missed your Vyvanse window, and your entire task list is bleeding red while the clock screams past the afternoon momentum check. Open https://cso-operator-terminal.vercel.app immediately to log your state and update your numbers. How many Brand2Audience outreaches and Loom audits have you actually executed today?"
+        },
+        {
+          "time": "2026-11-04 15:15:29",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: /start\nStop wasting cycles on command prompts and face the ground truth. It is 15:15, your Machine Score is rotting at 0%, and your entire habit list is flashing red with zero completions. Open https://cso-operator-terminal.vercel.app right now to log your state, then execute the 20-DM afternoon surge immediately. Report your current outreach and Loom count within the next sixty seconds."
+        },
+        {
+          "time": "2026-11-04 13:30:17",
+          "tag": "LLM 13:30",
+          "message": "It is 13:30, your Machine Score is rotting at 0%, and you missed your Vyvanse window while leaving every single target unlocked. You are expected to have at least 10 Brand2Audience outreaches fired off by now, but your telemetry shows complete operational stagnation. Open https://cso-operator-terminal.vercel.app right now to update your metrics and force yourself into compliance. Give me an immediate pulse report: how many outreaches, Loom audits, and client replies are actually live right now?"
+        },
         {
           "time": "2026-11-04 11:30:47",
           "tag": "LLM 11:30",
@@ -170,53 +190,13 @@
           "time": "2026-11-02 10:00:04",
           "tag": "LLM 10:00",
           "message": "Vyvanse is logged just under the wire at 09:49, but your Machine Score is still a disgraceful 0% with 250 XP in penalties. Drop your final gym lift numbers and workout proof right this second. Open https://cso-operator-terminal.vercel.app to lock your Non-Negotiables and prep for the 11:30 Brand2Audience cash runway sprint."
-        },
-        {
-          "time": "2026-11-02 09:54:15",
-          "tag": "OVERSEER LLM",
-          "message": "OPERATOR: I did 6 reps of bench press now doing 6 reps of chest flys\nThat is a pathetic warm-up, not a 60-minute gym deployment. Push that iron until your chest burns, finish the rest of your session, and then immediately log it on https://cso-operator-terminal.vercel.app. Report back the exact second you step off the gym floor."
-        },
-        {
-          "time": "2026-11-02 09:49:28",
-          "tag": "OVERSEER LLM",
-          "message": "OPERATOR: Ok I woke up on time and took my vyvanse\nGood, the pill is down and the 10:00 AM cutoff is beaten. Now stop wasting seconds and deploy to the gym floor right this instant for your 60-minute session. Open https://cso-operator-terminal.vercel.app and report back the exact minute you start grinding iron."
-        },
-        {
-          "time": "2026-11-02 09:49:28",
-          "tag": "VYVANSE INTAKE",
-          "message": "Vyvanse confirmed taken at 09:49 (ON TIME before 10:00 AM cutoff)."
-        },
-        {
-          "time": "2026-11-02 09:00:09",
-          "tag": "LLM 09:00",
-          "message": "It is 09:00 AM, your breakfast prep is finished, and your Vyvanse is still sitting on the counter. Swallow that pill right this second before the 10:00 AM cutoff slams shut, and deploy to the gym floor immediately for your 60-minute session. Open https://cso-operator-terminal.vercel.app to log your movement and report the exact second you touch the iron."
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
-      "tgChatId": "7712656644",
+      "tgChatId": "7734836789",
       "webhookUrl": "",
-      "lastTgUpdateId": 595333268,
+      "lastTgUpdateId": 595333269,
       "chatHistory": [
-        {
-          "role": "assistant",
-          "content": "That is a pathetic warm-up, not a 60-minute gym deployment. Push that iron until your chest burns, finish the rest of your session, and then immediately log it on https://cso-operator-terminal.vercel.app. Report back the exact second you step off the gym floor."
-        },
-        {
-          "role": "assistant",
-          "content": "Vyvanse is logged just under the wire at 09:49, but your Machine Score is still a disgraceful 0% with 250 XP in penalties. Drop your final gym lift numbers and workout proof right this second. Open https://cso-operator-terminal.vercel.app to lock your Non-Negotiables and prep for the 11:30 Brand2Audience cash runway sprint."
-        },
-        {
-          "role": "assistant",
-          "content": "The 11:30 Brand2Audience cash runway sprint is live and your Machine Score is rotting at a pathetic 0%. Open https://cso-operator-terminal.vercel.app to log your data, and drop proof of your first 5 custom Loom audits sent into the inbox within the hour. No excuses, start dialing up those targets right now."
-        },
-        {
-          "role": "user",
-          "content": "Ok my 3 non negotiable are: \n\n1. Hit at least 10 outreach \n\n2. No weed\n\n3. Follow up with John for the door project"
-        },
-        {
-          "role": "assistant",
-          "content": "Your Non-Negotiables are locked: 10 outreaches, zero substances, and following up with John on the door project. Now open https://cso-operator-terminal.vercel.app to log them into the system immediately. You are behind schedule, so drop proof of your first 3 Brand2Audience outreaches right now."
-        },
         {
           "role": "assistant",
           "content": "Look at that garbage telemetry: 0% across every single domain, zero habits checked, and a rotting 250 XP penalty dragging your unoptimized liability rank into the mud. It is 13:30, your target quota demanded at least 10 Brand2Audience outreaches by now, and your dashboard is bone dry. Open https://cso-operator-terminal.vercel.app immediately, log your metrics, and drop proof of your outreach count right this second."
@@ -316,6 +296,26 @@
         {
           "role": "assistant",
           "content": "11:30 B2A Outreach sprint launch. Deep work window open: fire off your 10 to 30 outreaches and Loom audits immediately."
+        },
+        {
+          "role": "assistant",
+          "content": "It is 13:30, your Machine Score is rotting at 0%, and you missed your Vyvanse window while leaving every single target unlocked. You are expected to have at least 10 Brand2Audience outreaches fired off by now, but your telemetry shows complete operational stagnation. Open https://cso-operator-terminal.vercel.app right now to update your metrics and force yourself into compliance. Give me an immediate pulse report: how many outreaches, Loom audits, and client replies are actually live right now?"
+        },
+        {
+          "role": "user",
+          "content": "/start"
+        },
+        {
+          "role": "assistant",
+          "content": "Stop wasting cycles on command prompts and face the ground truth. It is 15:15, your Machine Score is rotting at 0%, and your entire habit list is flashing red with zero completions. Open https://cso-operator-terminal.vercel.app right now to log your state, then execute the 20-DM afternoon surge immediately. Report your current outreach and Loom count within the next sixty seconds."
+        },
+        {
+          "role": "assistant",
+          "content": "Your telemetry is a pathetic disaster: a flatlined 0% Machine Score, zero completed habits, and a severe 250 XP penalty dragging your unoptimized liability rank straight into the dirt. You missed your Vyvanse window, and your entire task list is bleeding red while the clock screams past the afternoon momentum check. Open https://cso-operator-terminal.vercel.app immediately to log your state and update your numbers. How many Brand2Audience outreaches and Loom audits have you actually executed today?"
+        },
+        {
+          "role": "assistant",
+          "content": "Look at that pathetic telemetry: 0% Machine Score, zero habits checked, and a 250 XP penalty dragging your unoptimized liability rank straight into the dirt. It is 17:30, meaning Track 2 Agency Build is live and your infrastructure assets are completely delinquent. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and drop exact proof of the Brand2Audience case study or client deliverable you are finishing before nightfall."
         }
       ],
       "processedUpdateIds": [
@@ -336,7 +336,8 @@
         595333264,
         595333265,
         595333267,
-        595333268
+        595333268,
+        595333269
       ],
       "todayTargets": [],
       "habitProgress": {},
@@ -605,7 +606,7 @@
       }
     }
   },
-  "updated_at": "2026-11-04T11:30:47.850367-05:00",
+  "updated_at": "2026-11-04T17:30:11.847721-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -627,5 +628,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": false
+  "server_polls_telegram": true
 }
