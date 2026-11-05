@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": null,
-      "lastPingTimestamp": 1793866329.4004366,
+      "pendingAuditSlot": "11:30",
+      "lastPingTimestamp": 1793896234.0579915,
       "lastOperatorReplyTimestamp": 1793866329.4004354,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-05 11:30:34",
+          "tag": "LLM 11:30",
+          "message": "11:30 B2A Outreach sprint launch. Deep work window open: fire off your 10 to 30 outreaches and Loom audits immediately."
+        },
+        {
+          "time": "2026-11-05 09:00:39",
+          "tag": "LLM 09:00",
+          "message": "You are standing around with thumbs up your ass at 09:00 while your Vyvanse window bleeds away and your machine score rots at zero. Deploy to the gym floor RIGHT NOW. You have exactly 60 minutes before the 10:00 AM cutoff locks you out permanently. Report when your feet hit the gym floor — I want a timestamp."
+        },
+        {
+          "time": "2026-11-05 08:00:02",
+          "tag": "LLM 08:00",
+          "message": "Reveille is active and your machine score is sitting at an embarrassing 0%. Open https://cso-operator-terminal.vercel.app immediately to log your morning alignment journal and lock your 3 Non-Negotiables for physical, cash, and agency targets. Swallow your Vyvanse right now before the strict 10:00 AM cutoff locks you out."
+        },
         {
           "time": "2026-11-05 03:12:09",
           "tag": "OVERSEER LLM",
@@ -188,18 +203,6 @@
       "lastTgUpdateId": 595333271,
       "chatHistory": [
         {
-          "role": "user",
-          "content": "/start"
-        },
-        {
-          "role": "assistant",
-          "content": "It is 08:28, your rank is an unoptimized liability, and your Vyvanse status is currently pending before the 10:00 AM hard cutoff. Swallow that pill immediately and open https://cso-operator-terminal.vercel.app to log your morning alignment journal. Drop proof of your hydration and get your gear ready for the 09:00 AM gym deployment right now."
-        },
-        {
-          "role": "assistant",
-          "content": "Your pill status is still sitting as pending with the 10:00 AM hard cutoff ticking down, and your telemetry is a rotting 0% Machine Score. Swallow that Vyvanse right this second and deploy immediately to the gym floor for your 60-minute session. Open https://cso-operator-terminal.vercel.app and report the exact second you step under the iron."
-        },
-        {
           "role": "assistant",
           "content": "10:00 AM Vyvanse cutoff is closed. If you have not taken it, push through unmedicated today. Report your workout completion now."
         },
@@ -306,6 +309,18 @@
         {
           "role": "assistant",
           "content": "Spamming commands at 03:12 AM will not magically wipe away your flatlined 0% Machine Score or clear your 250 XP penalty. You are destroying sleep architecture that you critically need to hit tomorrow's 08:00 AM reveille on target. Open https://cso-operator-terminal.vercel.app right now to lock your morning non-negotiables, then shut this down and prepare for reveille."
+        },
+        {
+          "role": "assistant",
+          "content": "Reveille is active and your machine score is sitting at an embarrassing 0%. Open https://cso-operator-terminal.vercel.app immediately to log your morning alignment journal and lock your 3 Non-Negotiables for physical, cash, and agency targets. Swallow your Vyvanse right now before the strict 10:00 AM cutoff locks you out."
+        },
+        {
+          "role": "assistant",
+          "content": "You are standing around with thumbs up your ass at 09:00 while your Vyvanse window bleeds away and your machine score rots at zero. Deploy to the gym floor RIGHT NOW. You have exactly 60 minutes before the 10:00 AM cutoff locks you out permanently. Report when your feet hit the gym floor — I want a timestamp."
+        },
+        {
+          "role": "assistant",
+          "content": "11:30 B2A Outreach sprint launch. Deep work window open: fire off your 10 to 30 outreaches and Loom audits immediately."
         }
       ],
       "processedUpdateIds": [
@@ -620,7 +635,7 @@
       }
     }
   },
-  "updated_at": "2026-11-05T03:12:09.400514-05:00",
+  "updated_at": "2026-11-05T11:30:34.058067-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -642,5 +657,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": true
+  "server_polls_telegram": false
 }
