@@ -5,7 +5,7 @@
     "cash": 0,
     "streak": 0,
     "date": "2026-11-05",
-    "lastActiveDate": "2026-11-04",
+    "lastActiveDate": "2026-11-05",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
     "overseer": {
@@ -25,12 +25,17 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1793854800.0243227,
-      "lastOperatorReplyTimestamp": 1793843429.009399,
+      "pendingAuditSlot": null,
+      "lastPingTimestamp": 1793866329.4004366,
+      "lastOperatorReplyTimestamp": 1793866329.4004354,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-05 03:12:09",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: /start\nSpamming commands at 03:12 AM will not magically wipe away your flatlined 0% Machine Score or clear your 250 XP penalty. You are destroying sleep architecture that you critically need to hit tomorrow's 08:00 AM reveille on target. Open https://cso-operator-terminal.vercel.app right now to lock your morning non-negotiables, then shut this down and prepare for reveille."
+        },
         {
           "time": "2026-11-05 00:00:00",
           "tag": "00:00 ROLLOVER",
@@ -175,26 +180,13 @@
           "time": "2026-11-03 00:00:00",
           "tag": "00:00 ROLLOVER",
           "message": "Midnight rollover complete for 2026-11-03. Previous day archived; todayTargetsLocked reset to False."
-        },
-        {
-          "time": "2026-11-02 21:30:12",
-          "tag": "LLM 21:30",
-          "message": "Your telemetry is an absolute disaster: a 0% Machine Score, zero habits completed, and 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right this second to write your evening debrief journal entry, log your final failure metrics, and stare at your rotting score. Fall in line and prep your gear for the 08:00 AM reveille tomorrow, or I will lock your rank into permanent unoptimized exile."
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
-      "tgChatId": "8001736665",
+      "tgChatId": "8003576551",
       "webhookUrl": "",
-      "lastTgUpdateId": 595333270,
+      "lastTgUpdateId": 595333271,
       "chatHistory": [
-        {
-          "role": "assistant",
-          "content": "Your telemetry is an absolute disaster: a 0% Machine Score, zero habits completed, and 250 XP in penalties. Open https://cso-operator-terminal.vercel.app right this second to write your evening debrief journal entry, log your final failure metrics, and stare at your rotting score. Fall in line and prep your gear for the 08:00 AM reveille tomorrow, or I will lock your rank into permanent unoptimized exile."
-        },
-        {
-          "role": "assistant",
-          "content": "Reveille has sounded and your liability rank is rotting at 0% with a 250 XP penalty—swallow your Vyvanse right now before the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app immediately to log your morning alignment journal and clear your pending routine. Lock your 3 Non-Negotiables right this second for physical deployment, B2A cash outreach, and your agency target. Confirm pill intake status and drop your target numbers right now."
-        },
         {
           "role": "user",
           "content": "/start"
@@ -306,6 +298,14 @@
         {
           "role": "assistant",
           "content": "Look at that terminal screen: a pathetic 0% Machine Score, zero completed habits, and a severe 250 XP penalty locking your rank as an unoptimized liability. Open https://cso-operator-terminal.vercel.app immediately to log your total operational failure, write your evening debrief, and prep your mindset for tomorrow's 08:00 AM reveille. You cannot out"
+        },
+        {
+          "role": "user",
+          "content": "/start"
+        },
+        {
+          "role": "assistant",
+          "content": "Spamming commands at 03:12 AM will not magically wipe away your flatlined 0% Machine Score or clear your 250 XP penalty. You are destroying sleep architecture that you critically need to hit tomorrow's 08:00 AM reveille on target. Open https://cso-operator-terminal.vercel.app right now to lock your morning non-negotiables, then shut this down and prepare for reveille."
         }
       ],
       "processedUpdateIds": [
@@ -328,7 +328,8 @@
         595333267,
         595333268,
         595333269,
-        595333270
+        595333270,
+        595333271
       ],
       "todayTargets": [],
       "habitProgress": {},
@@ -619,7 +620,7 @@
       }
     }
   },
-  "updated_at": "2026-11-05T00:00:00.024363-05:00",
+  "updated_at": "2026-11-05T03:12:09.400514-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
