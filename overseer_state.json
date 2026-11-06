@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1793970022.84143,
+      "pendingAuditSlot": "15:30",
+      "lastPingTimestamp": 1793997002.5271878,
       "lastOperatorReplyTimestamp": 1793914344.2488344,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-06 15:30:02",
+          "tag": "LLM 15:30",
+          "message": "Your live telemetry is a total disaster: 0% Machine Score, zero habits checked, and you completely missed your Vyvanse window. You are sitting on zero Brand2Audience outreaches while the afternoon momentum window is bleeding out. Open https://cso-operator-terminal.vercel.app immediately to log your miserable metrics. Drop the silence and give me your exact outreach count right now."
+        },
+        {
+          "time": "2026-11-06 13:30:42",
+          "tag": "LLM 13:30",
+          "message": "Your midday audit is a dumpster fire: 0% Machine Score, missed your Vyvanse cutoff, and zero outreaches logged on a pathetic 100 XP baseline. You are completely behind pace while the clock ticks down to the afternoon momentum surge. Open https://cso-operator-terminal.vercel.app immediately to log your actual numbers. What is your live outreach count right now, or are you paralyzed?"
+        },
+        {
+          "time": "2026-11-06 11:30:13",
+          "tag": "LLM 11:30",
+          "message": "Your Vyvanse window is burned and your metrics are sitting at absolute zero, but excuses don't cash checks. Open https://cso-operator-terminal.vercel.app to log your state, then launch the 11:30 Brand2Audience cash sprint right now. I demand your first 5 outreaches and Loom audits sent within the hour—report back the exact count immediately."
+        },
         {
           "time": "2026-11-06 08:00:22",
           "tag": "LLM 08:00",
@@ -194,18 +209,6 @@
       "chatHistory": [
         {
           "role": "assistant",
-          "content": "It is 20:00, you haven't locked a single Non-Negotiable, every single habit is sitting in pending, and your Machine Score is a flatlined 0%. You have zero completed habits logged and a 250 XP penalty dragging your unoptimized liability rank through the dirt. Open https://cso-operator-terminal.vercel.app right now to force your actual numbers into the system and verify if anything was executed today. Give me an immediate breakdown of your physical, cash outreach, and agency outputs before nightfall slams shut."
-        },
-        {
-          "role": "assistant",
-          "content": "Zero habits completed, a flatlined 0% Machine Score, and a 250 XP penalty—you ran a complete operational surrender today. Open https://cso-operator-terminal.vercel.app right now to log your final metrics, write your evening debrief journal entry, and face your score. Lock down your gear and prep for 08:00 AM reveille tomorrow, because this level of incompetence cannot be repeated."
-        },
-        {
-          "role": "user",
-          "content": "/start"
-        },
-        {
-          "role": "assistant",
           "content": "It is 06:13, your Machine Score is flatlined at 0%, and you are staring down a 250 XP penalty for yesterday's total operational collapse. Open https://cso-operator-terminal.vercel.app immediately to log your state, and prepare for 08:00 AM reveille where you will hit your 1L hydration, morning journal, and lock your 3 Non-Negotiables. No excuses today—lock in your targets and execute."
         },
         {
@@ -311,6 +314,18 @@
         {
           "role": "assistant",
           "content": "Reveille is live and your telemetry is pathetic: 0% Machine Score, a 250 XP penalty, and zero habits logged. Swallow your Vyvanse right now before the strict 10:00 AM cutoff locks you out. Open https://cso-operator-terminal.vercel.app immediately, complete your morning alignment journal, and lock your 3 Non-Negotiables for physical, cash, and agency targets."
+        },
+        {
+          "role": "assistant",
+          "content": "Your Vyvanse window is burned and your metrics are sitting at absolute zero, but excuses don't cash checks. Open https://cso-operator-terminal.vercel.app to log your state, then launch the 11:30 Brand2Audience cash sprint right now. I demand your first 5 outreaches and Loom audits sent within the hour—report back the exact count immediately."
+        },
+        {
+          "role": "assistant",
+          "content": "Your midday audit is a dumpster fire: 0% Machine Score, missed your Vyvanse cutoff, and zero outreaches logged on a pathetic 100 XP baseline. You are completely behind pace while the clock ticks down to the afternoon momentum surge. Open https://cso-operator-terminal.vercel.app immediately to log your actual numbers. What is your live outreach count right now, or are you paralyzed?"
+        },
+        {
+          "role": "assistant",
+          "content": "Your live telemetry is a total disaster: 0% Machine Score, zero habits checked, and you completely missed your Vyvanse window. You are sitting on zero Brand2Audience outreaches while the afternoon momentum window is bleeding out. Open https://cso-operator-terminal.vercel.app immediately to log your miserable metrics. Drop the silence and give me your exact outreach count right now."
         }
       ],
       "processedUpdateIds": [
@@ -648,7 +663,7 @@
       }
     }
   },
-  "updated_at": "2026-11-06T08:00:22.841517-05:00",
+  "updated_at": "2026-11-06T15:30:02.527235-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
