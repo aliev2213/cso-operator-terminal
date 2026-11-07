@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1794027603.147476,
+      "pendingAuditSlot": "10:00",
+      "lastPingTimestamp": 1794063614.0744932,
       "lastOperatorReplyTimestamp": 1793914344.2488344,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-07 10:00:14",
+          "tag": "LLM 10:00",
+          "message": "The 10:00 AM cutoff has officially slammed shut, meaning your Vyvanse window is dead and you will operate unmedicated today with zero excuses. Your telemetry is an absolute disaster with 0% across every domain and every single habit sitting uncompleted. Where are your exact lift numbers from the gym and your workout proof, or did you just skip that too? Open https://cso-operator-terminal.vercel.app right now to log your state, and immediately launch your Brand2Audience cash sprint."
+        },
+        {
+          "time": "2026-11-07 09:00:04",
+          "tag": "LLM 09:00",
+          "message": "Your 09:00 gym deployment window is wide open, but you're still sitting on your ass with 0% domain scores and uncompleted habits. Swallow your Vyvanse right this second before the 10:00 AM cutoff slams shut permanently. Get off your dead weight and report the exact second your feet hit the gym floor."
+        },
+        {
+          "time": "2026-11-07 08:00:20",
+          "tag": "LLM 08:00",
+          "message": "Reveille is live and your telemetry is pathetic:"
+        },
         {
           "time": "2026-11-07 00:00:03",
           "tag": "00:00 ROLLOVER",
@@ -188,18 +203,6 @@
       "lastTgUpdateId": 595333273,
       "chatHistory": [
         {
-          "role": "user",
-          "content": "/start"
-        },
-        {
-          "role": "assistant",
-          "content": "I do not accept vague chatter. Your 3 Non-Negotiables for today are still unlocked. Lock them in right now: specify your Gym session, Outreach count, and Agency targets."
-        },
-        {
-          "role": "assistant",
-          "content": "10:00 AM Vyvanse cutoff is closed. If you have not taken it, push through unmedicated today. Report your workout completion now."
-        },
-        {
           "role": "assistant",
           "content": "11:30 B2A Outreach sprint launch. Deep work window open: fire off your 10 to 30 outreaches and Loom audits immediately."
         },
@@ -306,6 +309,18 @@
         {
           "role": "assistant",
           "content": "**21:30 NIGHT DEBRIEF AUDIT** Your telemetry is a disaster: 0% Machine Score, 250 XP penalty, and zero completed habits. Open https://cso-operator-terminal.vercel.app **RIGHT NOW** to log your final numbers, write your evening debrief, and review your 0% score. Tomorrow’s 08:00 AM reveille is locked—no excuses. **Do it.** **Final interrogation of the day.** Your Vyvanse is **MISSED** (past 10:00 AM cutoff), your Machine Score is **0%**, and every habit is pending."
+        },
+        {
+          "role": "assistant",
+          "content": "Reveille is live and your telemetry is pathetic:"
+        },
+        {
+          "role": "assistant",
+          "content": "Your 09:00 gym deployment window is wide open, but you're still sitting on your ass with 0% domain scores and uncompleted habits. Swallow your Vyvanse right this second before the 10:00 AM cutoff slams shut permanently. Get off your dead weight and report the exact second your feet hit the gym floor."
+        },
+        {
+          "role": "assistant",
+          "content": "The 10:00 AM cutoff has officially slammed shut, meaning your Vyvanse window is dead and you will operate unmedicated today with zero excuses. Your telemetry is an absolute disaster with 0% across every domain and every single habit sitting uncompleted. Where are your exact lift numbers from the gym and your workout proof, or did you just skip that too? Open https://cso-operator-terminal.vercel.app right now to log your state, and immediately launch your Brand2Audience cash sprint."
         }
       ],
       "processedUpdateIds": [
@@ -665,7 +680,7 @@
       }
     }
   },
-  "updated_at": "2026-11-07T00:00:03.147508-05:00",
+  "updated_at": "2026-11-07T10:00:14.074562-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -687,5 +702,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": false
+  "server_polls_telegram": true
 }
