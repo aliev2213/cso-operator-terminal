@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "15:30",
-      "lastPingTimestamp": 1793997002.5271878,
+      "pendingAuditSlot": "21:30",
+      "lastPingTimestamp": 1794018649.404349,
       "lastOperatorReplyTimestamp": 1793914344.2488344,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-06 21:30:49",
+          "tag": "LLM 21:30",
+          "message": "**21:30 NIGHT DEBRIEF AUDIT** Your telemetry is a disaster: 0% Machine Score, 250 XP penalty, and zero completed habits. Open https://cso-operator-terminal.vercel.app **RIGHT NOW** to log your final numbers, write your evening debrief, and review your 0% score. Tomorrow’s 08:00 AM reveille is locked—no excuses. **Do it.** **Final interrogation of the day.** Your Vyvanse is **MISSED** (past 10:00 AM cutoff), your Machine Score is **0%**, and every habit is pending."
+        },
+        {
+          "time": "2026-11-06 20:00:21",
+          "tag": "LLM 20:00",
+          "message": "Look at this catastrophic telemetry: 0% Machine Score, zero habits completed, and every single Non-Negotiable left completely dead on arrival. You didn't even lock your targets today, cementing your status as a total liability. Open https://cso-operator-terminal.vercel.app immediately to log this absolute failure and prepare for your 21:30 night debrief."
+        },
+        {
+          "time": "2026-11-06 17:30:10",
+          "tag": "LLM 17:30",
+          "message": "Your telemetry is a masterclass in failure: 0% Machine Score, zero completed habits, and a suffocating 250 XP penalty dragging you down. You missed your Vyvanse window, but that does not excuse you from finishing your agency deliverables right now. Open https://cso-operator-terminal.vercel.app and drop the exact proof of your Brand2Audience infrastructure asset or case study finish."
+        },
         {
           "time": "2026-11-06 15:30:02",
           "tag": "LLM 15:30",
@@ -208,18 +223,6 @@
       "lastTgUpdateId": 595333273,
       "chatHistory": [
         {
-          "role": "assistant",
-          "content": "It is 06:13, your Machine Score is flatlined at 0%, and you are staring down a 250 XP penalty for yesterday's total operational collapse. Open https://cso-operator-terminal.vercel.app immediately to log your state, and prepare for 08:00 AM reveille where you will hit your 1L hydration, morning journal, and lock your 3 Non-Negotiables. No excuses today—lock in your targets and execute."
-        },
-        {
-          "role": "assistant",
-          "content": "08:00 Reveille. Daily execution slate is at 0%. State your 3 Non-Negotiables across Physical/Gym, Cash/B2A Outreach, and Agency right now, and confirm your Vyvanse intake before the 10:00 AM cutoff."
-        },
-        {
-          "role": "assistant",
-          "content": "Deploy to the gym floor right now—your prep time is up and your telemetry is rotting at a pathetic 0%. Swallow your Vyvanse immediately, because you have exactly 60 minutes before the 10:00 AM hard cutoff closes and locks you into an unmedicated deployment. Open https://cso-operator-terminal.vercel.app right now to lock your 3 Non-Negotiables, and report the exact second you step under the iron."
-        },
-        {
           "role": "user",
           "content": "/start"
         },
@@ -326,6 +329,18 @@
         {
           "role": "assistant",
           "content": "Your live telemetry is a total disaster: 0% Machine Score, zero habits checked, and you completely missed your Vyvanse window. You are sitting on zero Brand2Audience outreaches while the afternoon momentum window is bleeding out. Open https://cso-operator-terminal.vercel.app immediately to log your miserable metrics. Drop the silence and give me your exact outreach count right now."
+        },
+        {
+          "role": "assistant",
+          "content": "Your telemetry is a masterclass in failure: 0% Machine Score, zero completed habits, and a suffocating 250 XP penalty dragging you down. You missed your Vyvanse window, but that does not excuse you from finishing your agency deliverables right now. Open https://cso-operator-terminal.vercel.app and drop the exact proof of your Brand2Audience infrastructure asset or case study finish."
+        },
+        {
+          "role": "assistant",
+          "content": "Look at this catastrophic telemetry: 0% Machine Score, zero habits completed, and every single Non-Negotiable left completely dead on arrival. You didn't even lock your targets today, cementing your status as a total liability. Open https://cso-operator-terminal.vercel.app immediately to log this absolute failure and prepare for your 21:30 night debrief."
+        },
+        {
+          "role": "assistant",
+          "content": "**21:30 NIGHT DEBRIEF AUDIT** Your telemetry is a disaster: 0% Machine Score, 250 XP penalty, and zero completed habits. Open https://cso-operator-terminal.vercel.app **RIGHT NOW** to log your final numbers, write your evening debrief, and review your 0% score. Tomorrow’s 08:00 AM reveille is locked—no excuses. **Do it.** **Final interrogation of the day.** Your Vyvanse is **MISSED** (past 10:00 AM cutoff), your Machine Score is **0%**, and every habit is pending."
         }
       ],
       "processedUpdateIds": [
@@ -663,7 +678,7 @@
       }
     }
   },
-  "updated_at": "2026-11-06T15:30:02.527235-05:00",
+  "updated_at": "2026-11-06T21:30:49.404415-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -685,5 +700,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": true
+  "server_polls_telegram": false
 }
