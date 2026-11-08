@@ -4,7 +4,7 @@
     "xp": 100,
     "cash": 0,
     "streak": 0,
-    "date": "2026-11-07",
+    "date": "2026-11-08",
     "lastActiveDate": "2026-11-07",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
@@ -25,12 +25,22 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "20:00",
-      "lastPingTimestamp": 1794099625.0248923,
+      "pendingAuditSlot": "08:00",
+      "lastPingTimestamp": 1794114004.8042731,
       "lastOperatorReplyTimestamp": 1794065795.8613062,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-08 00:00:04",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-11-08. Previous day archived; todayTargetsLocked reset to False."
+        },
+        {
+          "time": "2026-11-08 00:00:02",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-11-08. Previous day archived; todayTargetsLocked reset to False."
+        },
         {
           "time": "2026-11-07 20:00:25",
           "tag": "LLM 20:00",
@@ -170,41 +180,6 @@
           "time": "2026-11-05 03:12:09",
           "tag": "OVERSEER LLM",
           "message": "OPERATOR: /start\nSpamming commands at 03:12 AM will not magically wipe away your flatlined 0% Machine Score or clear your 250 XP penalty. You are destroying sleep architecture that you critically need to hit tomorrow's 08:00 AM reveille on target. Open https://cso-operator-terminal.vercel.app right now to lock your morning non-negotiables, then shut this down and prepare for reveille."
-        },
-        {
-          "time": "2026-11-05 00:00:00",
-          "tag": "00:00 ROLLOVER",
-          "message": "Midnight rollover complete for 2026-11-05. Previous day archived; todayTargetsLocked reset to False."
-        },
-        {
-          "time": "2026-11-05 00:00:00",
-          "tag": "00:00 ROLLOVER",
-          "message": "Midnight rollover complete for 2026-11-05. Previous day archived; todayTargetsLocked reset to False."
-        },
-        {
-          "time": "2026-11-04 21:30:10",
-          "tag": "LLM 21:30",
-          "message": "Look at that terminal screen: a pathetic 0% Machine Score, zero completed habits, and a severe 250 XP penalty locking your rank as an unoptimized liability. Open https://cso-operator-terminal.vercel.app immediately to log your total operational failure, write your evening debrief, and prep your mindset for tomorrow's 08:00 AM reveille. You cannot out"
-        },
-        {
-          "time": "2026-11-04 20:50:29",
-          "tag": "OVERSEER LLM",
-          "message": "OPERATOR: /start\nStop typing commands into the void and look at the clock. It is 20:50, your Machine Score is dead at 0%, and every single habit for today is sitting completely uncompleted. Open https://cso-operator-terminal.vercel.app immediately to log your terminal failure and execute your night debrief."
-        },
-        {
-          "time": "2026-11-04 20:00:01",
-          "tag": "LLM 20:00",
-          "message": "Look at your evening clearance telemetry: 0% Machine Score, zero completed habits, and every single non-negotiable sitting dead in the dirt. You surrendered the entire day, leaving every single habit pending while your rank rots at T1 Unoptimized Liability. Open https://cso-operator-terminal.vercel.app right now to log your inevitable failure and prepare your exact operational correction for tomorrow's 08:00 AM reveille."
-        },
-        {
-          "time": "2026-11-04 17:30:11",
-          "tag": "LLM 17:30",
-          "message": "Look at that pathetic telemetry: 0% Machine Score, zero habits checked, and a 250 XP penalty dragging your unoptimized liability rank straight into the dirt. It is 17:30, meaning Track 2 Agency Build is live and your infrastructure assets are completely delinquent. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and drop exact proof of the Brand2Audience case study or client deliverable you are finishing before nightfall."
-        },
-        {
-          "time": "2026-11-04 15:30:11",
-          "tag": "LLM 15:30",
-          "message": "Your telemetry is a pathetic disaster: a flatlined 0% Machine Score, zero completed habits, and a severe 250 XP penalty dragging your unoptimized liability rank straight into the dirt. You missed your Vyvanse window, and your entire task list is bleeding red while the clock screams past the afternoon momentum check. Open https://cso-operator-terminal.vercel.app immediately to log your state and update your numbers. How many Brand2Audience outreaches and Loom audits have you actually executed today?"
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
@@ -362,6 +337,28 @@
       "habitProgress": {},
       "awardedHabitXP": {},
       "dailyHistory": [
+        {
+          "date": "2026-11-07",
+          "archived_at": "2026-11-08T00:00:02.801995-05:00",
+          "final_machine_score": 0,
+          "physical_score": 0,
+          "mental_score": 0,
+          "cash_score": 0,
+          "agency_score": 0,
+          "domains_cleared": 0,
+          "completed_habits": [],
+          "habit_progress": {},
+          "non_negotiables": {
+            "physical": "",
+            "mental": "",
+            "cash": "",
+            "agency": ""
+          },
+          "today_targets": [],
+          "end_xp": 100,
+          "xp_delta": 0,
+          "enforced_penalty_xp": 250
+        },
         {
           "date": "2026-11-06",
           "archived_at": "2026-11-07T00:00:01.144965-05:00",
@@ -687,11 +684,11 @@
         "takenTime": null,
         "cutoffTime": "10:00",
         "status": "pending",
-        "date": "2026-11-07"
+        "date": "2026-11-08"
       }
     }
   },
-  "updated_at": "2026-11-07T20:00:25.024962-05:00",
+  "updated_at": "2026-11-08T00:00:04.804294-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -713,5 +710,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": true
+  "server_polls_telegram": false
 }
