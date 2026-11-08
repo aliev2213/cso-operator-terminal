@@ -25,12 +25,22 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "15:30",
-      "lastPingTimestamp": 1794083437.271167,
+      "pendingAuditSlot": "20:00",
+      "lastPingTimestamp": 1794099625.0248923,
       "lastOperatorReplyTimestamp": 1794065795.8613062,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-07 20:00:25",
+          "tag": "LLM 20:00",
+          "message": "Look at this pathetic telemetry: a flat 0% Machine Score, a humiliating 250 XP penalty, and every single habit sitting uncompleted. You didn't even lock your Non-Negotiables today, proving you completely surrendered before the fight even started. Open https://cso-operator-terminal.vercel.app immediately to log this absolute disaster. Give me your exact status on why every single item on your board is dead on arrival."
+        },
+        {
+          "time": "2026-11-07 17:30:48",
+          "tag": "LLM 17:30",
+          "message": "Your telemetry is an absolute joke with a 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty locking you at T1: UNOPTIMIZED LIABILITY. You are staring straight down the barrel of the 17:30 Track 2 Agency Build, and your infrastructure assets are sitting at zero. Open https://cso-operator-terminal.vercel.app immediately to log your state. What specific Brand2Audience case study, VSL, or client deliverable proof are you shipping right this second?"
+        },
         {
           "time": "2026-11-07 15:30:37",
           "tag": "LLM 15:30",
@@ -203,14 +213,6 @@
       "lastTgUpdateId": 595333279,
       "chatHistory": [
         {
-          "role": "assistant",
-          "content": "Look at that pathetic telemetry: 0% Machine Score, zero habits checked, and a 250 XP penalty dragging your unoptimized liability rank straight into the dirt. It is 17:30, meaning Track 2 Agency Build is live and your infrastructure assets are completely delinquent. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and drop exact proof of the Brand2Audience case study or client deliverable you are finishing before nightfall."
-        },
-        {
-          "role": "assistant",
-          "content": "Look at your evening clearance telemetry: 0% Machine Score, zero completed habits, and every single non-negotiable sitting dead in the dirt. You surrendered the entire day, leaving every single habit pending while your rank rots at T1 Unoptimized Liability. Open https://cso-operator-terminal.vercel.app right now to log your inevitable failure and prepare your exact operational correction for tomorrow's 08:00 AM reveille."
-        },
-        {
           "role": "user",
           "content": "/start"
         },
@@ -321,6 +323,14 @@
         {
           "role": "assistant",
           "content": "Look at this pathetic telemetry: 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty dragging your unoptimized liability rank straight into the mud. You completely missed your Vyvanse window and you're sitting on a flat zero for Brand2Audience outreaches when you should have at least 20 locked and loaded. Open https://cso-operator-terminal.vercel.app right now to log your miserable metrics. What is your exact outreach and Loom count for this afternoon surge?"
+        },
+        {
+          "role": "assistant",
+          "content": "Your telemetry is an absolute joke with a 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty locking you at T1: UNOPTIMIZED LIABILITY. You are staring straight down the barrel of the 17:30 Track 2 Agency Build, and your infrastructure assets are sitting at zero. Open https://cso-operator-terminal.vercel.app immediately to log your state. What specific Brand2Audience case study, VSL, or client deliverable proof are you shipping right this second?"
+        },
+        {
+          "role": "assistant",
+          "content": "Look at this pathetic telemetry: a flat 0% Machine Score, a humiliating 250 XP penalty, and every single habit sitting uncompleted. You didn't even lock your Non-Negotiables today, proving you completely surrendered before the fight even started. Open https://cso-operator-terminal.vercel.app immediately to log this absolute disaster. Give me your exact status on why every single item on your board is dead on arrival."
         }
       ],
       "processedUpdateIds": [
@@ -681,7 +691,7 @@
       }
     }
   },
-  "updated_at": "2026-11-07T15:30:37.271239-05:00",
+  "updated_at": "2026-11-07T20:00:25.024962-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
