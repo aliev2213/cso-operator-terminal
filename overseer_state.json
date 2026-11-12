@@ -25,12 +25,22 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "15:30",
-      "lastPingTimestamp": 1794429036.9763038,
+      "pendingAuditSlot": "21:30",
+      "lastPingTimestamp": 1794450612.712568,
       "lastOperatorReplyTimestamp": 1794415409.4502685,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-11 21:30:12",
+          "tag": "LLM 21:30",
+          "message": "You finished the day with an absolute zero across every single domain, a dead 0% Machine Score, and a humiliating 250 XP penalty cementing your rank as a T1: Unoptimized Liability. Open https://cso-operator-terminal.vercel.app right now to log your total failure, write your evening debrief in absolute shame, and lock in your mindset for 08:00 AM reveille tomorrow."
+        },
+        {
+          "time": "2026-11-11 20:00:05",
+          "tag": "LLM 20:00",
+          "message": "Your telemetry is a complete catastrophe: a flat 0% Machine Score, zero habits completed, and a punishing 250 XP penalty locking you as a T1: Unoptimized Liability. You failed to lock your Non-Negotiables today like a coward, leaving your physical, cash, and agency domains in absolute ruin. Open https://cso-operator-terminal.vercel.app immediately to log your evening clearance, and confess right this second why you delivered zero execution today."
+        },
         {
           "time": "2026-11-11 15:30:36",
           "tag": "LLM 15:30",
@@ -198,14 +208,6 @@
       "lastTgUpdateId": 595333294,
       "chatHistory": [
         {
-          "role": "user",
-          "content": "/start"
-        },
-        {
-          "role": "assistant",
-          "content": "Stop treating this terminal like a toy and look at the wreckage: you are sitting at 12:31 with a 0% Machine Score and every single habit uncompleted. Your Vyvanse window is permanently slammed shut, meaning you must crush this afternoon unmedicated. Open https://cso-operator-terminal.vercel.app immediately to log your state and push out 10 instant Brand2Audience outreaches."
-        },
-        {
           "role": "assistant",
           "content": "Look at this pathetic telemetry: a flat 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty locking you as an unoptimized liability. You missed your Vyvanse window and you are sitting at absolute zero for Brand2Audience outreaches when you should have at least 20 locked and loaded. Open https://cso-operator-terminal.vercel.app right now to log your numbers, and give me your exact outreach and Loom count for this afternoon surge."
         },
@@ -316,6 +318,14 @@
         {
           "role": "assistant",
           "content": "Look at this pathetic telemetry: a 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty dragging your unoptimized liability rank through the mud. You completely missed your Vyvanse window and you are sitting at zero Brand2Audience outreaches when you should have at least 20 dispatched by now. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and give me your exact outreach and Loom count for this afternoon surge right this second."
+        },
+        {
+          "role": "assistant",
+          "content": "Your telemetry is a complete catastrophe: a flat 0% Machine Score, zero habits completed, and a punishing 250 XP penalty locking you as a T1: Unoptimized Liability. You failed to lock your Non-Negotiables today like a coward, leaving your physical, cash, and agency domains in absolute ruin. Open https://cso-operator-terminal.vercel.app immediately to log your evening clearance, and confess right this second why you delivered zero execution today."
+        },
+        {
+          "role": "assistant",
+          "content": "You finished the day with an absolute zero across every single domain, a dead 0% Machine Score, and a humiliating 250 XP penalty cementing your rank as a T1: Unoptimized Liability. Open https://cso-operator-terminal.vercel.app right now to log your total failure, write your evening debrief in absolute shame, and lock in your mindset for 08:00 AM reveille tomorrow."
         }
       ],
       "processedUpdateIds": [
@@ -770,7 +780,7 @@
       }
     }
   },
-  "updated_at": "2026-11-11T15:30:36.976374-05:00",
+  "updated_at": "2026-11-11T21:30:12.712650-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
