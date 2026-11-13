@@ -25,12 +25,22 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1794546003.5399933,
+      "pendingAuditSlot": "09:00",
+      "lastPingTimestamp": 1794578410.3980792,
       "lastOperatorReplyTimestamp": 1794499765.1374,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-13 09:00:10",
+          "tag": "LLM 09:00",
+          "message": "Swallow your Vyvanse this exact second before the 10:00 AM cutoff slams shut, and deploy to the gym floor for your 60-minute session. Open https://cso-operator-terminal.vercel.app to log your morning alignment and lock your 3 Non-Negotiables immediately. Report back the exact second you step onto the iron—move!"
+        },
+        {
+          "time": "2026-11-13 08:00:10",
+          "tag": "LLM 08:00",
+          "message": "Reveille is flashing red: swallow your Vyvanse right this second before the 10:00 AM hard cutoff slams shut to protect your sleep architecture. Open https://cso-operator-terminal.vercel.app immediately, execute your morning alignment journal, and lock your 3 Non-Negotiables for physical, cash, and agency domains. Move with absolute aggression or stay pinned at the bottom as an unoptimized liability."
+        },
         {
           "time": "2026-11-13 00:00:03",
           "tag": "00:00 ROLLOVER",
@@ -189,14 +199,6 @@
       "chatHistory": [
         {
           "role": "assistant",
-          "content": "You are sitting at 13:30 with a flat 0% Machine Score, zero completed habits, and a pathetic 250 XP penalty dragging your unoptimized liability rank through the dirt. You completely missed your Vyvanse window, yet your outreach count is sitting at an embarrassing zero when you should have at least 10 Brand2Audience runs locked and loaded. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and report your exact outreach and Loom count for this midday surge."
-        },
-        {
-          "role": "assistant",
-          "content": "Look at this pathetic telemetry: a 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty dragging your unoptimized liability rank straight through the mud. Your 3 Non-Negotiables are completely blank because you didn't even lock them today like a coward. Open https://cso-operator-terminal.vercel.app right this second and confess which items you failed to execute before nightfall."
-        },
-        {
-          "role": "assistant",
           "content": "Look at that pathetic telemetry: a 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty locking you as an unoptimized liability. You completely squandered every single domain from reveille to nightfall, finishing the day with an absolute zero. Open https://cso-operator-terminal.vercel.app right now to log your final metrics, write your evening debrief in absolute shame, and prep your mindset for 08:00 AM reveille tomorrow."
         },
         {
@@ -306,6 +308,14 @@
         {
           "role": "assistant",
           "content": "You finished the day with a pathetic 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty cementing your rank as a T1: Unoptimized Liability. Open https://cso-operator-terminal.vercel.app right now to log your total failure, write your evening debrief in absolute shame, and lock in your mindset for 08:00 AM reveille tomorrow."
+        },
+        {
+          "role": "assistant",
+          "content": "Reveille is flashing red: swallow your Vyvanse right this second before the 10:00 AM hard cutoff slams shut to protect your sleep architecture. Open https://cso-operator-terminal.vercel.app immediately, execute your morning alignment journal, and lock your 3 Non-Negotiables for physical, cash, and agency domains. Move with absolute aggression or stay pinned at the bottom as an unoptimized liability."
+        },
+        {
+          "role": "assistant",
+          "content": "Swallow your Vyvanse this exact second before the 10:00 AM cutoff slams shut, and deploy to the gym floor for your 60-minute session. Open https://cso-operator-terminal.vercel.app to log your morning alignment and lock your 3 Non-Negotiables immediately. Report back the exact second you step onto the iron—move!"
         }
       ],
       "processedUpdateIds": [
@@ -806,7 +816,7 @@
       }
     }
   },
-  "updated_at": "2026-11-13T00:00:03.540016-05:00",
+  "updated_at": "2026-11-13T09:00:10.398172-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
