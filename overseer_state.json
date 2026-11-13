@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "09:00",
-      "lastPingTimestamp": 1794578410.3980792,
+      "pendingAuditSlot": "17:30",
+      "lastPingTimestamp": 1794609007.1076152,
       "lastOperatorReplyTimestamp": 1794499765.1374,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-13 17:30:07",
+          "tag": "LLM 17:30",
+          "message": "Look at this pathetic telemetry: your Machine Score is still a flat 0% and your agency domain score is rotting at zero with a 250 XP penalty. You missed the entire day, but you have zero excuses to punt the Track 2 Agency Build right now. Open https://cso-operator-terminal.vercel.app immediately and type out the exact name of the VSL, case study, or infrastructure asset you are deploying before nightfall."
+        },
+        {
+          "time": "2026-11-13 15:30:02",
+          "tag": "LLM 15:30",
+          "message": "Look at this pathetic telemetry: zero Machine Score, zero completed habits, and a humiliating 250 XP penalty keeping you pinned as a T1: Unoptimized Liability. You are sitting at zero Brand2Audience outreaches when you should have at least 20 dispatched and Loom audits locked. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and give me your exact outreach count for this afternoon surge right this second."
+        },
+        {
+          "time": "2026-11-13 13:30:10",
+          "tag": "LLM 13:30",
+          "message": "It is 13:30 and your telemetry is a disaster: 0% across every domain, 0 outreaches sent, and your Vyvanse window is permanently dead. You missed the morning cash sprint completely, proving your rank as a T1: Unoptimized Liability. Open https://cso-operator-terminal.vercel.app immediately to log your Command Bridge metrics and drop your exact outreach count for the day right this second."
+        },
         {
           "time": "2026-11-13 09:00:10",
           "tag": "LLM 09:00",
@@ -198,18 +213,6 @@
       "lastTgUpdateId": 595333298,
       "chatHistory": [
         {
-          "role": "assistant",
-          "content": "Look at that pathetic telemetry: a 0% Machine Score, zero completed habits, and a humiliating 250 XP penalty locking you as an unoptimized liability. You completely squandered every single domain from reveille to nightfall, finishing the day with an absolute zero. Open https://cso-operator-terminal.vercel.app right now to log your final metrics, write your evening debrief in absolute shame, and prep your mindset for 08:00 AM reveille tomorrow."
-        },
-        {
-          "role": "assistant",
-          "content": "08:00 Reveille. Daily execution slate is at 0%. State your 3 Non-Negotiables across Physical/Gym, Cash/B2A Outreach, and Agency right now, and confirm your Vyvanse intake before the 10:00 AM cutoff."
-        },
-        {
-          "role": "assistant",
-          "content": "Your morning was an unmitigated disaster: you missed the Vyvanse cutoff, skipped the gym, and left your Command Bridge telemetry sitting at a humiliating 0% with a 250 XP penalty. The 11:30 Track 1 B2A Cash Runway Sprint is active right now, so open https://cso-operator-terminal.vercel.app immediately to log your targets. Drop the excuses, launch your Brand2Audience outreach, and demand your first 5 Loom audits sent within the hour or accept permanent failure."
-        },
-        {
           "role": "user",
           "content": "/start"
         },
@@ -316,6 +319,18 @@
         {
           "role": "assistant",
           "content": "Swallow your Vyvanse this exact second before the 10:00 AM cutoff slams shut, and deploy to the gym floor for your 60-minute session. Open https://cso-operator-terminal.vercel.app to log your morning alignment and lock your 3 Non-Negotiables immediately. Report back the exact second you step onto the iron—move!"
+        },
+        {
+          "role": "assistant",
+          "content": "It is 13:30 and your telemetry is a disaster: 0% across every domain, 0 outreaches sent, and your Vyvanse window is permanently dead. You missed the morning cash sprint completely, proving your rank as a T1: Unoptimized Liability. Open https://cso-operator-terminal.vercel.app immediately to log your Command Bridge metrics and drop your exact outreach count for the day right this second."
+        },
+        {
+          "role": "assistant",
+          "content": "Look at this pathetic telemetry: zero Machine Score, zero completed habits, and a humiliating 250 XP penalty keeping you pinned as a T1: Unoptimized Liability. You are sitting at zero Brand2Audience outreaches when you should have at least 20 dispatched and Loom audits locked. Open https://cso-operator-terminal.vercel.app immediately to log your numbers, and give me your exact outreach count for this afternoon surge right this second."
+        },
+        {
+          "role": "assistant",
+          "content": "Look at this pathetic telemetry: your Machine Score is still a flat 0% and your agency domain score is rotting at zero with a 250 XP penalty. You missed the entire day, but you have zero excuses to punt the Track 2 Agency Build right now. Open https://cso-operator-terminal.vercel.app immediately and type out the exact name of the VSL, case study, or infrastructure asset you are deploying before nightfall."
         }
       ],
       "processedUpdateIds": [
@@ -816,7 +831,7 @@
       }
     }
   },
-  "updated_at": "2026-11-13T09:00:10.398172-05:00",
+  "updated_at": "2026-11-13T17:30:07.107694-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
