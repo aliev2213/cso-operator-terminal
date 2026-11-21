@@ -4,7 +4,7 @@
     "xp": 100,
     "cash": 0,
     "streak": 0,
-    "date": "2026-11-20",
+    "date": "2026-11-21",
     "lastActiveDate": "2026-11-20",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
@@ -25,12 +25,27 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "20:00",
-      "lastPingTimestamp": 1795222808.941187,
+      "pendingAuditSlot": "08:00",
+      "lastPingTimestamp": 1795237202.2757154,
       "lastOperatorReplyTimestamp": 1795221434.8927925,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-21 00:00:02",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-11-21. Previous day archived; todayTargetsLocked reset to False."
+        },
+        {
+          "time": "2026-11-21 00:00:00",
+          "tag": "00:00 ROLLOVER",
+          "message": "Midnight rollover complete for 2026-11-21. Previous day archived; todayTargetsLocked reset to False."
+        },
+        {
+          "time": "2026-11-20 21:30:05",
+          "tag": "LLM 21:30",
+          "message": "Your day is a complete disaster with a flatlined 0% Machine Score, zero cash, and every single habit sitting in the pending bin. Open https://cso-operator-terminal.vercel.app right now to log your final numbers, write your evening debrief, and stare at your catastrophic failure. You earned a net-negative XP score and rank of T1:UNOPTIMIZED LIABILITY today, so lock in your recovery strategy for 08:00 AM reveille immediately."
+        },
         {
           "time": "2026-11-20 20:00:08",
           "tag": "LLM 20:00",
@@ -165,26 +180,6 @@
           "time": "2026-11-18 20:00:05",
           "tag": "LLM 20:00",
           "message": "Look at this wreckage: zero cash, zero physical output, zero habits completed, and an embarrassing 0% Machine Score. Your 3 Non-Negotiables are completely blank because you surrendered the day entirely. Open https://cso-operator-terminal.vercel.app right now to log your miserable failure and face the music."
-        },
-        {
-          "time": "2026-11-18 17:30:05",
-          "tag": "LLM 17:30",
-          "message": "Your telemetry is a dumpster fire: zero cash, zero physical output, and a pathetic 0% Machine Score because you've dodged every single target today. It is 17:30, meaning your Track 2 Agency Build sprint starts right now—what exact infrastructure asset, case study, or client deliverable are you finishing before evening clearance? Open https://cso-operator-terminal.vercel.app immediately, log your brutal failure, and give me the exact name of the asset you are deploying this second."
-        },
-        {
-          "time": "2026-11-18 15:30:11",
-          "tag": "LLM 15:30",
-          "message": "Your telemetry screams total operational failure: a pathetic 0% Machine Score, zero cash, zero habits completed, and a missed Vyvanse window because you are operating like an undisciplined amateur. Open https://cso-operator-terminal.vercel.app immediately to log your Command Bridge and face the wreckage of your day. How many Brand2Audience outreaches and Loom audits have you actually dispatched for this afternoon momentum check, or are you sitting at zero? Give me exact numbers this instant!"
-        },
-        {
-          "time": "2026-11-18 13:30:08",
-          "tag": "LLM 13:30",
-          "message": "You missed your 10:00 AM Vyvanse cutoff, your physical and cash scores are sitting at an embarrassing 0%, and your habits are completely untouched. Open https://cso-operator-terminal.vercel.app right now to update your Command Bridge metrics before I dock more XP. How many Brand2Audience outreaches and Loom audits have you actually sent today, or are you sitting at zero while your cash runway bleeds out? Give me exact numbers this instant."
-        },
-        {
-          "time": "2026-11-18 09:00:08",
-          "tag": "LLM 09:00",
-          "message": "Drop your phone, lace your shoes, and deploy to the gym floor right this second for your 60-minute session. Swallow your Vyvanse immediately before the 10:00 AM cutoff locks you out permanently, and open https://cso-operator-terminal.vercel.app to log your Command Bridge. Report back the exact minute your workout begins or accept your unoptimized liability status."
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
@@ -192,10 +187,6 @@
       "webhookUrl": "",
       "lastTgUpdateId": 595333327,
       "chatHistory": [
-        {
-          "role": "assistant",
-          "content": "Look at this wreckage: zero cash, zero physical output, zero habits completed, and an embarrassing 0% Machine Score. Your 3 Non-Negotiables are completely blank because you surrendered the day entirely. Open https://cso-operator-terminal.vercel.app right now to log your miserable failure and face the music."
-        },
         {
           "role": "user",
           "content": "/start"
@@ -311,6 +302,10 @@
         {
           "role": "assistant",
           "content": "Your evening clearance audit is a complete disaster with 0% across every single domain and every single habit sitting in the pending bin. You failed your Non-Negotiables entirely today and your Machine Score is flatlined at zero. Open https://cso-operator-terminal.vercel.app right now to log this catastrophic failure on your Command Bridge before nightfall."
+        },
+        {
+          "role": "assistant",
+          "content": "Your day is a complete disaster with a flatlined 0% Machine Score, zero cash, and every single habit sitting in the pending bin. Open https://cso-operator-terminal.vercel.app right now to log your final numbers, write your evening debrief, and stare at your catastrophic failure. You earned a net-negative XP score and rank of T1:UNOPTIMIZED LIABILITY today, so lock in your recovery strategy for 08:00 AM reveille immediately."
         }
       ],
       "processedUpdateIds": [
@@ -371,6 +366,28 @@
       "habitProgress": {},
       "awardedHabitXP": {},
       "dailyHistory": [
+        {
+          "date": "2026-11-20",
+          "archived_at": "2026-11-21T00:00:00.273925-05:00",
+          "final_machine_score": 0,
+          "physical_score": 0,
+          "mental_score": 0,
+          "cash_score": 0,
+          "agency_score": 0,
+          "domains_cleared": 0,
+          "completed_habits": [],
+          "habit_progress": {},
+          "non_negotiables": {
+            "physical": "",
+            "mental": "",
+            "cash": "",
+            "agency": ""
+          },
+          "today_targets": [],
+          "end_xp": 100,
+          "xp_delta": 0,
+          "enforced_penalty_xp": 250
+        },
         {
           "date": "2026-11-19",
           "archived_at": "2026-11-20T00:00:00.306085-05:00",
@@ -982,11 +999,11 @@
         "takenTime": null,
         "cutoffTime": "10:00",
         "status": "pending",
-        "date": "2026-11-20"
+        "date": "2026-11-21"
       }
     }
   },
-  "updated_at": "2026-11-20T20:00:08.941225-05:00",
+  "updated_at": "2026-11-21T00:00:02.275734-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -1008,5 +1025,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": true
+  "server_polls_telegram": false
 }
