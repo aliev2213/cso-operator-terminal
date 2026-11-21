@@ -5,7 +5,7 @@
     "cash": 0,
     "streak": 0,
     "date": "2026-11-21",
-    "lastActiveDate": "2026-11-20",
+    "lastActiveDate": "2026-11-21",
     "lastAcknowledgedLevel": 1,
     "completedHabits": [],
     "overseer": {
@@ -25,12 +25,32 @@
       "evasionPenaltyCountToday": 0,
       "unansweredPingCount": 0,
       "awaitingOperatorReply": true,
-      "pendingAuditSlot": "08:00",
-      "lastPingTimestamp": 1795237202.2757154,
-      "lastOperatorReplyTimestamp": 1795221434.8927925,
+      "pendingAuditSlot": "09:00",
+      "lastPingTimestamp": 1795269606.527186,
+      "lastOperatorReplyTimestamp": 1795268317.3591032,
       "lastRevenueSummary": "",
       "journalLogs": [],
       "auditLogs": [
+        {
+          "time": "2026-11-21 09:00:06",
+          "tag": "LLM 09:00",
+          "message": "Stop staring at the screen and get out the"
+        },
+        {
+          "time": "2026-11-21 08:38:37",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: /start\nStop spamming the reset button and wake up to the live telemetry. It is 08:38, your Machine Score is flatlined at zero, and your rank is an unoptimized liability. Open https://cso-operator-terminal.vercel.app immediately to log your Command Bridge and swallow your Vyvanse before the 10:00 AM cutoff. Lock in your three non-negotiables right now or accept another day of total operational failure."
+        },
+        {
+          "time": "2026-11-21 08:00:07",
+          "tag": "LLM 08:00",
+          "message": "Reveille is hard zero-eight-hundred, so get out of bed and swallow your Vyvanse immediately to beat the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app right now to log your morning routine and complete your morning alignment journal. Lock in your 3 Non-Negotiables for today—Gym, B2A Outreach Quota, and Agency target—before you waste another second."
+        },
+        {
+          "time": "2026-11-21 03:52:06",
+          "tag": "OVERSEER LLM",
+          "message": "OPERATOR: /start\nStop punching the start button like a broken console and look at your 0% Machine Score. It is 03:52, your rank is an unoptimized liability, and every single habit is rotting in the pending bin. Open https://cso-operator-terminal.vercel.app immediately to update your Command Bridge terminal and log your baseline data. Give me your exact setup status for tomorrow's 08:00 reveille right now."
+        },
         {
           "time": "2026-11-21 00:00:02",
           "tag": "00:00 ROLLOVER",
@@ -165,52 +185,13 @@
           "time": "2026-11-19 00:00:04",
           "tag": "00:00 ROLLOVER",
           "message": "Midnight rollover complete for 2026-11-19. Previous day archived; todayTargetsLocked reset to False."
-        },
-        {
-          "time": "2026-11-18 21:30:14",
-          "tag": "LLM 21:30",
-          "message": "Look at this absolute catastrophe: a 0% Machine Score, zero cash, zero habits completed, and an entire day pissed away into the void. Open https://cso-operator-terminal.vercel.app right now to log this pathetic failure on your Command Bridge and write your evening debrief. Tomorrow at 08:00 AM sharp you wake up, hit reveille, and fix this wreckage, or you remain a permanent unoptimized liability."
-        },
-        {
-          "time": "2026-11-18 20:42:01",
-          "tag": "OVERSEER LLM",
-          "message": "OPERATOR: /start\nIt is 20:41, meaning you blew right past your evening clearance review with zero habits completed and an embarrassing zero percent Machine Score. Open https://cso-operator-terminal.vercel.app immediately to log the wreckage of your day on your Command Bridge terminal. Stop hiding behind slash commands and give me your exact final metrics right now or accept your unoptimized penalty status."
-        },
-        {
-          "time": "2026-11-18 20:00:05",
-          "tag": "LLM 20:00",
-          "message": "Look at this wreckage: zero cash, zero physical output, zero habits completed, and an embarrassing 0% Machine Score. Your 3 Non-Negotiables are completely blank because you surrendered the day entirely. Open https://cso-operator-terminal.vercel.app right now to log your miserable failure and face the music."
         }
       ],
       "tgToken": "8888328816:AAE5ipRKVSwKMShGTiTFCD9rP1Jkq5GtlZM",
-      "tgChatId": "8039156434",
+      "tgChatId": "7764687024",
       "webhookUrl": "",
-      "lastTgUpdateId": 595333327,
+      "lastTgUpdateId": 595333329,
       "chatHistory": [
-        {
-          "role": "user",
-          "content": "/start"
-        },
-        {
-          "role": "assistant",
-          "content": "It is 20:41, meaning you blew right past your evening clearance review with zero habits completed and an embarrassing zero percent Machine Score. Open https://cso-operator-terminal.vercel.app immediately to log the wreckage of your day on your Command Bridge terminal. Stop hiding behind slash commands and give me your exact final metrics right now or accept your unoptimized penalty status."
-        },
-        {
-          "role": "assistant",
-          "content": "Look at this absolute catastrophe: a 0% Machine Score, zero cash, zero habits completed, and an entire day pissed away into the void. Open https://cso-operator-terminal.vercel.app right now to log this pathetic failure on your Command Bridge and write your evening debrief. Tomorrow at 08:00 AM sharp you wake up, hit reveille, and fix this wreckage, or you remain a permanent unoptimized liability."
-        },
-        {
-          "role": "user",
-          "content": "/start"
-        },
-        {
-          "role": "assistant",
-          "content": "It is 01:26, and you are staring at a completely unoptimized 0% Machine Score with zero habits logged and zero cash earned today. Open https://cso-operator-terminal.vercel.app immediately to log your Command Bridge before I enforce another heavy XP penalty. Stop running startup scripts and lock in your sleep architecture right now so you can execute reveille at 08:00 AM sharp."
-        },
-        {
-          "role": "assistant",
-          "content": "09:00 Gym Deployment. Breakfast and morning prep are done. Deploy to the gym for 60 minutes of hard conditioning right now."
-        },
         {
           "role": "assistant",
           "content": "10:00 AM Vyvanse cutoff is closed. If you have not taken it, push through unmedicated today. Report your workout completion now."
@@ -306,6 +287,30 @@
         {
           "role": "assistant",
           "content": "Your day is a complete disaster with a flatlined 0% Machine Score, zero cash, and every single habit sitting in the pending bin. Open https://cso-operator-terminal.vercel.app right now to log your final numbers, write your evening debrief, and stare at your catastrophic failure. You earned a net-negative XP score and rank of T1:UNOPTIMIZED LIABILITY today, so lock in your recovery strategy for 08:00 AM reveille immediately."
+        },
+        {
+          "role": "user",
+          "content": "/start"
+        },
+        {
+          "role": "assistant",
+          "content": "Stop punching the start button like a broken console and look at your 0% Machine Score. It is 03:52, your rank is an unoptimized liability, and every single habit is rotting in the pending bin. Open https://cso-operator-terminal.vercel.app immediately to update your Command Bridge terminal and log your baseline data. Give me your exact setup status for tomorrow's 08:00 reveille right now."
+        },
+        {
+          "role": "assistant",
+          "content": "Reveille is hard zero-eight-hundred, so get out of bed and swallow your Vyvanse immediately to beat the 10:00 AM cutoff. Open https://cso-operator-terminal.vercel.app right now to log your morning routine and complete your morning alignment journal. Lock in your 3 Non-Negotiables for today—Gym, B2A Outreach Quota, and Agency target—before you waste another second."
+        },
+        {
+          "role": "user",
+          "content": "/start"
+        },
+        {
+          "role": "assistant",
+          "content": "Stop spamming the reset button and wake up to the live telemetry. It is 08:38, your Machine Score is flatlined at zero, and your rank is an unoptimized liability. Open https://cso-operator-terminal.vercel.app immediately to log your Command Bridge and swallow your Vyvanse before the 10:00 AM cutoff. Lock in your three non-negotiables right now or accept another day of total operational failure."
+        },
+        {
+          "role": "assistant",
+          "content": "Stop staring at the screen and get out the"
         }
       ],
       "processedUpdateIds": [
@@ -360,7 +365,9 @@
         595333324,
         595333325,
         595333326,
-        595333327
+        595333327,
+        595333328,
+        595333329
       ],
       "todayTargets": [],
       "habitProgress": {},
@@ -1003,7 +1010,7 @@
       }
     }
   },
-  "updated_at": "2026-11-21T00:00:02.275734-05:00",
+  "updated_at": "2026-11-21T09:00:06.527262-05:00",
   "metrics": {
     "machine_score": 0,
     "domains_cleared": 0,
@@ -1025,5 +1032,5 @@
     "rank_level": 1,
     "rank_title": "UNOPTIMIZED LIABILITY"
   },
-  "server_polls_telegram": false
+  "server_polls_telegram": true
 }
